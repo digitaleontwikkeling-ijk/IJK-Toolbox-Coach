@@ -1,0 +1,41 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.17/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.17",
+  "version": "{{VERSIE}}",
+  "id": "{{TEAMS_APP_ID}}",
+  "developer": {
+    "name": "IJK – Team Digitale Ontwikkeling",
+    "websiteUrl": "https://{{APP_DOMEIN}}",
+    "privacyUrl": "https://{{APP_DOMEIN}}/login",
+    "termsOfUseUrl": "https://{{APP_DOMEIN}}/login"
+  },
+  "name": {
+    "short": "Toolbox Coach",
+    "full": "IJK Toolbox Coach"
+  },
+  "description": {
+    "short": "Advies over verantwoord gebruik van tools uit de IJK Toolbox.",
+    "full": "De IJK Toolbox Coach helpt je in vier stappen: wat wil je bereiken, welke tool past, zes checks en een advies. Niet de tool bepaalt wat mag, maar wat je ermee doet."
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "accentColor": "#1E0E3B",
+  "staticTabs": [
+    {
+      "entityId": "toolbox-coach",
+      "name": "Toolbox Coach",
+      "contentUrl": "https://{{APP_DOMEIN}}/login?inTeams=1&terug=/wizard",
+      "websiteUrl": "https://{{APP_DOMEIN}}/wizard",
+      "scopes": ["personal"]
+    }
+  ],
+  "permissions": ["identity"],
+  "validDomains": ["{{APP_DOMEIN}}"],
+  "webApplicationInfo": {
+    "id": "{{ENTRA_CLIENT_ID}}",
+    "resource": "api://{{APP_DOMEIN}}/{{ENTRA_CLIENT_ID}}"
+  },
+  "showLoadingIndicator": false
+}

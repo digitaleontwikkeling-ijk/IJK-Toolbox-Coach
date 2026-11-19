@@ -24,11 +24,19 @@ export default defineConfig({
     { name: "mock-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3100" }, testMatch: /wizard|toetsing/ },
     { name: "zonder-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3101" }, testMatch: /zonder-coach/ },
     { name: "hermes", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3102" }, testMatch: /hermes/ },
+    { name: "teams", use: { ...devices["Desktop Chrome"] }, testMatch: /teams-tabblad/ },
     { name: "telefoon", use: { ...devices["Pixel 7"], baseURL: "http://localhost:3100" }, testMatch: /smal/ },
   ],
   webServer: [
     { command: "npx next start -p 3100", port: 3100, env: { ...env, COACH_MODUS: "mock" }, reuseExistingServer: false },
     { command: "npx next start -p 3101", port: 3101, env: { ...env, COACH_MODUS: "uit" }, reuseExistingServer: false },
+    // App zoals in Teams: sessiecookie geschikt voor een iframe op een andere site.
+    {
+      command: "npx next start -p 3103",
+      port: 3103,
+      env: { ...env, COACH_MODUS: "mock", SESSIE_IN_IFRAME: "true", EXTRA_FRAME_ANCESTORS: "http://127.0.0.1:*" },
+      reuseExistingServer: false,
+    },
     // Nagebootste Hermes API-server + app die via het Hermes-protocol praat.
     { command: "npx tsx mocks/hermes-mock.ts --port 8649", url: "http://127.0.0.1:8649/health", env: { HERMES_API_KEY: "e2e-hermes" }, reuseExistingServer: false },
     {

@@ -15,7 +15,8 @@
     "test:e2e": "playwright test --trace off",
     "opruimen": "tsx src/db/opruimen.ts",
     "mock:hermes": "tsx mocks/hermes-mock.ts",
-    "mock:webhooks": "tsx mocks/webhook-mock.ts"
+    "mock:webhooks": "tsx mocks/webhook-mock.ts",
+    "teams:pakket": "tsx scripts/teams-pakket.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -29,6 +30,9 @@
     "vitest": "^3.2.7"
   },
   "dependencies": {
+    "@azure/msal-browser": "^4.30.0",
+    "@microsoft/teams-js": "^2.59.0",
+    "jose": "^5.10.0",
     "next": "^15.5.29",
     "pg": "^8.23.1",
     "react": "^19.3.1",

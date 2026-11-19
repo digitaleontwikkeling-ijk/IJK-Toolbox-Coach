@@ -27,11 +27,33 @@ export const config = {
   get pseudoniemGeheim() {
     return verplicht("PSEUDONIEM_GEHEIM");
   },
-  /** "nep" = testgebruikers (proof of concept). Later: "entra". */
-  get authModus(): "nep" {
+  /** "nep" = testgebruikers (proof of concept); "entra" = Microsoft Entra ID / Teams-SSO. */
+  get authModus(): "nep" | "entra" {
     const m = process.env.AUTH_MODUS ?? "nep";
-    if (m !== "nep") throw new Error(`AUTH_MODUS "${m}" wordt nog niet ondersteund.`);
+    if (m !== "nep" && m !== "entra") throw new Error(`AUTH_MODUS "${m}" wordt niet ondersteund.`);
     return m;
+  },
+  /** Instellingen voor Entra ID (alleen bij AUTH_MODUS=entra). Geen geheimen: alleen id's. */
+  get entra() {
+    const tenantId = verplicht("ENTRA_TENANT_ID");
+    const clientId = verplicht("ENTRA_CLIENT_ID");
+    return {
+      tenantId,
+      clientId,
+      /** Application ID URI, bijvoorbeeld api://coach.ijk.nl/<clientId> */
+      appIdUri: verplicht("ENTRA_APP_ID_URI"),
+      /** Rol die elke ingelogde medewerker krijgt, naast de App Roles uit het token. */
+      standaardRol: process.env.ENTRA_STANDAARD_ROL ?? "medewerker",
+      jwksUrl: process.env.ENTRA_JWKS_URL ?? `https://login.microsoftonline.com/${tenantId}/discovery/v2.0/keys`,
+    };
+  },
+  /**
+   * De sessiecookie moet ook werken als de app in een iframe van Teams draait
+   * (andere site): dan SameSite=None; Secure; Partitioned. Standaard aan bij Entra.
+   */
+  get cookieInIframe() {
+    const w = process.env.SESSIE_IN_IFRAME;
+    return w === undefined ? this.authModus === "entra" : w === "true";
   },
   /** "hermes" = Hermes Agent, "mock" = vaste antwoorden zonder AI, "uit" = geen coach. */
   get coachModus(): "mock" | "hermes" | "uit" {

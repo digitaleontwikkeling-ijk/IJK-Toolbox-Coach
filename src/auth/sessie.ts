@@ -46,15 +46,16 @@ export function maakSessieCookie(inhoud: Omit<SessieInhoud, "verloopt">, nu = Da
   return `${data}.${onderteken(data)}`;
 }
 
-export function cookieOpties() {
-  return {
-    httpOnly: true,
-    // In Teams draait de app in een iframe; daarvoor is SameSite=None; Secure nodig (fase 6).
-    sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
-    path: "/",
-    maxAge: GELDIGHEID_SECONDEN,
-  };
+/**
+ * De Set-Cookie-header voor de sessie.
+ * In een iframe van Teams (andere site) is SameSite=None; Secure; Partitioned nodig,
+ * anders stuurt de browser de cookie niet mee. Buiten Teams volstaat SameSite=Lax.
+ */
+export function sessieCookieHeader(waarde: string, opties: { inIframe: boolean; maxAge?: number }): string {
+  const maxAge = opties.maxAge ?? GELDIGHEID_SECONDEN;
+  const basis = `${SESSIE_COOKIE}=${encodeURIComponent(waarde)}; Path=/; Max-Age=${maxAge}; HttpOnly`;
+  if (opties.inIframe) return `${basis}; SameSite=None; Secure; Partitioned`;
+  return `${basis}; SameSite=Lax${process.env.NODE_ENV === "production" ? "; Secure" : ""}`;
 }
 
 /** Leest en controleert de sessiecookie. Geeft `null` bij ontbrekende, vervalste of verlopen sessie. */

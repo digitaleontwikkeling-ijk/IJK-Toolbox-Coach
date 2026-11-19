@@ -8,7 +8,7 @@ const ROLNAMEN: Record<string, string> = {
   beheerder: "beheerder",
 };
 
-export function NepLogin({ gebruikers }: { gebruikers: { oid: string; naam: string; rollen: string[] }[] }) {
+export function NepLogin({ gebruikers, terug = "/wizard" }: { gebruikers: { oid: string; naam: string; rollen: string[] }[]; terug?: string }) {
   const [fout, setFout] = useState<string | null>(null);
 
   async function kies(oid: string) {
@@ -18,7 +18,7 @@ export function NepLogin({ gebruikers }: { gebruikers: { oid: string; naam: stri
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ oid }),
     });
-    if (res.ok) window.location.href = "/wizard";
+    if (res.ok) window.location.href = terug;
     else setFout("Inloggen is niet gelukt. Probeer het opnieuw.");
   }
 

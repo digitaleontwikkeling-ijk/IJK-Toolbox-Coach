@@ -12,8 +12,6 @@ const nextConfig: NextConfig = {
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          // In fase 6 wordt frame-ancestors uitgebreid met de Teams-domeinen.
-          { key: "Content-Security-Policy", value: "frame-ancestors 'self'" },
         ],
       },
     ];

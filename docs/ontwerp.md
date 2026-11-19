@@ -159,3 +159,13 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Toetsersscherm (`/toetsing`) met besluitformulier; beheerscherm (`/beheer`) met alle adviezen en de inhoud.
 - Audit-log van elke inzage en elk besluit door toetsers en beheerders.
 - Extra waarborg (niet in de opdracht, wel logisch): een toetser kan zijn eigen aanvraag niet toetsen.
+
+## 14. Stand na fase 6
+
+- Teams-manifest (`teams/manifest.template.json`): één statisch tabblad, alleen scope `personal`, met `webApplicationInfo` voor SSO.
+  `npm run teams:pakket` vult het in, controleert het en maakt de zip.
+- Inloggen met Entra ID (`AUTH_MODUS=entra`): Teams-SSO in Teams, MSAL daarbuiten; de server controleert het token
+  (`src/auth/entra.ts`) en maakt een sessie. App Roles bepalen de rollen.
+- Sessiecookie geschikt voor een iframe op een andere site (`SameSite=None; Secure; Partitioned`).
+- Insluiten alleen in de eigen site en Teams/Microsoft 365 (middleware).
+- Getest met een nagebootst Teams-iframe; niet in een echte Teams-omgeving. Zie `docs/teams.md`.

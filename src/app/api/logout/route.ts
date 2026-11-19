@@ -1,7 +1,8 @@
-import { SESSIE_COOKIE } from "@/auth/sessie";
+import { sessieCookieHeader } from "@/auth/sessie";
+import { config } from "@/lib/config";
 
 export async function POST() {
   const res = Response.json({ ok: true });
-  res.headers.append("Set-Cookie", `${SESSIE_COOKIE}=; Path=/; Max-Age=0; HttpOnly; SameSite=Lax`);
+  res.headers.append("Set-Cookie", sessieCookieHeader("", { inIframe: config.cookieInIframe, maxAge: 0 }));
   return res;
 }
