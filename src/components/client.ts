@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Regelset, Spelregels, Teksten, ToolsConfig } from "@/domain/content-schema";
 import type { AdviesRij } from "@/db/adviezen";
+import { volledigPad } from "@/lib/paden";
 
 export interface ContentDto {
   regelset: Regelset;
@@ -42,13 +43,19 @@ export class ApiFoutClient extends Error {
 }
 
 export async function api<T>(pad: string, opties: { method?: string; body?: unknown } = {}): Promise<T> {
+  // Letterlijke env-vergelijking: dan laat de bundler deze tak (en src/demo/) weg uit de echte app.
+  if (process.env.NEXT_PUBLIC_DEMO === "1") {
+    // Statische demo: de "server" draait in de browser (zie src/demo/).
+    const { demoApi } = await import("@/demo/api");
+    return demoApi<T>(pad, opties);
+  }
   const res = await fetch(pad, {
     method: opties.method ?? (opties.body === undefined ? "GET" : "POST"),
     headers: opties.body === undefined ? undefined : { "Content-Type": "application/json" },
     body: opties.body === undefined ? undefined : JSON.stringify(opties.body),
   });
   if (res.status === 401) {
-    window.location.href = "/login";
+    window.location.href = volledigPad("/login");
     throw new ApiFoutClient(401, "Je bent niet ingelogd.");
   }
   const json = await res.json().catch(() => ({}));

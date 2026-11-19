@@ -1,10 +1,11 @@
 /**
  * Toetsing en beheer: inzage (altijd met audit-log) en besluiten van toetsers.
  */
-import { z } from "zod";
+import type { z } from "zod";
 import type { Gebruiker } from "../auth/sessie";
 import { TOETSER_ROLLEN, type Rol } from "../auth/rollen";
-import { BESLUITEN, eindstatus } from "../domain/besluiten";
+import { eindstatus, type besluitInvoerSchema } from "../domain/besluiten";
+export { besluitInvoerSchema } from "../domain/besluiten";
 import { db, transactie } from "../db/pool";
 import {
   adviezenVoorToetsers,
@@ -61,22 +62,6 @@ export async function detailVoorToetser(g: Gebruiker, id: string): Promise<Advie
       : advies.toetsers.filter((t) => rollen.includes(t) && !detail.besluiten.some((b) => b.toetserRol === t));
   return { ...detail, openRollen, eigenAanvraag };
 }
-
-export const besluitInvoerSchema = z
-  .object({
-    besluit: z.enum(BESLUITEN),
-    toelichting: z.string().trim().max(2000).optional().default(""),
-    /** Alleen nodig als iemand meerdere toetserrollen heeft. */
-    rol: z.enum(TOETSER_ROLLEN).optional(),
-  })
-  .superRefine((b, ctx) => {
-    if (b.besluit === "goedgekeurd_met_voorwaarden" && b.toelichting.length < 5) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["toelichting"], message: "Beschrijf de voorwaarden." });
-    }
-    if (b.besluit === "afgewezen" && b.toelichting.length < 5) {
-      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["toelichting"], message: "Geef een motivatie voor de afwijzing." });
-    }
-  });
 
 export async function legBesluitVast(g: Gebruiker, id: string, invoer: z.output<typeof besluitInvoerSchema>) {
   const mijnRollen = toetserRollen(g);

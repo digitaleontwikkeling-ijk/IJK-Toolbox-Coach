@@ -1,5 +1,7 @@
 "use client";
 import { useState } from "react";
+import { volledigPad } from "@/lib/paden";
+import { api } from "./client";
 
 const ROLNAMEN: Record<string, string> = {
   medewerker: "medewerker",
@@ -13,13 +15,12 @@ export function NepLogin({ gebruikers, terug = "/wizard" }: { gebruikers: { oid:
 
   async function kies(oid: string) {
     setFout(null);
-    const res = await fetch("/api/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ oid }),
-    });
-    if (res.ok) window.location.href = terug;
-    else setFout("Inloggen is niet gelukt. Probeer het opnieuw.");
+    try {
+      await api("/api/login", { body: { oid } });
+      window.location.href = volledigPad(terug);
+    } catch {
+      setFout("Inloggen is niet gelukt. Probeer het opnieuw.");
+    }
   }
 
   return (

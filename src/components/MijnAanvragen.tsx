@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { adviesPad, volledigPad } from "@/lib/paden";
 import { api, datum, kleurVan, toolNaam, useContent, type AdviesDto } from "./client";
 
 export function MijnAanvragen() {
@@ -17,7 +18,7 @@ export function MijnAanvragen() {
   async function ietsVeranderd(id: string) {
     try {
       await api(`/api/advies/${id}/opnieuw`, { method: "POST" });
-      window.location.href = "/wizard";
+      window.location.href = volledigPad("/wizard");
     } catch {
       setFout("Het opnieuw starten is niet gelukt. Probeer het later opnieuw.");
     }
@@ -53,7 +54,7 @@ export function MijnAanvragen() {
                   <strong>{toolNaam(content, a.tooladvies.tool)}</strong> · {a.beschrijving.length > 160 ? `${a.beschrijving.slice(0, 160)}…` : a.beschrijving}
                 </p>
                 <div className="knoppen" style={{ marginTop: 0 }}>
-                  <Link className="knop knop--secundair" href={`/advies/${a.id}`}>
+                  <Link className="knop knop--secundair" href={adviesPad(a.id)}>
                     Bekijk advies<span className="sr-only"> {a.referentie}</span>
                   </Link>
                   <button type="button" className="knop knop--tekst" onClick={() => ietsVeranderd(a.id)}>

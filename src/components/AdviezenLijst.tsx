@@ -2,6 +2,7 @@
 /** Overzicht van aanvragen voor toetsers ("toetsing") of van alle adviezen voor beheerders ("beheer"). */
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { beheerAdviesPad, toetsingPad } from "@/lib/paden";
 import { api, datum, kleurVan, toetserNaam, toolNaam, useContent, type AdviesDto, type ContentDto } from "./client";
 
 export function AdviezenLijst({ modus }: { modus: "toetsing" | "beheer" }) {
@@ -42,7 +43,7 @@ function Lijst({ adviezen, content, modus }: { adviezen: AdviesDto[]; content: C
     <ul className="aanvragen">
       {adviezen.map((a) => {
         const k = kleurVan(content, a.uitkomst)!;
-        const href = modus === "toetsing" ? `/toetsing/${a.id}` : `/beheer/advies/${a.id}`;
+        const href = modus === "toetsing" ? toetsingPad(a.id) : beheerAdviesPad(a.id);
         return (
           <li key={a.id} className="aanvraag">
             <div className="aanvraag__regel">

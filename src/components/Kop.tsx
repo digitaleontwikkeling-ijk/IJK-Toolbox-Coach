@@ -1,6 +1,9 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { volledigPad } from "@/lib/paden";
+import { api } from "./client";
 
 interface Props {
   appNaam: string;
@@ -9,12 +12,15 @@ interface Props {
 
 export function Kop({ appNaam, gebruiker }: Props) {
   const pad = usePathname();
+  // In Teams (iframe) regelt Teams het inloggen; dan geen knop "Uitloggen".
+  const [inIframe, setInIframe] = useState(false);
+  useEffect(() => setInIframe(window.parent !== window), []);
   const huidig = (p: string) => (pad === p || pad.startsWith(`${p}/`) ? "page" : undefined);
   const [ijk, ...rest] = appNaam.split(" ");
 
   async function uitloggen() {
-    await fetch("/api/logout", { method: "POST" });
-    window.location.href = "/login";
+    await api("/api/logout", { method: "POST" }).catch(() => undefined);
+    window.location.href = volledigPad("/login");
   }
 
   return (
@@ -38,7 +44,7 @@ export function Kop({ appNaam, gebruiker }: Props) {
         {gebruiker && (
           <div className="kop__gebruiker">
             <span>{gebruiker.naam}</span>
-            <button type="button" onClick={uitloggen}>Uitloggen</button>
+            {!inIframe && <button type="button" onClick={uitloggen}>Uitloggen</button>}
           </div>
         )}
       </div>

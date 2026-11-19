@@ -169,3 +169,11 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Sessiecookie geschikt voor een iframe op een andere site (`SameSite=None; Secure; Partitioned`).
 - Insluiten alleen in de eigen site en Teams/Microsoft 365 (middleware).
 - Getest met een nagebootst Teams-iframe; niet in een echte Teams-omgeving. Zie `docs/teams.md`.
+
+## 15. Afronding (fase 7)
+
+- README, volledige `.env.example`, `docs/content-beheren.md` (wijzigen en versienummers van de regelset).
+- Statische demo voor GitHub Pages (`demo/`, `src/demo/`): dezelfde schermen, content en beslisregels; de API draait
+  in de browser met localStorage. Workflow `.github/workflows/demo-pages.yml` bouwt en publiceert bij elke push naar `main`.
+  De echte app bevat geen democode (gecontroleerd in de bundel).
+- In Teams (iframe) wordt de knop "Uitloggen" verborgen.

@@ -8,3 +8,7 @@ next-env.d.ts
 test-results/
 playwright-report/
 build/
+src/demo/content.generated.json
+demo/out/
+demo/.next/
+demo/next-env.d.ts

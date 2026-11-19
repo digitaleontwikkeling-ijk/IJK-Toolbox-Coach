@@ -16,7 +16,10 @@
     "opruimen": "tsx src/db/opruimen.ts",
     "mock:hermes": "tsx mocks/hermes-mock.ts",
     "mock:webhooks": "tsx mocks/webhook-mock.ts",
-    "teams:pakket": "tsx scripts/teams-pakket.ts"
+    "teams:pakket": "tsx scripts/teams-pakket.ts",
+    "demo:build": "tsx scripts/demo-content.ts && next build demo && node -e \"require('fs').writeFileSync('demo/out/.nojekyll','')\"",
+    "demo:serve": "tsx scripts/serveer-demo.ts",
+    "test:demo": "playwright test --config playwright.demo.config.ts --trace off"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

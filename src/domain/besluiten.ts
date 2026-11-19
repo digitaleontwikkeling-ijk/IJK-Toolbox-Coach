@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { TOETSER_ROLLEN } from "../auth/rollen";
 /**
  * Eindstatus van een aanvraag op basis van de besluiten van de toetsers (pure functie).
  *
@@ -21,3 +23,21 @@ export function eindstatus(
   if (alle.includes("goedgekeurd_met_voorwaarden")) return "goedgekeurd_met_voorwaarden";
   return "goedgekeurd";
 }
+
+/** Invoer van een toetser bij het vastleggen van een besluit. */
+export const besluitInvoerSchema = z
+  .object({
+    besluit: z.enum(BESLUITEN),
+    toelichting: z.string().trim().max(2000).optional().default(""),
+    /** Alleen nodig als iemand meerdere toetserrollen heeft. */
+    rol: z.enum(TOETSER_ROLLEN).optional(),
+  })
+  .superRefine((b, ctx) => {
+    if (b.besluit === "goedgekeurd_met_voorwaarden" && b.toelichting.length < 5) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["toelichting"], message: "Beschrijf de voorwaarden." });
+    }
+    if (b.besluit === "afgewezen" && b.toelichting.length < 5) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, path: ["toelichting"], message: "Geef een motivatie voor de afwijzing." });
+    }
+  });
+
