@@ -1,0 +1,16 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: claude_code
+zelf_doen:
+  - Experimenteren
+  - Prototypes maken
+  - Kleine interne tools bouwen
+eerst_toetsen:
+  - Als je persoonsgegevens gebruikt
+  - Koppelingen met IJK-systemen
+  - Gebruik door meerdere collega's
+  - Bedrijfskritische toepassingen
+altijd:
+  - Gebruik alleen de Claude Enterprise-omgeving van IJK
+  - Controleer de code
+  - Geen secrets (wachtwoorden, API-keys) in de code
+  - Minimale rechten

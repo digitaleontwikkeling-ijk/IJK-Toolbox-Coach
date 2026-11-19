@@ -1,0 +1,201 @@
+# Regelset van de IJK Toolbox Coach
+#
+# Beheer: Team Digitale Ontwikkeling + AI governance & compliance officer.
+# Verhoog bij ELKE inhoudelijke wijziging het versienummer en noteer de wijziging
+# in content/CHANGELOG.md. Het versienummer wordt bij elk advies opgeslagen.
+#
+# Startversie: nog NIET gevalideerd door beide toetsers.
+# TODO: valideren door toetsers
+
+versie: "0.1"
+gevalideerd: false
+
+# Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
+# hex: kleur uit het IJK-huisstijlhandboek (08-2025) waar mogelijk:
+#   groen = Blad, oranje = Zon, rood = Avondrood. Het handboek heeft geen geel;
+#   daarvoor gebruiken we de kleur uit de opdracht.
+# tekstkleur: kleur van tekst op dit vlak, gekozen voor voldoende contrast (WCAG AA).
+# motivatie: tekst voor "Waarom deze kleur?"; zie onderaan dit bestand.
+kleuren:
+  - id: groen
+    uitkomst: Direct aan de slag
+    hex: "#50A78A"
+    tekstkleur: "#1E0E3B"
+    vervolgactie: accountaanvraag
+    motivatie: Alle checks scoren groen.
+  - id: geel
+    uitkomst: Aan de slag met voorwaarden
+    hex: "#EFBE2E"
+    tekstkleur: "#1E0E3B"
+    vervolgactie: accountaanvraag_met_voorwaarden
+    motivatie: "{redenen}."
+  - id: oranje
+    uitkomst: Eerst toetsen
+    hex: "#F69B37"
+    tekstkleur: "#1E0E3B"
+    vervolgactie: toetsing
+    motivatie: "{redenen}."
+  - id: rood
+    uitkomst: Niet op deze manier
+    hex: "#D61539"
+    tekstkleur: "#FFFFFF"
+    vervolgactie: alleen_vastleggen
+    motivatie: "{redenen}."
+
+# Toetsers die een aanvraag kunnen krijgen.
+toetsers:
+  - id: toetser_compliance
+    naam: AI governance & compliance officer
+  - id: toetser_architect
+    naam: architect Digitale Ontwikkeling
+
+# De zes checks.
+# toetser: wie toetst als deze check oranje scoort.
+# voorwaarde: alleen bij antwoorden die geel scoren; wordt getoond als de uitkomst geel is.
+# alternatief: alleen bij antwoorden die rood scoren; wordt getoond als de uitkomst rood is.
+checks:
+  - id: data
+    nummer: 1
+    naam: Data
+    vraag: Welke data gebruik je?
+    toetser: toetser_compliance
+    antwoorden:
+      - { id: openbaar, label: Openbaar, kleur: groen }
+      - { id: intern, label: Intern, kleur: groen }
+      - { id: persoonsgegevens, label: Persoonsgegevens, kleur: oranje }
+      - { id: vertrouwelijk, label: Vertrouwelijk/gevoelig, kleur: oranje }
+
+  - id: systemen
+    nummer: 2
+    naam: Systemen
+    vraag: Welke systemen raak je?
+    toetser: toetser_architect
+    antwoorden:
+      - { id: geen, label: Geen, kleur: groen }
+      - id: lezen
+        label: Lezen (uit een goedgekeurde IJK-bron)
+        kleur: geel
+        voorwaarde: Gebruik de goedgekeurde koppeling en IJK-credentials met alleen leesrechten.
+      - { id: koppelen, label: Koppelen, kleur: oranje }
+      - { id: schrijven, label: Schrijven in bedrijfssystemen, kleur: oranje }
+
+  - id: gebruikers
+    nummer: 3
+    naam: Gebruikers
+    vraag: Wie gebruikt de oplossing?
+    toetser: toetser_architect
+    antwoorden:
+      - { id: alleen_ik, label: Alleen ik, kleur: groen }
+      - id: collegas
+        label: Collega's
+        kleur: geel
+        voorwaarde: Gaat je team erop vertrouwen? Wijs een eigenaar aan en documenteer.
+      - { id: afdeling, label: Afdeling, kleur: oranje }
+      - { id: organisatie, label: Organisatie, kleur: oranje }
+      - { id: extern, label: Extern/klanten, kleur: oranje }
+
+  - id: autonomie
+    nummer: 4
+    naam: Autonomie
+    vraag: Wat mag de oplossing doen?
+    toetser: toetser_compliance
+    antwoorden:
+      - { id: assisteren, label: Assisteren, kleur: groen }
+      - { id: adviseren, label: Adviseren, kleur: groen }
+      - id: lezen
+        label: Lezen
+        kleur: geel
+        # TODO: valideren door toetsers (placeholder, tekst nog aan te leveren door IJK)
+        voorwaarde: "[Placeholder] Voorwaarde bij Autonomie = Lezen wordt nog vastgesteld door de toetsers."
+      - { id: schrijven, label: Schrijven, kleur: oranje }
+      - { id: handelen, label: Handelen, kleur: oranje }
+      - id: beslissen
+        label: Beslissen (over mensen)
+        kleur: rood
+        # TODO: valideren door toetsers
+        alternatief: Laat AI samenvatten of adviseren, en laat een mens (bijvoorbeeld de recruiter) beslissen.
+
+  - id: impact
+    nummer: 5
+    naam: Impact
+    vraag: Wat is de impact als het misgaat?
+    toetser: toetser_compliance
+    antwoorden:
+      - { id: nauwelijks, label: Nauwelijks, kleur: groen }
+      - id: beperkt
+        label: Beperkt
+        kleur: geel
+        # TODO: valideren door toetsers (placeholder, tekst nog aan te leveren door IJK)
+        voorwaarde: "[Placeholder] Voorwaarde bij Impact = Beperkt wordt nog vastgesteld door de toetsers."
+      - { id: serieus, label: Serieus, kleur: oranje }
+      - id: groot
+        label: Groot
+        kleur: rood
+        # TODO: valideren door toetsers
+        alternatief: Maak de oplossing kleiner, zodat een fout weinig gevolgen heeft, en laat een mens de uitkomst controleren.
+
+  - id: afhankelijkheid
+    nummer: 6
+    naam: Afhankelijkheid
+    vraag: Hoe afhankelijk wordt IJK van de oplossing?
+    toetser: toetser_architect
+    antwoorden:
+      - { id: experiment, label: Experiment, kleur: groen }
+      - { id: persoonlijk, label: Persoonlijke oplossing, kleur: groen }
+      - { id: team, label: Teamoplossing, kleur: oranje }
+      - { id: bedrijf, label: Bedrijfsoplossing, kleur: oranje }
+
+# Extra vragen die alleen bij een bepaald antwoord worden gesteld.
+extra_vragen:
+  - id: bijzondere_persoonsgegevens
+    check: data
+    toon_bij: [persoonsgegevens]
+    vraag: Gaat het om bijzondere persoonsgegevens, zoals gezondheid?
+    uitleg: Bijzondere persoonsgegevens zijn extra gevoelig, zoals gegevens over gezondheid, religie of afkomst.
+
+# Rode vlaggen: ja = altijd deze kleur.
+rode_vlag_kleur: rood
+rode_vlaggen:
+  - id: niet_goedgekeurde_tool
+    nummer: 1
+    vraag: Gebruik je een tool die IJK niet heeft goedgekeurd, bijvoorbeeld een gratis AI-tool op een persoonlijk account?
+    kort: een tool die IJK niet heeft goedgekeurd
+    # TODO: valideren door toetsers
+    alternatief: Kies een goedgekeurde tool uit de IJK Toolbox en werk met je IJK-account.
+  - id: persoonlijke_inlog_of_secrets
+    nummer: 2
+    vraag: Koppel je met je eigen persoonlijke inlog, of staan er wachtwoorden of API-keys in de code?
+    kort: een persoonlijke inlog of wachtwoorden/API-keys in de code
+    # TODO: valideren door toetsers
+    alternatief: Vraag een koppeling aan met IJK-credentials en bewaar wachtwoorden en API-keys in een kluis, nooit in de code.
+  - id: ai_beslist_over_mensen
+    nummer: 3
+    vraag: Beslist AI zelfstandig over mensen, met grote gevolgen?
+    kort: AI die zelfstandig over mensen beslist
+    # TODO: valideren door toetsers
+    alternatief: Laat AI samenvatten of adviseren, en laat een mens (bijvoorbeeld de recruiter) beslissen.
+  - id: open_zonder_toetsing
+    nummer: 4
+    vraag: Zet je een oplossing met echte gegevens zonder toetsing open voor klanten of op internet?
+    kort: een oplossing met echte gegevens die zonder toetsing openstaat
+    # TODO: valideren door toetsers
+    alternatief: Werk eerst met testdata en laat de oplossing toetsen voordat je hem openzet.
+
+# DPIA-signaal (DPIA = gegevensbeschermingseffectbeoordeling, verplicht bij hoog privacyrisico).
+# Signaal als ALLE voorwaarden in "vereist" gelden EN minstens één uit "minstens_een_van".
+dpia:
+  vereist:
+    - { check: data, antwoorden: [persoonsgegevens] }
+  minstens_een_van:
+    - { extra_vraag: bijzondere_persoonsgegevens }
+    - { check: autonomie, antwoorden: [beslissen, handelen] }
+    - { check: gebruikers, antwoorden: [organisatie, extern] }
+    - { check: impact, antwoorden: [serieus, groot] }
+  # Bij een DPIA-signaal gaat een aanvraag altijd (ook) naar deze toetser.
+  toetser: toetser_compliance
+
+# "Waarom deze kleur?": per kleur staat de tekst bij de kleur (veld motivatie).
+# {redenen} wordt vervangen door de doorslaggevende checks en rode vlaggen,
+# bijvoorbeeld "Persoonsgegevens (Data) en Koppelen (Systemen)".
+# Zo wordt een rode vlag in die opsomming beschreven ({kort} = korte omschrijving van de vlag):
+motivatie_rode_vlag: "rode vlag: {kort}"

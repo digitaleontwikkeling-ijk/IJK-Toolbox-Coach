@@ -1,0 +1,12 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: azure_openai
+zelf_doen:
+  - Experimenteren
+  - Persoons- of vertrouwelijke gegevens verwerken via een goedgekeurde IJK-deployment in de EU
+eerst_toetsen:
+  - Bijzondere persoonsgegevens
+  - Een nieuwe deployment of regio
+  - Beslissingen over mensen
+altijd:
+  - Alleen EU Data Zone- of regionale deployments
+  - API-keys in een kluis

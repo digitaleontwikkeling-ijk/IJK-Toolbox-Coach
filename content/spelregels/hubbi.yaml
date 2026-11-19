@@ -1,0 +1,11 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: hubbi
+zelf_doen:
+  - Bestaande automatiseringen gebruiken
+  - Bouwen in een testomgeving
+eerst_toetsen:
+  - Live wijzigingen in AFAS
+  - Persoons- of salarisgegevens
+altijd:
+  - Eerst testen
+  - API-tokens veilig beheren

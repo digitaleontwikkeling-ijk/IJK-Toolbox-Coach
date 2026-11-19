@@ -1,0 +1,50 @@
+# Tools in de IJK Toolbox en de behoeften waarvoor de coach ze adviseert.
+# Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
+# TODO: valideren door toetsers
+
+versie: "0.1"
+
+tools:
+  - id: m365_copilot
+    naam: Microsoft 365 Copilot
+    spelregels: spelregels/m365_copilot.yaml
+  - id: n8n
+    naam: n8n
+    spelregels: spelregels/n8n.yaml
+  - id: hubbi
+    naam: HubBI
+    omschrijving: IJK's eigen automatiserings- en integratieplatform voor AFAS.
+    spelregels: spelregels/hubbi.yaml
+  - id: ai_flows
+    naam: AI Flows
+    spelregels: spelregels/ai_flows.yaml
+  - id: claude_code
+    naam: Claude Code
+    spelregels: spelregels/claude_code.yaml
+  - id: azure_openai
+    naam: Azure OpenAI
+    spelregels: spelregels/azure_openai.yaml
+
+behoeften:
+  - id: sneller_afhandelen
+    omschrijving: Mails, vergaderingen en documenten sneller afhandelen
+    tools: [m365_copilot]
+  - id: automatiseren
+    omschrijving: Een taak of proces automatiseren
+    tools: [n8n, hubbi]
+  - id: verbinden
+    omschrijving: Systemen of gegevens met elkaar verbinden
+    tools: [n8n, hubbi]
+  - id: ai_in_werkproces
+    omschrijving: AI toevoegen aan een werkproces
+    tools: [ai_flows]
+  - id: bouwen
+    omschrijving: Een tool, app of dashboard bouwen
+    tools: [claude_code]
+  - id: ai_model_eigen_oplossing
+    omschrijving: Een AI-model gebruiken in een eigen oplossing
+    tools: [azure_openai]
+
+# Hints voor de coach bij het kiezen tussen tools binnen dezelfde behoefte.
+keuzehints:
+  - Kies HubBI boven n8n als het om AFAS-processen gaat.

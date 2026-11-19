@@ -1,0 +1,13 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: n8n
+zelf_doen:
+  - Persoonlijke automatiseringen
+  - Werken met goedgekeurde API's
+eerst_toetsen:
+  - Als je persoonsgegevens gebruikt
+  - Schrijven in kernsystemen
+  - Automatisch extern communiceren
+altijd:
+  - Credentials veilig opslaan
+  - Logging aanzetten
+  - Een eigenaar aanwijzen

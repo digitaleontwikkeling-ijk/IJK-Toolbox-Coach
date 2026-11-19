@@ -1,0 +1,11 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: ai_flows
+zelf_doen:
+  - Experimenteren met testdata
+  - AI-voorstellen die een mens controleert
+eerst_toetsen:
+  - Persoonsgegevens in de AI-stap
+  - Uitkomsten die automatisch doorwerken
+altijd:
+  - Gebruik goedgekeurde modellen
+  - Zorg voor menselijke controle

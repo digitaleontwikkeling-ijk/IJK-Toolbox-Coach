@@ -1,0 +1,12 @@
+# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+tool: m365_copilot
+zelf_doen:
+  - Teksten schrijven
+  - Samenvattingen maken
+  - Vergaderingen voorbereiden en samenvatten
+eerst_toetsen:
+  - Besluiten over personen
+  - Eigen Copilot-agents bouwen
+altijd:
+  - Controleer de uitkomst
+  - Werk met je IJK-account
