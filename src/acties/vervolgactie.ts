@@ -1,0 +1,111 @@
+/**
+ * Voert de vervolgactie bij een advies uit (zie opdracht §4.5):
+ *   Direct aan de slag          → accountaanvraag
+ *   Aan de slag met voorwaarden → accountaanvraag, inclusief voorwaarden
+ *   Eerst toetsen               → aanvraag naar de toetser(s) + melding in Teams
+ *   Niet op deze manier         → geen aanvraag (alleen vastgelegd)
+ *
+ * Volgorde, zodat dubbel klikken of een mislukte webhook geen rommel geeft:
+ * 1. de status wordt eerst "geclaimd" (alleen als die nog "advies gegeven" is);
+ * 2. de hoofdactie wordt verstuurd; mislukt die, dan gaat de status terug en krijgt
+ *    de medewerker een foutmelding;
+ * 3. de Teams-melding mag mislukken zonder dat de aanvraag terugdraait (wel gelogd).
+ */
+import type { Content } from "../content/laad-content";
+import type { Gebruiker } from "../auth/sessie";
+import { haalEigenAdvies, verwijderConceptenVanAdvies, type AdviesRij } from "../db/adviezen";
+import { db } from "../db/pool";
+import { ApiFout, nietGevonden } from "../lib/api";
+import type { Status } from "../domain/content-schema";
+import type { ActieClient, ActiePayload, ActieResultaat, ActieType } from "./ActieClient";
+
+const STATUS_NA_ACTIE: Record<string, Status | null> = {
+  accountaanvraag: "account_aangevraagd",
+  accountaanvraag_met_voorwaarden: "account_aangevraagd",
+  toetsing: "in_toetsing",
+  alleen_vastleggen: null,
+};
+
+async function logActie(adviesId: string, type: ActieType, r: ActieResultaat) {
+  await db().query(
+    "INSERT INTO actie_log (advies_id, type, resultaat, http_status, melding) VALUES ($1, $2, $3, $4, $5)",
+    [adviesId, type, r.resultaat, r.httpStatus ?? null, r.melding ?? null],
+  );
+}
+
+export interface VervolgactieOpties {
+  adviesId: string;
+  gebruiker: Gebruiker;
+  content: Content;
+  client: ActieClient;
+  appUrl: string;
+  stuurUpn: boolean;
+}
+
+export function maakPayloads(advies: AdviesRij, o: Omit<VervolgactieOpties, "adviesId" | "client">): ActiePayload[] {
+  const { content, gebruiker, appUrl, stuurUpn } = o;
+  const kleur = content.regelset.kleuren.find((k) => k.id === advies.uitkomst)!;
+  const tool = { id: advies.tooladvies.tool, naam: content.tools.tools.find((t) => t.id === advies.tooladvies.tool)?.naam };
+  const basis = {
+    referentie: advies.referentie,
+    adviesId: advies.id,
+    aanvrager: { pseudoniemId: gebruiker.pseudoniemId, ...(stuurUpn && gebruiker.upn ? { upn: gebruiker.upn } : {}) },
+    regelversie: advies.regelversie,
+    tool,
+    uitkomst: { kleur: kleur.id, naam: kleur.uitkomst },
+  };
+
+  if (kleur.vervolgactie === "toetsing") {
+    const toetsers = advies.toetsers.map((rol) => ({ rol, naam: content.regelset.toetsers.find((t) => t.id === rol)?.naam ?? rol }));
+    const link = `${appUrl}/toetsing/${advies.id}`;
+    return [
+      { ...basis, type: "toetsing", link, toetsers, motivatie: advies.motivatie, dpiaSignaal: advies.dpiaSignaal },
+      {
+        ...basis,
+        type: "teams_melding",
+        link,
+        ontvangers: toetsers,
+        tekst: `Nieuwe aanvraag ${advies.referentie} (${tool.naam}) wacht op je toetsing.`,
+      },
+    ];
+  }
+  return [{ ...basis, type: "accountaanvraag", link: `${appUrl}/advies/${advies.id}`, voorwaarden: advies.voorwaarden }];
+}
+
+export async function voerVervolgactieUit(o: VervolgactieOpties): Promise<{ status: Status; meldingVerstuurd?: boolean }> {
+  const advies = await haalEigenAdvies(o.adviesId, o.gebruiker.pseudoniemId);
+  if (!advies) throw nietGevonden();
+  const kleur = o.content.regelset.kleuren.find((k) => k.id === advies.uitkomst);
+  const nieuweStatus = kleur ? STATUS_NA_ACTIE[kleur.vervolgactie] : null;
+  if (!nieuweStatus) throw new ApiFout(409, "Bij deze uitkomst hoort geen aanvraag.");
+
+  // 1. Claimen: lukt maar één keer, ook bij dubbel klikken.
+  const claim = await db().query(
+    "UPDATE advies SET status = $2, bijgewerkt_op = now() WHERE id = $1 AND status = 'advies_gegeven' RETURNING id",
+    [advies.id, nieuweStatus],
+  );
+  if (claim.rowCount === 0) throw new ApiFout(409, "Voor dit advies is de vervolgactie al uitgevoerd.");
+
+  const [hoofd, melding] = maakPayloads(advies, o);
+
+  // 2. Hoofdactie.
+  const r = await o.client.verstuur(hoofd!);
+  await logActie(advies.id, hoofd!.type, r);
+  if (!r.ok) {
+    await db().query("UPDATE advies SET status = 'advies_gegeven', bijgewerkt_op = now() WHERE id = $1", [advies.id]);
+    throw new ApiFout(502, "Je aanvraag kon niet worden verstuurd. Probeer het later opnieuw.");
+  }
+
+  // 3. Teams-melding (alleen bij toetsing); een mislukte melding blokkeert de aanvraag niet.
+  let meldingVerstuurd: boolean | undefined;
+  if (melding) {
+    const m = await o.client.verstuur(melding);
+    await logActie(advies.id, melding.type, m);
+    meldingVerstuurd = m.ok;
+    if (!m.ok) console.warn(`[actie] Teams-melding voor ${advies.referentie} mislukt: ${m.melding}`);
+  }
+
+  // Het concept (met de chat) is niet meer nodig: in het register staat alleen wat nodig is.
+  await verwijderConceptenVanAdvies(advies.id);
+  return { status: nieuweStatus, meldingVerstuurd };
+}

@@ -6,18 +6,15 @@ import {
   haalConcept,
   haalEigenAdvies,
   koppelConceptAanAdvies,
-  verwijderConceptenVanAdvies,
   voegAdviesToe,
   volgendeReferentie,
   werkAdviesBij,
-  zetStatus,
   type AdviesRij,
   type NieuwAdvies,
 } from "../db/adviezen";
 import { transactie } from "../db/pool";
 import { ApiFout, nietGevonden } from "../lib/api";
 import { evalueer, extraVraagVanToepassing, OngeldigeInvoerFout, type BeslisInvoer } from "../domain/beslisregels";
-import type { Status } from "../domain/content-schema";
 import { wizardDataSchema, type WizardData } from "../domain/wizard";
 
 export function beslisInvoerUit(data: WizardData, content: Content): BeslisInvoer {
@@ -107,32 +104,6 @@ export async function registreerAdvies(opties: {
     await koppelConceptAanAdvies(q, conceptId, advies.id);
     return advies;
   });
-}
-
-/** De status na de vervolgactie, per type vervolgactie. */
-const STATUS_NA_ACTIE: Record<string, Status | null> = {
-  accountaanvraag: "account_aangevraagd",
-  accountaanvraag_met_voorwaarden: "account_aangevraagd",
-  toetsing: "in_toetsing",
-  alleen_vastleggen: null,
-};
-
-/**
- * Voert de vervolgactie uit. In fase 3 wordt alleen de status gezet en gelogd;
- * in fase 5 komen hier de webhooks bij. Na de actie wordt het concept (met de
- * chat) verwijderd: in het register staat alleen wat nodig is.
- */
-export async function voerVervolgactieUit(opties: { adviesId: string; pseudoniemId: string; content: Content }) {
-  const advies = await haalEigenAdvies(opties.adviesId, opties.pseudoniemId);
-  if (!advies) throw nietGevonden();
-  if (advies.status !== "advies_gegeven") throw new ApiFout(409, "Voor dit advies is de vervolgactie al uitgevoerd.");
-  const kleur = opties.content.regelset.kleuren.find((k) => k.id === advies.uitkomst);
-  const nieuweStatus = kleur ? STATUS_NA_ACTIE[kleur.vervolgactie] : null;
-  if (!nieuweStatus) throw new ApiFout(409, "Bij deze uitkomst hoort geen aanvraag.");
-  await transactie((q) => zetStatus(q, advies.id, nieuweStatus));
-  await verwijderConceptenVanAdvies(advies.id);
-  console.info(`[actie] ${advies.referentie}: ${kleur!.vervolgactie} → ${nieuweStatus}`);
-  return { status: nieuweStatus };
 }
 
 /** Maakt de wizardgegevens voor "Er is iets veranderd" uit een eerder advies. */

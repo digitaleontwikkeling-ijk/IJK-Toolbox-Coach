@@ -13,11 +13,27 @@ export interface ContentDto {
 }
 
 /** Een advies zoals de API het teruggeeft (datums als tekst, zonder pseudoniem). */
+export interface BesluitDto {
+  toetserRol: string;
+  besluit: "goedgekeurd" | "goedgekeurd_met_voorwaarden" | "afgewezen";
+  toelichting: string | null;
+  datum: string;
+}
+
 export type AdviesDto = Omit<AdviesRij, "pseudoniemId" | "aangemaaktOp" | "bijgewerktOp" | "verlooptOp"> & {
   aangemaaktOp: string;
   bijgewerktOp: string;
   verlooptOp: string;
+  besluiten?: BesluitDto[];
+  /** Alleen voor toetsers en beheerders. */
+  pseudoniemId?: string;
+  openRollen?: string[];
+  eigenAanvraag?: boolean;
 };
+
+export function toetserNaam(c: ContentDto, rol: string): string {
+  return c.regelset.toetsers.find((t) => t.id === rol)?.naam ?? rol;
+}
 
 export class ApiFoutClient extends Error {
   constructor(public readonly status: number, message: string, public readonly details?: string[]) {

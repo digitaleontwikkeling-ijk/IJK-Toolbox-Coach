@@ -27,6 +27,12 @@ export function Kop({ appNaam, gebruiker }: Props) {
           <nav aria-label="Hoofdmenu">
             <Link href="/wizard" aria-current={huidig("/wizard")}>Nieuw idee</Link>
             <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
+            {gebruiker.rollen.some((r) => r.startsWith("toetser_")) && (
+              <Link href="/toetsing" aria-current={huidig("/toetsing")}>Toetsing</Link>
+            )}
+            {gebruiker.rollen.includes("beheerder") && (
+              <Link href="/beheer" aria-current={huidig("/beheer")}>Beheer</Link>
+            )}
           </nav>
         )}
         {gebruiker && (

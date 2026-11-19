@@ -89,7 +89,7 @@ export interface AdviesRij {
   verlooptOp: Date;
 }
 
-const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId", aangemaakt_op AS "aangemaaktOp",
+export const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId", aangemaakt_op AS "aangemaaktOp",
   bijgewerkt_op AS "bijgewerktOp", beschrijving, verduidelijking, tooladvies, antwoorden,
   rode_vlaggen AS "rodeVlaggen", uitkomst, toetsers, dpia_signaal AS "dpiaSignaal", motivatie,
   voorwaarden, alternatieven, regelversie, toolsversie, status, vorig_advies_id AS "vorigAdviesId",

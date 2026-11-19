@@ -8,13 +8,15 @@ import type { Rol } from "./rollen";
 export interface Testgebruiker {
   oid: string;
   naam: string;
+  /** Fictief; alleen meegestuurd met acties als ACTIE_STUUR_UPN=true. */
+  upn: string;
   rollen: Rol[];
 }
 
 export const TESTGEBRUIKERS: Testgebruiker[] = [
-  { oid: "test-0001", naam: "Testmedewerker Anna", rollen: ["medewerker"] },
-  { oid: "test-0002", naam: "Testmedewerker Bram", rollen: ["medewerker"] },
-  { oid: "test-0003", naam: "Testtoetser Compliance", rollen: ["medewerker", "toetser_compliance"] },
-  { oid: "test-0004", naam: "Testtoetser Architect", rollen: ["medewerker", "toetser_architect"] },
-  { oid: "test-0005", naam: "Testbeheerder", rollen: ["medewerker", "beheerder"] },
+  { oid: "test-0001", upn: "anna@voorbeeld.invalid", naam: "Testmedewerker Anna", rollen: ["medewerker"] },
+  { oid: "test-0002", upn: "bram@voorbeeld.invalid", naam: "Testmedewerker Bram", rollen: ["medewerker"] },
+  { oid: "test-0003", upn: "compliance@voorbeeld.invalid", naam: "Testtoetser Compliance", rollen: ["medewerker", "toetser_compliance"] },
+  { oid: "test-0004", upn: "architect@voorbeeld.invalid", naam: "Testtoetser Architect", rollen: ["medewerker", "toetser_architect"] },
+  { oid: "test-0005", upn: "beheer@voorbeeld.invalid", naam: "Testbeheerder", rollen: ["medewerker", "beheerder"] },
 ];

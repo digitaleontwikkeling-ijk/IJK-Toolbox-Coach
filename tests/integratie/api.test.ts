@@ -4,6 +4,7 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { maakSessieCookie, SESSIE_COOKIE } from "@/auth/sessie";
 import type { Rol } from "@/auth/rollen";
+import { ANNA, BRAM, leegDatabase, nieuwConcept, roep, VOLLEDIG, type Handler } from "./hulp";
 import { migreer } from "@/db/migreer";
 import { db, sluitDb } from "@/db/pool";
 import * as conceptRoute from "@/app/api/concept/route";
@@ -16,54 +17,12 @@ import * as coachRoute from "@/app/api/coach/[taak]/route";
 import * as contentRoute from "@/app/api/content/route";
 import * as mijnRoute from "@/app/api/mijn-aanvragen/route";
 
-type Handler = (req: Request, ctx: { params: Promise<Record<string, string>> }) => Promise<Response>;
-
-const ANNA = { oid: "int-anna", naam: "Anna", rollen: ["medewerker"] as Rol[] };
-const BRAM = { oid: "int-bram", naam: "Bram", rollen: ["medewerker"] as Rol[] };
-
-async function roep(
-  handler: Handler,
-  opties: { gebruiker?: typeof ANNA | null; body?: unknown; params?: Record<string, string>; cookie?: string; method?: string } = {},
-) {
-  const headers = new Headers({ "Content-Type": "application/json" });
-  const g = opties.gebruiker === undefined ? ANNA : opties.gebruiker;
-  if (opties.cookie) headers.set("cookie", opties.cookie);
-  else if (g) headers.set("cookie", `${SESSIE_COOKIE}=${encodeURIComponent(maakSessieCookie(g))}`);
-  const req = new Request("http://test.local/api", {
-    method: opties.method ?? (opties.body === undefined ? "GET" : "POST"),
-    headers,
-    body: opties.body === undefined ? undefined : typeof opties.body === "string" ? opties.body : JSON.stringify(opties.body),
-  });
-  const res = await handler(req, { params: Promise.resolve(opties.params ?? {}) });
-  return { status: res.status, json: await res.json() };
-}
-
-/** Een volledig ingevulde wizard (scenario 4: verzuimdashboard). */
-const VOLLEDIG = {
-  stap: 3,
-  beschrijving: "Verzuimdashboard van mijn afdeling (testscenario).",
-  verduidelijkingGevraagd: true,
-  tooladvies: { tool: "claude_code", behoefte: "bouwen", motivatie: "Dashboard bouwen.", bron: "coach", geaccepteerd: true },
-  checks: { data: "persoonsgegevens", systemen: "lezen", gebruikers: "afdeling", autonomie: "lezen", impact: "serieus", afhankelijkheid: "experiment" },
-  extraVragen: { bijzondere_persoonsgegevens: true },
-  rodeVlaggen: { niet_goedgekeurde_tool: false, persoonlijke_inlog_of_secrets: false, ai_beslist_over_mensen: false, open_zonder_toetsing: false },
-  chat: [{ rol: "medewerker", tekst: "Dit gesprek mag niet in het register." }],
-};
-
-async function nieuwConcept(gebruiker = ANNA, data: unknown = VOLLEDIG): Promise<string> {
-  const c = await roep(conceptRoute.POST as Handler, { gebruiker, method: "POST" });
-  const id = c.json.concept.id as string;
-  const r = await roep(conceptIdRoute.PUT as Handler, { gebruiker, params: { id }, body: data, method: "PUT" });
-  expect(r.status).toBe(200);
-  return id;
-}
-
 beforeAll(async () => {
   vi.spyOn(console, "info").mockImplementation(() => undefined);
   await migreer();
 });
 beforeEach(async () => {
-  await db().query("TRUNCATE concept, besluit, audit_log, advies, referentie_teller RESTART IDENTITY CASCADE");
+  await leegDatabase();
 });
 afterAll(sluitDb);
 
@@ -167,7 +126,7 @@ describe("adviesregister", () => {
     const id = await nieuwConcept();
     const a = (await roep(adviesRoute.POST as Handler, { body: { conceptId: id } })).json.advies;
     const r = await roep(actieRoute.POST as Handler, { params: { id: a.id }, method: "POST" });
-    expect(r.json).toEqual({ status: "in_toetsing" });
+    expect(r.json).toEqual({ status: "in_toetsing", meldingVerstuurd: true });
     expect((await db().query("SELECT count(*)::int AS n FROM concept")).rows[0].n).toBe(0);
     expect((await roep(actieRoute.POST as Handler, { params: { id: a.id }, method: "POST" })).status).toBe(409);
   });

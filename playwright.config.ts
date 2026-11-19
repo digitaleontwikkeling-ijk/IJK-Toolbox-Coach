@@ -21,7 +21,7 @@ export default defineConfig({
   workers: 1,
   use: { trace: "off" },
   projects: [
-    { name: "mock-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3100" }, testMatch: /wizard/ },
+    { name: "mock-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3100" }, testMatch: /wizard|toetsing/ },
     { name: "zonder-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3101" }, testMatch: /zonder-coach/ },
     { name: "hermes", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3102" }, testMatch: /hermes/ },
     { name: "telefoon", use: { ...devices["Pixel 7"], baseURL: "http://localhost:3100" }, testMatch: /smal/ },

@@ -66,4 +66,30 @@ export const config = {
   get conceptBewaardagen() {
     return getal("CONCEPT_BEWAARDAGEN", 30);
   },
+  /** "mock" = acties alleen loggen; "webhook" = echte webhooks aanroepen. */
+  get actieModus(): "mock" | "webhook" {
+    const m = process.env.ACTIE_MODUS ?? "mock";
+    if (m !== "mock" && m !== "webhook") throw new Error(`ACTIE_MODUS "${m}" wordt niet ondersteund.`);
+    return m;
+  },
+  get webhooks() {
+    return {
+      urls: {
+        accountaanvraag: verplicht("ACTIE_ACCOUNT_URL"),
+        toetsing: verplicht("ACTIE_TOETSING_URL"),
+        teams_melding: verplicht("ACTIE_MELDING_URL"),
+      },
+      geheim: verplicht("ACTIE_GEHEIM"),
+      geheimHeader: process.env.ACTIE_GEHEIM_HEADER ?? "X-IJK-Webhook-Secret",
+      timeoutMs: getal("ACTIE_TIMEOUT_MS", 10_000),
+    };
+  },
+  /** Stuur de UPN van de aanvrager mee met acties (standaard uit: alleen pseudoniem). */
+  get actieStuurUpn() {
+    return process.env.ACTIE_STUUR_UPN === "true";
+  },
+  /** Publieke URL van de app, voor links in meldingen. */
+  get appUrl() {
+    return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  },
 };

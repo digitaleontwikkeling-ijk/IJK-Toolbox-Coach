@@ -151,3 +151,11 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Contactgegevens worden uit tekst gehaald voor verzending (`src/coach/privacy.ts`).
 - Nagebootste Hermes API-server voor tests en ontwikkeling (`mocks/hermes-mock.ts`).
 - Inrichting en advies voor het Hermes-profiel: `docs/hermes.md`.
+
+## 13. Stand na fase 5
+
+- Vervolgacties via webhooks met gedeeld geheim en idempotency-sleutel; mock die alleen logt. Zie `docs/acties.md`.
+- Statussen: advies gegeven → account aangevraagd / in toetsing → goedgekeurd / goedgekeurd met voorwaarden / afgewezen.
+- Toetsersscherm (`/toetsing`) met besluitformulier; beheerscherm (`/beheer`) met alle adviezen en de inhoud.
+- Audit-log van elke inzage en elk besluit door toetsers en beheerders.
+- Extra waarborg (niet in de opdracht, wel logisch): een toetser kan zijn eigen aanvraag niet toetsen.

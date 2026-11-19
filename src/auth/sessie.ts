@@ -18,12 +18,15 @@ export interface Gebruiker {
   pseudoniemId: string;
   /** Alleen voor weergave in de interface; wordt nergens opgeslagen. */
   naam: string;
+  /** Alleen meegestuurd met acties als ACTIE_STUUR_UPN=true; wordt nergens opgeslagen. */
+  upn?: string;
   rollen: Rol[];
 }
 
 interface SessieInhoud {
   oid: string;
   naam: string;
+  upn?: string;
   rollen: Rol[];
   verloopt: number;
 }
@@ -70,7 +73,12 @@ export function leesSessie(cookieWaarde: string | undefined, nu = Date.now()): G
   }
   if (typeof inhoud.verloopt !== "number" || inhoud.verloopt * 1000 < nu) return null;
   const rollen = (inhoud.rollen ?? []).filter((r): r is Rol => (ROLLEN as readonly string[]).includes(r));
-  return { pseudoniemId: maakPseudoniem(inhoud.oid), naam: String(inhoud.naam ?? ""), rollen };
+  return {
+    pseudoniemId: maakPseudoniem(inhoud.oid),
+    naam: String(inhoud.naam ?? ""),
+    upn: typeof inhoud.upn === "string" ? inhoud.upn : undefined,
+    rollen,
+  };
 }
 
 /** Haalt de cookie uit een Request (route handlers). */

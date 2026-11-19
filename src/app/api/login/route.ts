@@ -19,7 +19,7 @@ export async function POST(req: Request) {
   const o = cookieOpties();
   res.headers.append(
     "Set-Cookie",
-    `${SESSIE_COOKIE}=${encodeURIComponent(maakSessieCookie(gebruiker))}; Path=${o.path}; Max-Age=${o.maxAge}; HttpOnly; SameSite=Lax${o.secure ? "; Secure" : ""}`,
+    `${SESSIE_COOKIE}=${encodeURIComponent(maakSessieCookie({ oid: gebruiker.oid, naam: gebruiker.naam, upn: gebruiker.upn, rollen: gebruiker.rollen }))}; Path=${o.path}; Max-Age=${o.maxAge}; HttpOnly; SameSite=Lax${o.secure ? "; Secure" : ""}`,
   );
   return res;
 }

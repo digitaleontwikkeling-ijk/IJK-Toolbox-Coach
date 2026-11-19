@@ -5,7 +5,7 @@
  * de naam van de uitkomst staat er altijd bij.
  */
 import { forwardRef } from "react";
-import { kleurVan, toolNaam, type AdviesDto, type ContentDto } from "./client";
+import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
 
 interface Props {
   advies: AdviesDto;
@@ -15,10 +15,12 @@ interface Props {
   onVraag?: () => void;
   onOpnieuw?: () => void;
   actieFout?: string | null;
+  /** "medewerker" (standaard) toont de vervolgactie; "inzage" is voor toetsers en beheerders. */
+  weergave?: "medewerker" | "inzage";
 }
 
 export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviescard(
-  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, actieFout },
+  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, actieFout, weergave = "medewerker" },
   kopRef,
 ) {
   const kleur = kleurVan(content, advies.uitkomst)!;
@@ -80,7 +82,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         )}
 
         <section>
-          <h3>Je antwoorden</h3>
+          <h3>{weergave === "inzage" ? "Antwoorden" : "Je antwoorden"}</h3>
           <table className="antwoorden">
             <caption className="sr-only">Antwoorden per check en rode vlaggen</caption>
             <tbody>
@@ -115,6 +117,26 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           </table>
         </section>
 
+        {advies.besluiten && advies.besluiten.length > 0 && (
+          <section>
+            <h3>Besluiten van de toetsers</h3>
+            <ul>
+              {advies.besluiten.map((b) => (
+                <li key={b.toetserRol}>
+                  <strong>{toetserNaam(content, b.toetserRol)}</strong>: {t.besluiten[b.besluit]} ({datum(b.datum)})
+                  {b.toelichting && <><br />{b.toelichting}</>}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {weergave === "inzage" ? (
+          <section>
+            <h3>Status</h3>
+            <p>{t.statussen[advies.status]}</p>
+          </section>
+        ) : (
         <section>
           <h3>Wat nu?</h3>
           <p>{actie?.uitleg}</p>
@@ -132,6 +154,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             {onOpnieuw && <button type="button" className="knop knop--secundair" onClick={onOpnieuw}>Opnieuw beginnen</button>}
           </div>
         </section>
+        )}
       </div>
 
       <footer className="adviescard__voet">

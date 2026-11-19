@@ -86,8 +86,11 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await page.getByRole("button", { name: "Account aanvragen voor Claude Code" }).click();
   await expect(page.locator(".adviescard")).toContainText("Status: Account aangevraagd");
 
+  // Het nieuwe advies staat naast het vorige in Mijn aanvragen.
+  const nieuweRef = (await page.locator(".adviescard__voet strong").innerText()).trim();
   await page.goto("/mijn-aanvragen");
-  await expect(page.locator(".aanvraag")).toHaveCount(2);
+  await expect(page.locator(".aanvraag", { hasText: nieuweRef })).toContainText("Account aangevraagd");
+  await expect(page.locator(".aanvraag", { hasText: "In toetsing" }).first()).toBeVisible();
 });
 
 test("een medewerker ziet alleen zijn eigen aanvragen", async ({ page }) => {
