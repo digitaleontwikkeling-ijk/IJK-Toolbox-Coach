@@ -1,9 +1,14 @@
 import { expect, type Page } from "@playwright/test";
 
-export async function login(page: Page, naam: string) {
+/** Inloggen en met een nieuw, leeg idee beginnen (tests delen één database). */
+export async function login(page: Page, naam: string, opties: { nieuwIdee?: boolean } = {}) {
   await page.goto("/login");
   await page.getByRole("button", { name: new RegExp(naam) }).click();
   await page.waitForURL("**/wizard");
+  if (opties.nieuwIdee !== false) {
+    await page.request.post("/api/concept");
+    await page.reload();
+  }
 }
 
 /** Kiest een antwoord binnen het blok van een check, extra vraag of rode vlag. */

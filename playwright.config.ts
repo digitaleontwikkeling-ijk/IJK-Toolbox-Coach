@@ -23,10 +23,19 @@ export default defineConfig({
   projects: [
     { name: "mock-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3100" }, testMatch: /wizard/ },
     { name: "zonder-coach", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3101" }, testMatch: /zonder-coach/ },
+    { name: "hermes", use: { ...devices["Desktop Chrome"], baseURL: "http://localhost:3102" }, testMatch: /hermes/ },
     { name: "telefoon", use: { ...devices["Pixel 7"], baseURL: "http://localhost:3100" }, testMatch: /smal/ },
   ],
   webServer: [
     { command: "npx next start -p 3100", port: 3100, env: { ...env, COACH_MODUS: "mock" }, reuseExistingServer: false },
     { command: "npx next start -p 3101", port: 3101, env: { ...env, COACH_MODUS: "uit" }, reuseExistingServer: false },
+    // Nagebootste Hermes API-server + app die via het Hermes-protocol praat.
+    { command: "npx tsx mocks/hermes-mock.ts --port 8649", url: "http://127.0.0.1:8649/health", env: { HERMES_API_KEY: "e2e-hermes" }, reuseExistingServer: false },
+    {
+      command: "npx next start -p 3102",
+      port: 3102,
+      env: { ...env, COACH_MODUS: "hermes", HERMES_API_URL: "http://127.0.0.1:8649/v1", HERMES_API_KEY: "e2e-hermes", COACH_TIMEOUT_MS: "5000" },
+      reuseExistingServer: false,
+    },
   ],
 });

@@ -33,11 +33,30 @@ export const config = {
     if (m !== "nep") throw new Error(`AUTH_MODUS "${m}" wordt nog niet ondersteund.`);
     return m;
   },
-  /** "mock" = vaste antwoorden zonder AI. "hermes" volgt in fase 4. "uit" = geen coach. */
-  get coachModus(): "mock" | "uit" {
+  /** "hermes" = Hermes Agent, "mock" = vaste antwoorden zonder AI, "uit" = geen coach. */
+  get coachModus(): "mock" | "hermes" | "uit" {
     const m = process.env.COACH_MODUS ?? "mock";
-    if (m !== "mock" && m !== "uit") throw new Error(`COACH_MODUS "${m}" wordt nog niet ondersteund.`);
+    if (m !== "mock" && m !== "hermes" && m !== "uit") throw new Error(`COACH_MODUS "${m}" wordt niet ondersteund.`);
     return m;
+  },
+  /** Maximale wachttijd op de coach per verzoek, in milliseconden. */
+  get coachTimeoutMs() {
+    return getal("COACH_TIMEOUT_MS", 30_000);
+  },
+  /** Instellingen voor Hermes (alleen nodig bij COACH_MODUS=hermes). */
+  get hermes() {
+    const apiUrl = verplicht("HERMES_API_URL");
+    const url = new URL(apiUrl);
+    const lokaal = ["localhost", "127.0.0.1", "::1"].includes(url.hostname);
+    if (url.protocol !== "https:" && !lokaal && process.env.NODE_ENV === "production") {
+      console.warn("Let op: HERMES_API_URL gebruikt geen https. Gebruik https buiten een afgeschermd netwerk.");
+    }
+    return {
+      apiUrl,
+      apiKey: verplicht("HERMES_API_KEY"),
+      model: process.env.HERMES_MODEL ?? "toolbox-coach",
+      timeoutMs: this.coachTimeoutMs,
+    };
   },
   /** Bewaartermijn van adviezen in het register, in maanden. */
   get bewaartermijnMaanden() {

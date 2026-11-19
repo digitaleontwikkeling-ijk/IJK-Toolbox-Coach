@@ -13,7 +13,8 @@
     "start": "next start",
     "db:migreer": "tsx src/db/migreer.ts",
     "test:e2e": "playwright test --trace off",
-    "opruimen": "tsx src/db/opruimen.ts"
+    "opruimen": "tsx src/db/opruimen.ts",
+    "mock:hermes": "tsx mocks/hermes-mock.ts"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",

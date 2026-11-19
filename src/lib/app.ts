@@ -6,7 +6,12 @@ import { config } from "./config";
 let coach: CoachService | undefined;
 
 export function coachService(): CoachService {
-  coach ??= new CoachService(maakCoachClient(config.coachModus, content()), content());
+  const modus = config.coachModus;
+  coach ??= new CoachService(
+    maakCoachClient(modus, content(), modus === "hermes" ? config.hermes : undefined),
+    content(),
+    config.coachTimeoutMs + 1_000, // iets ruimer dan de client, zodat de client zelf netjes afbreekt
+  );
   return coach;
 }
 

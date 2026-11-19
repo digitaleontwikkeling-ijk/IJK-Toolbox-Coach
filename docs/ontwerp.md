@@ -104,7 +104,7 @@ De uitkomst wordt **altijd server-side** berekend; de client stuurt alleen antwo
 
 `CoachClient` met `verduidelijk`, `tooladvies`, `checksVoorinvullen`, `uitleg`, `chat`. Elk antwoord → Zod-validatie (tool moet in `tools.yaml`, waarden in de schaal). Ongeldig, time-out of fout → `null` → UI valt terug op handmatig invullen. Naar Hermes gaat alleen: beschrijving, relevante content, pseudoniem-ID.
 
-> De Hermes-documentatie (hermes-agent.nousresearch.com) was vanuit deze ontwikkelomgeving niet bereikbaar. In fase 4 zoek ik de exacte API (endpoints, authenticatie, profielkeuze) op; het ontwerp gaat uit van een OpenAI-compatibele chat-endpoint met Bearer-token, met de URL, sleutel en het profiel als omgevingsvariabelen.
+> Uitgewerkt in fase 4: zie `docs/hermes.md` (OpenAI-compatibele `/v1/chat/completions`, Bearer-token, profielnaam als model).
 
 ## 8. Fasering
 
@@ -142,3 +142,12 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Vervolgactie zet nu alleen de status en logt; webhooks volgen in fase 5.
 - Chat staat alleen in het concept en wordt verwijderd na de vervolgactie, bij "Opnieuw beginnen" of na `CONCEPT_BEWAARDAGEN`. `npm run opruimen` handhaaft de bewaartermijnen.
 - Schermafbeeldingen: `docs/schermen/`.
+
+## 12. Stand na fase 4
+
+- `HermesCoachClient` (`src/coach/HermesCoachClient.ts`) met instructies uit de content (`src/coach/prompts.ts`).
+- Schema-validatie per taak, plus weigering van een uitleg die een andere uitkomst noemt.
+- Terugval op handmatig bij fout, time-out, 401/429/500, afgebroken turn of ongeldige JSON.
+- Contactgegevens worden uit tekst gehaald voor verzending (`src/coach/privacy.ts`).
+- Nagebootste Hermes API-server voor tests en ontwikkeling (`mocks/hermes-mock.ts`).
+- Inrichting en advies voor het Hermes-profiel: `docs/hermes.md`.

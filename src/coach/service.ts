@@ -4,6 +4,7 @@
  * handmatig invullen. De app werkt dus ook volledig zonder AI.
  */
 import type { Content } from "../content/laad-content";
+import { HermesCoachClient, type HermesInstellingen } from "./HermesCoachClient";
 import { MockCoachClient } from "./MockCoachClient";
 import type {
   ChatInvoer,
@@ -97,9 +98,21 @@ export class CoachService {
     return [...geldig.values()];
   }
 
+  /**
+   * Uitleg bij de berekende uitkomst. Noemt de uitleg een ándere uitkomst dan
+   * berekend, dan wordt hij geweigerd: het taalmodel bepaalt nooit de kleur.
+   */
   async uitleg(invoer: UitlegInvoer, ctx: CoachContext) {
     const ruw = await this.vraag("uitleg", (c) => c.uitleg(invoer, ctx));
-    return this.valideer("uitleg", uitlegSchema, ruw)?.uitleg ?? null;
+    const uitleg = this.valideer("uitleg", uitlegSchema, ruw)?.uitleg ?? null;
+    if (!uitleg) return null;
+    const tekst = uitleg.toLowerCase();
+    const andere = this.content.regelset.kleuren.filter((k) => k.id !== invoer.uitkomst.kleur);
+    if (andere.some((k) => tekst.includes(k.uitkomst.toLowerCase()))) {
+      console.warn('Coach-taak "uitleg": noemt een andere uitkomst dan berekend, geweigerd.');
+      return null;
+    }
+    return uitleg;
   }
 
   async chat(invoer: ChatInvoer, ctx: CoachContext) {
@@ -108,7 +121,15 @@ export class CoachService {
   }
 }
 
-export function maakCoachClient(modus: "mock" | "uit", content: Content): CoachClient | null {
+export function maakCoachClient(
+  modus: "mock" | "hermes" | "uit",
+  content: Content,
+  hermes?: HermesInstellingen,
+): CoachClient | null {
   if (modus === "mock") return new MockCoachClient(content);
+  if (modus === "hermes") {
+    if (!hermes) throw new Error("COACH_MODUS=hermes vereist HERMES_API_URL en HERMES_API_KEY.");
+    return new HermesCoachClient(hermes, content);
+  }
   return null;
 }
