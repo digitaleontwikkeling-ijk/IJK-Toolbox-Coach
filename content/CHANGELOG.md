@@ -3,6 +3,12 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## tools.yaml 0.2 (concept)
+
+- n8n verwijderd uit de toolbox; Copilot workflows toegevoegd (waarschijnlijke opvolger, nog te bevestigen).
+- Behoeften "automatiseren" en "verbinden": HubBI of Copilot workflows; HubBI heeft voorrang bij AFAS.
+- Spelregels Copilot workflows: placeholder, nog aan te leveren door IJK.
+
 ## 0.1 (concept)
 
 - Startversie op basis van de opdracht.

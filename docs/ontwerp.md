@@ -15,6 +15,7 @@ Status: concept, wacht op akkoord. Alle domeininhoud is startversie `v0.1` en mo
 | Auth | MSAL (`@azure/msal-browser`) + Teams JS SDK v2 (`authentication.getAuthToken`), backend valideert Entra-JWT via JWKS (`jose`) | Conform voorkeur; rollen via Entra **App Roles** |
 | Tests | Vitest (unit + API-integratie tegen echte Postgres in Docker), Playwright (e2e met mock-coach) | Snel, TypeScript-native |
 | UI | React + CSS Modules, geen UI-framework | Volledige controle over IJK-huisstijl en WCAG |
+| Acties | Generieke HTTP-webhooks (URL + gedeeld geheim per actie). Het ontvangende platform (n8n, Copilot workflows, Power Automate) maakt voor de app niet uit | IJK kan van platform wisselen zonder codewijziging |
 | Container | Dockerfile (multi-stage) + docker-compose: app, postgres, mock-webhooks, mock-hermes | Lokaal alles zonder externe afhankelijkheden |
 
 ## 2. Mappenstructuur
@@ -55,7 +56,7 @@ ijk-toolbox-coach/
 ## 3. Datamodel (PostgreSQL)
 
 - **gebruiker**: `id` (uuid), `pseudoniem_id` (HMAC-SHA256 van Entra `oid` met server-geheim), `aangemaakt_op`. Geen naam of e-mail opgeslagen.
-- **advies** (= adviesregister): `id`, `referentie` (`TC-JJJJ-NNNN`, uniek, teller per jaar), `pseudoniem_id`, `aangemaakt_op`, `beschrijving`, `tooladvies` (jsonb: behoefte, tool, motivatie, geaccepteerd), `antwoorden` (jsonb: checks + bijzondere persoonsgegevens), `rode_vlaggen` (jsonb), `uitkomst`, `toetsers` (text[]), `dpia_signaal`, `motivatie`, `voorwaarden` (jsonb), `regelversie`, `status`, `vorig_advies_id` (bij "Er is iets veranderd"), `verloopt_op` (bewaartermijn).
+- **advies** (= adviesregister), met naast `regelversie` ook `toolsversie`: `id`, `referentie` (`TC-JJJJ-NNNN`, uniek, teller per jaar), `pseudoniem_id`, `aangemaakt_op`, `beschrijving`, `tooladvies` (jsonb: behoefte, tool, motivatie, geaccepteerd), `antwoorden` (jsonb: checks + bijzondere persoonsgegevens), `rode_vlaggen` (jsonb), `uitkomst`, `toetsers` (text[]), `dpia_signaal`, `motivatie`, `voorwaarden` (jsonb), `regelversie`, `status`, `vorig_advies_id` (bij "Er is iets veranderd"), `verloopt_op` (bewaartermijn).
 - **besluit**: `id`, `advies_id`, `toetser_rol`, `toetser_pseudoniem_id`, `besluit` (goedgekeurd / goedgekeurd_met_voorwaarden / afgewezen), `toelichting`, `datum`.
 - **gesprek_bericht**: alleen tijdens de wizard (concept), `advies_id`/`concept_id`, rol, tekst, tijd. Wordt verwijderd bij bewaartermijn; zie vraag 6.
 - **concept**: de wizard-voortgang (stap, ingevulde antwoorden), zodat terug/vooruit en herladen geen gegevens verliezen.
@@ -125,3 +126,10 @@ Zoals in de opdracht (fases 2–7), met na elke fase een samenvatting en wacht o
 Contrast (WCAG AA): op groen, geel en oranje staat tekst in Lucht (contrast > 6:1); op rood witte tekst (≈ 5:1). Witte tekst op Blad haalt AA niet (≈ 2,9:1) en gebruiken we dus niet.
 
 Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op te vragen bij marketing. Tot die er zijn: systeemlettertype als terugval. Logo alleen in Blad of wit. Iconen in hexagonvorm (Wolk-vlak, Lucht-lijn) passen we toe in fase 3.
+
+## 10. Besluiten na fase 2
+
+- n8n vervalt als tool; Copilot workflows komt (waarschijnlijk) in de plaats. HubBI gaat voor bij AFAS.
+- Bij twee toetsers: één afwijzing → *afgewezen*; één keer "met voorwaarden" → *goedgekeurd met voorwaarden*; status is definitief als alle toetsers hebben besloten.
+- Proof of concept: nep-login met testgebruikers per rol; Entra ID/Teams-SSO volgt later.
+- Webhook-payloads bevatten standaard alleen het pseudoniem. Meesturen van de UPN is instelbaar (`ACTIE_STUUR_UPN`, standaard uit).

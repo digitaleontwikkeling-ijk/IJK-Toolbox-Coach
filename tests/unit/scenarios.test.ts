@@ -21,7 +21,7 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.dpiaSignaal).toBe(false);
   });
 
-  it("2. Wekelijks overzicht openstaande facturen uit AFAS in Teams (n8n) → geel, voorwaarden leesrechten en eigenaar", () => {
+  it("2. Wekelijks overzicht openstaande facturen uit AFAS in Teams (HubBI, AFAS) → geel, voorwaarden leesrechten en eigenaar", () => {
     const u = evalueer(
       invoer({
         checks: {
@@ -82,7 +82,7 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.motivatie).toBe("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact).");
   });
 
-  it("5. HR-gegevens wekelijks automatisch in AFAS verwerken (n8n) → oranje, beide toetsers, DPIA-signaal", () => {
+  it("5. HR-gegevens wekelijks automatisch in AFAS verwerken (HubBI) → oranje, beide toetsers, DPIA-signaal", () => {
     const u = evalueer(
       invoer({
         checks: {

@@ -2,15 +2,16 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.1"
+versie: "0.2"
 
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
     spelregels: spelregels/m365_copilot.yaml
-  - id: n8n
-    naam: n8n
-    spelregels: spelregels/n8n.yaml
+  - id: copilot_workflows
+    naam: Copilot workflows
+    # TODO: valideren door toetsers (vervangt waarschijnlijk n8n; definitieve naam en keuze nog bevestigen)
+    spelregels: spelregels/copilot_workflows.yaml
   - id: hubbi
     naam: HubBI
     omschrijving: IJK's eigen automatiserings- en integratieplatform voor AFAS.
@@ -31,10 +32,10 @@ behoeften:
     tools: [m365_copilot]
   - id: automatiseren
     omschrijving: Een taak of proces automatiseren
-    tools: [n8n, hubbi]
+    tools: [hubbi, copilot_workflows]
   - id: verbinden
     omschrijving: Systemen of gegevens met elkaar verbinden
-    tools: [n8n, hubbi]
+    tools: [hubbi, copilot_workflows]
   - id: ai_in_werkproces
     omschrijving: AI toevoegen aan een werkproces
     tools: [ai_flows]
@@ -47,4 +48,4 @@ behoeften:
 
 # Hints voor de coach bij het kiezen tussen tools binnen dezelfde behoefte.
 keuzehints:
-  - Kies HubBI boven n8n als het om AFAS-processen gaat.
+  - Kies HubBI boven Copilot workflows als het om AFAS-processen gaat.

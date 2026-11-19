@@ -1,0 +1,9 @@
+# Placeholder. Copilot workflows vervangt (waarschijnlijk) n8n.
+# De spelregels levert IJK nog aan. TODO: valideren door toetsers
+tool: copilot_workflows
+zelf_doen:
+  - "[Placeholder] Nog aan te leveren door IJK."
+eerst_toetsen:
+  - "[Placeholder] Nog aan te leveren door IJK."
+altijd:
+  - "[Placeholder] Nog aan te leveren door IJK."
