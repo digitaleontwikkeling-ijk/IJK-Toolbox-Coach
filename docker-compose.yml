@@ -1,0 +1,27 @@
+# Lokaal draaien: app + PostgreSQL. De coach draait als mock (zonder AI).
+# Start: docker compose up --build   →   http://localhost:3000
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: coach
+      POSTGRES_PASSWORD: coach_dev   # alleen voor lokaal gebruik
+      POSTGRES_DB: toolbox_coach
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U coach -d toolbox_coach"]
+      interval: 3s
+      retries: 20
+
+  app:
+    build: .
+    ports: ["3000:3000"]
+    env_file: [.env.docker]
+    environment:
+      DATABASE_URL: postgres://coach:coach_dev@db:5432/toolbox_coach
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  dbdata:

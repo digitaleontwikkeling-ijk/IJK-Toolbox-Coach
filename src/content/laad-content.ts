@@ -11,7 +11,9 @@ import {
   spelregelsSchema,
   toolsSchema,
   type Regelset,
+  tekstenSchema,
   type Spelregels,
+  type Teksten,
   type ToolsConfig,
 } from "../domain/content-schema";
 
@@ -20,6 +22,7 @@ export interface Content {
   tools: ToolsConfig;
   /** tool-id → spelregels */
   spelregels: Record<string, Spelregels>;
+  teksten: Teksten;
 }
 
 export class ContentFout extends Error {
@@ -62,7 +65,8 @@ export function laadContent(map: string = standaardContentMap()): Content {
     }
     spelregels[tool.id] = s;
   }
-  return { regelset, tools, spelregels };
+  const teksten = leesYaml(map, "teksten.yaml", tekstenSchema);
+  return { regelset, tools, spelregels, teksten };
 }
 
 let cache: Content | undefined;

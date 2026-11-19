@@ -1,0 +1,258 @@
+/*
+ * IJK Toolbox Coach — stijlen volgens het IJK-huisstijlhandboek (08-2025).
+ * Kleuren: Blad, Lucht, Wolk, Dauw (primair); Water, Zon, Avondrood (secundair).
+ * Lettertypes Riona Sans (titels) en Ratio (tekst) zijn licentie-fonts; zolang ze
+ * niet zijn geïnstalleerd valt de browser terug op het systeemlettertype.
+ */
+:root {
+  --blad: #50a78a;
+  --blad-donker: #2f7a62; /* voor tekst/rand op wit; contrast ≥ 4.5:1 */
+  --lucht: #1e0e3b;
+  --wolk: #dfe9f0;
+  --dauw: #98a8af;
+  --water: #005282;
+  --zon: #f69b37;
+  --avondrood: #d61539;
+  --zand: #f2eae5; /* zijvlak in het handboek */
+  --wit: #ffffff;
+  --tekst: var(--lucht);
+  --tekst-zacht: #4a4560;
+  --rand: #c4ced4; /* alleen decoratieve randen */
+  --rand-invoer: #6b7c84; /* invoervelden en keuzeknoppen: contrast ≥ 3:1 (WCAG 1.4.11) */
+  --focus: var(--water);
+
+  --font-titel: "Riona Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-tekst: "Ratio", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --ruimte: 1rem;
+  --radius: 4px;
+  --max-breedte: 72rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-tekst);
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--tekst);
+  background: var(--wit);
+}
+
+h1, h2, h3 {
+  font-family: var(--font-titel);
+  color: var(--lucht);
+  line-height: 1.2;
+  margin: 0 0 0.5em;
+}
+h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.02em; }
+h2 { font-size: 1.25rem; }
+h3 { font-size: 1.05rem; }
+p { margin: 0 0 0.75em; }
+
+a { color: var(--water); }
+a:hover { text-decoration-thickness: 2px; }
+
+:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+}
+
+.skiplink {
+  position: absolute; left: -999px; top: 0; background: var(--lucht); color: var(--wit);
+  padding: 0.5rem 1rem; z-index: 10;
+}
+.skiplink:focus { left: 0.5rem; top: 0.5rem; }
+
+/* ---------- Kop ---------- */
+.kop {
+  background: var(--lucht);
+  color: var(--wit);
+  position: relative;
+  overflow: hidden;
+}
+/* Schuine rand onder 60 graden, afgeleid van de hexagon-vorm. */
+.kop::after {
+  content: "";
+  position: absolute; right: -2rem; top: 0; bottom: 0; width: 10rem;
+  background: var(--blad);
+  transform: skewX(-30deg);
+  opacity: 0.9;
+}
+.kop__binnen {
+  position: relative; z-index: 1;
+  max-width: var(--max-breedte); margin: 0 auto;
+  padding: 0.75rem var(--ruimte);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.5rem;
+}
+.kop__naam {
+  font-family: var(--font-titel); font-weight: 700; font-size: 1.1rem;
+  color: var(--wit); text-decoration: none; letter-spacing: 0.02em;
+}
+.kop__naam span { color: var(--blad); }
+.kop nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.kop nav a { color: var(--wit); text-decoration: none; padding: 0.25rem 0; border-bottom: 2px solid transparent; }
+.kop nav a[aria-current="page"], .kop nav a:hover { border-bottom-color: var(--blad); }
+.kop__gebruiker { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; font-size: 0.9rem; margin-right: 6rem; }
+.kop__gebruiker button { background: none; border: 1px solid var(--wit); color: var(--wit); border-radius: var(--radius); padding: 0.2rem 0.6rem; cursor: pointer; font: inherit; }
+.kop :focus-visible { outline-color: var(--wit); }
+
+.melding-testdata {
+  background: var(--zand); color: var(--lucht);
+  font-size: 0.875rem; padding: 0.4rem var(--ruimte); text-align: center;
+}
+
+main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.25rem var(--ruimte) 3rem; }
+
+/* ---------- Knoppen ---------- */
+.knop {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  font: inherit; font-weight: 600; line-height: 1.2;
+  padding: 0.65rem 1.1rem; min-height: 44px;
+  border-radius: var(--radius); border: 2px solid var(--lucht);
+  background: var(--lucht); color: var(--wit); cursor: pointer; text-decoration: none;
+}
+.knop:hover { background: #33245a; }
+.knop--secundair { background: var(--wit); color: var(--lucht); }
+.knop--secundair:hover { background: var(--wolk); }
+.knop--tekst { background: none; border-color: transparent; color: var(--water); padding-inline: 0.25rem; }
+.knop--tekst:hover { background: none; text-decoration: underline; }
+.knop:disabled { opacity: 0.55; cursor: not-allowed; }
+.knoppen { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; align-items: center; }
+.knoppen--tussen { justify-content: space-between; }
+
+/* ---------- Stappenbalk ---------- */
+.stappenbalk { margin: 0 0 1.5rem; }
+.stappenbalk__fases { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.stappenbalk__fase { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tekst-zacht); border-bottom: 2px solid var(--wolk); padding-bottom: 0.25rem; }
+.stappenbalk ol { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
+.stap { display: flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: var(--tekst-zacht); }
+.stap__hex {
+  flex: none; width: 2.2rem; height: 2.5rem;
+  display: grid; place-items: center; font-weight: 700;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--wolk); color: var(--lucht);
+}
+.stap--klaar .stap__hex { background: var(--blad); color: var(--lucht); }
+.stap--huidig { color: var(--lucht); font-weight: 700; }
+.stap--huidig .stap__hex { background: var(--lucht); color: var(--wit); }
+.stap button { all: unset; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; }
+.stap button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.stap button:hover .stap__titel { text-decoration: underline; }
+
+/* ---------- Wizard-indeling ---------- */
+.wizard { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) {
+  .wizard { grid-template-columns: minmax(0, 1fr) 20rem; align-items: start; }
+  .chat { position: sticky; top: 1rem; }
+}
+.paneel { background: var(--wit); border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.25rem; }
+.paneel--vlak { background: var(--wolk); border-color: var(--wolk); }
+.instructie { color: var(--tekst-zacht); }
+
+label, legend { font-weight: 600; }
+textarea, input[type="text"] {
+  width: 100%; font: inherit; color: var(--tekst);
+  border: 2px solid var(--rand-invoer); border-radius: var(--radius); padding: 0.6rem 0.75rem; background: var(--wit);
+}
+textarea { min-height: 9rem; resize: vertical; }
+textarea:focus, input[type="text"]:focus { border-color: var(--water); outline: none; box-shadow: 0 0 0 2px var(--water); }
+.hulptekst { font-size: 0.875rem; color: var(--tekst-zacht); margin-top: 0.25rem; }
+.veld { margin-bottom: 1rem; }
+
+.foutmelding {
+  border-left: 4px solid var(--avondrood); background: #fdecef; padding: 0.75rem 1rem; margin: 1rem 0;
+  border-radius: var(--radius);
+}
+.foutmelding ul { margin: 0.25rem 0 0; padding-left: 1.25rem; }
+.info {
+  border-left: 4px solid var(--water); background: var(--wolk); padding: 0.75rem 1rem; margin: 1rem 0;
+  border-radius: var(--radius);
+}
+
+/* ---------- Keuzeknoppen (checks) ---------- */
+fieldset.keuze { border: 1px solid var(--rand); border-radius: var(--radius); padding: 0.85rem 1rem 1rem; margin: 0 0 1rem; min-width: 0; }
+/* float zorgt dat de legend binnen het kader valt, ook als hij meerdere regels heeft */
+fieldset.keuze legend { float: left; width: 100%; padding: 0; margin-bottom: 0.25rem; }
+fieldset.keuze legend + * { clear: both; }
+.keuze__vraag { font-weight: 400; color: var(--tekst-zacht); display: block; font-size: 0.95rem; }
+.keuze__opties { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.keuze__optie { position: relative; }
+.keuze__optie input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.keuze__optie label {
+  display: inline-flex; align-items: center; gap: 0.35rem; min-height: 44px;
+  padding: 0.5rem 0.85rem; border: 2px solid var(--rand-invoer); border-radius: 999px;
+  font-weight: 400; cursor: pointer; background: var(--wit);
+}
+.keuze__optie input:checked + label { background: var(--lucht); border-color: var(--lucht); color: var(--wit); font-weight: 600; }
+.keuze__optie input:checked + label::before { content: "✓"; }
+.keuze__optie input:focus-visible + label { outline: 3px solid var(--focus); outline-offset: 2px; }
+.keuze__optie label:hover { border-color: var(--lucht); }
+.coach-label { display: inline-block; font-size: 0.8rem; font-weight: 600; background: var(--wolk); color: var(--lucht); border-radius: 999px; padding: 0.1rem 0.6rem; margin-left: 0.5rem; }
+.coach-label--laag { background: #fff3e0; }
+
+/* ---------- Tooladvies en spelregels ---------- */
+.tool-kaart { border: 2px solid var(--blad); border-radius: var(--radius); padding: 1rem 1.25rem; }
+.tool-kaart h3 { font-size: 1.3rem; margin-bottom: 0.25rem; }
+.spelregels { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-top: 1rem; }
+.spelregels h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.spelregels ul { margin: 0; padding-left: 1.1rem; }
+
+/* ---------- Adviescard ---------- */
+.adviescard { border: 1px solid var(--rand); border-radius: var(--radius); overflow: hidden; }
+.adviescard__kop { padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+.adviescard__kop h2 { color: inherit; margin: 0; font-size: 1.4rem; }
+.adviescard__kleur { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
+.adviescard__hex { flex: none; width: 2rem; height: 2.3rem; background: currentColor; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); opacity: 0.85; }
+.adviescard__inhoud { padding: 1.25rem; display: grid; gap: 1.25rem; }
+.adviescard section h3 { margin-bottom: 0.35rem; }
+.antwoorden { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+.antwoorden th, .antwoorden td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--wolk); vertical-align: top; }
+.antwoorden th { font-weight: 600; width: 40%; }
+.badge-kleur {
+  display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 600;
+  border-radius: 999px; padding: 0.15rem 0.6rem;
+}
+.adviescard__voet { background: var(--zand); padding: 0.85rem 1.25rem; font-size: 0.9rem; }
+
+/* ---------- Chat ---------- */
+.chat { display: flex; flex-direction: column; max-height: 80vh; }
+.chat h2 { font-size: 1.05rem; }
+.chat__berichten { list-style: none; margin: 0 0 0.75rem; padding: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; min-height: 6rem; }
+.chat__bericht { padding: 0.5rem 0.75rem; border-radius: var(--radius); max-width: 95%; white-space: pre-wrap; }
+.chat__bericht--coach { background: var(--wolk); align-self: flex-start; }
+.chat__bericht--medewerker { background: var(--lucht); color: var(--wit); align-self: flex-end; }
+.chat__wie { display: block; font-size: 0.75rem; font-weight: 700; opacity: 0.85; }
+.chat form { display: flex; gap: 0.5rem; }
+.chat form input { flex: 1; }
+
+/* ---------- Lijsten ---------- */
+.aanvragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
+.aanvraag { border: 1px solid var(--rand); border-radius: var(--radius); padding: 1rem; display: grid; gap: 0.5rem; }
+.aanvraag__regel { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
+.aanvraag__ref { font-family: var(--font-titel); font-weight: 700; }
+.status { font-size: 0.85rem; border: 1px solid var(--rand-invoer); border-radius: 999px; padding: 0.1rem 0.6rem; }
+
+.login-lijst { list-style: none; padding: 0; display: grid; gap: 0.5rem; max-width: 28rem; }
+.login-lijst .knop { width: 100%; justify-content: space-between; }
+.login-lijst small { font-weight: 400; opacity: 0.85; }
+
+@media (max-width: 599px) {
+  .stap__titel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .stappenbalk ol { justify-items: center; }
+  .kop::after { display: none; } /* op smalle schermen valt de schuine band over de knoppen */
+  .kop__gebruiker { margin-right: 0; margin-left: 0; }
+  h1 { font-size: 1.25rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { scroll-behavior: auto !important; transition: none !important; }
+}

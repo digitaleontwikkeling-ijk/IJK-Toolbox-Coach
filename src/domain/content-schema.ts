@@ -166,3 +166,25 @@ export const toolsSchema = z
     }
   });
 export type ToolsConfig = z.infer<typeof toolsSchema>;
+
+export const STATUSSEN = [
+  "advies_gegeven",
+  "account_aangevraagd",
+  "in_toetsing",
+  "goedgekeurd",
+  "goedgekeurd_met_voorwaarden",
+  "afgewezen",
+] as const;
+export type Status = (typeof STATUSSEN)[number];
+
+export const tekstenSchema = z.object({
+  app: z.object({ naam: tekst, uitgangspunt: tekst, testdata_melding: tekst }),
+  fases: z.array(z.object({ naam: tekst, stappen: z.array(z.number().int()) })),
+  stappen: z.array(z.object({ nummer: z.number().int(), titel: tekst, instructie: tekst })).length(4),
+  spelregels_kopjes: z.object({ zelf_doen: tekst, eerst_toetsen: tekst, altijd: tekst }),
+  vervolgacties: z.record(z.enum(VERVOLGACTIES), z.object({ knop: z.string(), uitleg: tekst })),
+  statussen: z.record(z.enum(STATUSSEN), tekst),
+  dpia: z.object({ titel: tekst, uitleg: tekst }),
+  coach_niet_beschikbaar: tekst,
+});
+export type Teksten = z.infer<typeof tekstenSchema>;

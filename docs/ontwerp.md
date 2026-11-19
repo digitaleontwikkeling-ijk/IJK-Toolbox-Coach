@@ -9,7 +9,7 @@ Status: concept, wacht op akkoord. Alle domeininhoud is startversie `v0.1` en mo
 | Taal | TypeScript (strict) | Conform voorkeur |
 | Framework | Next.js 15 (App Router), frontend + API-routes in één app | Eén codebase, eenvoudig te beheren |
 | Database | PostgreSQL 16 | Conform voorkeur |
-| Database-toegang | Drizzle ORM + SQL-migraties | Leesbare SQL, geen zware tooling |
+| Database-toegang | `pg` met gewone SQL in `src/db/` + SQL-migraties (bij opstarten uitgevoerd) | Afwijking van eerder plan (Drizzle): gewone SQL is voor het beheerteam het makkelijkst te lezen |
 | Validatie | Zod (invoer API, content-bestanden, coach-antwoorden) | Eén schema-bibliotheek voor alles |
 | Content | YAML in `content/`, bij opstart gevalideerd met Zod | Leesbaar voor niet-ontwikkelaars |
 | Auth | MSAL (`@azure/msal-browser`) + Teams JS SDK v2 (`authentication.getAuthToken`), backend valideert Entra-JWT via JWKS (`jose`) | Conform voorkeur; rollen via Entra **App Roles** |
@@ -133,3 +133,12 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Bij twee toetsers: één afwijzing → *afgewezen*; één keer "met voorwaarden" → *goedgekeurd met voorwaarden*; status is definitief als alle toetsers hebben besloten.
 - Proof of concept: nep-login met testgebruikers per rol; Entra ID/Teams-SSO volgt later.
 - Webhook-payloads bevatten standaard alleen het pseudoniem. Meesturen van de UPN is instelbaar (`ACTIE_STUUR_UPN`, standaard uit).
+
+## 11. Stand na fase 3
+
+- Wizard (4 stappen, terug zonder verlies, concept op de server), chatvenster, adviescard, "Mijn aanvragen", "Er is iets veranderd".
+- Nep-login met vijf testgebruikers (`src/auth/testgebruikers.ts`); sessie = ondertekende cookie.
+- Mock-coach (`src/coach/MockCoachClient.ts`) met validatie en terugval (`src/coach/service.ts`). `COACH_MODUS=uit` = volledig handmatig.
+- Vervolgactie zet nu alleen de status en logt; webhooks volgen in fase 5.
+- Chat staat alleen in het concept en wordt verwijderd na de vervolgactie, bij "Opnieuw beginnen" of na `CONCEPT_BEWAARDAGEN`. `npm run opruimen` handhaaft de bewaartermijnen.
+- Schermafbeeldingen: `docs/schermen/`.

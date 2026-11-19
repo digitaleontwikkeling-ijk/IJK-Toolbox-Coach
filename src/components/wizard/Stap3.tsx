@@ -1,0 +1,106 @@
+"use client";
+import { Keuze, JA_NEE, naarJaNee } from "../Keuze";
+import { kleurVan } from "../client";
+import type { StapProps } from "./types";
+
+interface Props extends StapProps {
+  coachNietBeschikbaar: boolean;
+  /** id's van velden die nog niet zijn ingevuld (na een poging om verder te gaan). */
+  ontbrekend: Set<string>;
+}
+
+export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar, ontbrekend }: Props) {
+  const r = content.regelset;
+
+  if (coachBezig === "checks") {
+    return <p role="status">De coach vult de checks alvast voor je in…</p>;
+  }
+
+  return (
+    <>
+      {coachNietBeschikbaar && (
+        <p className="info" role="status">{content.teksten.coach_niet_beschikbaar}</p>
+      )}
+
+      <h2>De zes checks</h2>
+      {r.checks.map((c) => {
+        const voorstel = data.coachVoorstellen[c.id];
+        const vanCoach = voorstel && voorstel.voorstel === data.checks[c.id];
+        return (
+          <div id={`veld-${c.id}`} key={c.id}>
+            <Keuze
+              naam={c.id}
+              fout={ontbrekend.has(c.id)}
+              legend={
+                <>
+                  {c.nummer}. {c.naam}
+                  {vanCoach && (
+                    <span className={`coach-label${voorstel.zekerheid === "laag" ? " coach-label--laag" : ""}`}>
+                      {voorstel.zekerheid === "laag" ? "Voorstel coach (onzeker, check dit)" : "Voorgesteld door de coach"}
+                    </span>
+                  )}
+                </>
+              }
+              vraag={c.vraag}
+              opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label }))}
+              waarde={data.checks[c.id]}
+              onKies={(id) => wijzig((d) => ({ ...d, checks: { ...d.checks, [c.id]: id } }))}
+              extra={r.extra_vragen
+                .filter((e) => e.check === c.id && e.toon_bij.includes(data.checks[c.id] ?? ""))
+                .map((e) => (
+                  <div id={`veld-${e.id}`} key={e.id} style={{ marginTop: "0.75rem" }}>
+                    <Keuze
+                      naam={e.id}
+                      fout={ontbrekend.has(e.id)}
+                      legend={e.vraag}
+                      vraag={e.uitleg}
+                      opties={JA_NEE}
+                      waarde={naarJaNee(data.extraVragen[e.id])}
+                      onKies={(v) => wijzig((d) => ({ ...d, extraVragen: { ...d.extraVragen, [e.id]: v === "ja" } }))}
+                    />
+                  </div>
+                ))}
+            />
+          </div>
+        );
+      })}
+
+      <h2>Rode vlaggen</h2>
+      <p className="instructie">
+        Beantwoord deze vragen eerlijk. Is het antwoord op één van deze vragen &quot;ja&quot;, dan is de uitkomst altijd{" "}
+        &quot;{kleurVan(content, r.rode_vlag_kleur)?.uitkomst}&quot;.
+      </p>
+      {r.rode_vlaggen.map((v) => (
+        <div id={`veld-${v.id}`} key={v.id}>
+          <Keuze
+            naam={v.id}
+            fout={ontbrekend.has(v.id)}
+            legend={`Rode vlag ${v.nummer}`}
+            vraag={v.vraag}
+            opties={JA_NEE}
+            waarde={naarJaNee(data.rodeVlaggen[v.id])}
+            onKies={(x) => wijzig((d) => ({ ...d, rodeVlaggen: { ...d.rodeVlaggen, [v.id]: x === "ja" } }))}
+          />
+        </div>
+      ))}
+    </>
+  );
+}
+
+/** Welke velden van stap 3 ontbreken nog? Geeft [id, leesbare naam]. */
+export function ontbrekendeVelden(content: StapProps["content"], data: StapProps["data"]): [string, string][] {
+  const r = content.regelset;
+  const uit: [string, string][] = [];
+  for (const c of r.checks) {
+    if (!data.checks[c.id]) uit.push([c.id, `${c.nummer}. ${c.naam}`]);
+    for (const e of r.extra_vragen) {
+      if (e.check === c.id && e.toon_bij.includes(data.checks[c.id] ?? "") && typeof data.extraVragen[e.id] !== "boolean") {
+        uit.push([e.id, e.vraag]);
+      }
+    }
+  }
+  for (const v of r.rode_vlaggen) {
+    if (typeof data.rodeVlaggen[v.id] !== "boolean") uit.push([v.id, `Rode vlag ${v.nummer}`]);
+  }
+  return uit;
+}

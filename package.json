@@ -7,15 +7,30 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
-    "content:check": "tsx scripts/controleer-content.ts"
+    "content:check": "tsx scripts/controleer-content.ts",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "db:migreer": "tsx src/db/migreer.ts",
+    "test:e2e": "playwright test --trace off",
+    "opruimen": "tsx src/db/opruimen.ts"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.63.0",
     "@types/node": "^22.20.5",
+    "@types/pg": "^8.23.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
   },
   "dependencies": {
+    "next": "^15.5.29",
+    "pg": "^8.23.1",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "yaml": "^2.9.1",
     "zod": "^3.25.76"
   }

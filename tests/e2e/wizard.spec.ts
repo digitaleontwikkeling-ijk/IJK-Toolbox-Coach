@@ -1,0 +1,114 @@
+import { expect, test } from "@playwright/test";
+import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
+
+test.describe.configure({ mode: "serial" });
+
+test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvraag, Mijn aanvragen", async ({ page }) => {
+  await login(page, "Testmedewerker Anna");
+
+  await naarStap3(page, "Ik wil een verzuimdashboard van mijn afdeling, met gegevens uit AFAS. Het is voor de afdeling.");
+  // De mock-coach adviseert HubBI (AFAS); de medewerker kiest zelf Claude Code.
+  await expect(page.getByRole("heading", { name: "HubBI", level: 3 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Wat mag je zelf doen?" })).toBeVisible();
+  await page.getByRole("button", { name: "Zelf een tool kiezen" }).click();
+  await page.getByText("Claude Code", { exact: true }).click();
+  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+
+  // Stap 3: de coach heeft voorgesteld; voorgestelde waarde is geselecteerd.
+  await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
+  await expect(page.getByRole("radio", { name: "Persoonsgegevens" })).toBeChecked();
+  await expect(page.getByRole("radio", { name: "Afdeling" })).toBeChecked();
+  await expect(page.getByText("Voorgesteld door de coach").first()).toBeVisible();
+
+  // Zonder rode vlaggen kun je niet verder: duidelijke foutmelding.
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+  await expect(page.locator(".foutmelding")).toContainText("Nog niet alle vragen zijn beantwoord");
+  await expect(page.locator(".foutmelding")).toContainText("Rode vlag 1");
+
+  await kies(page, "bijzondere_persoonsgegevens", "Ja");
+  await geenRodeVlaggen(page);
+
+  // Terug en weer vooruit: niets kwijt.
+  await page.getByRole("button", { name: "← Terug" }).click();
+  await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();
+  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+  await expect(page.getByRole("radio", { name: "Ja" }).first()).toBeChecked();
+
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+
+  // Stap 4: de adviescard.
+  const card = page.locator(".adviescard");
+  await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeFocused();
+  await expect(card).toContainText("Uitkomst: oranje");
+  await expect(card).toContainText("Claude Code");
+  await expect(card).toContainText("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact).");
+  await expect(card).toContainText("AI governance & compliance officer");
+  await expect(card).toContainText("architect Digitale Ontwikkeling");
+  await expect(card).toContainText("Mogelijk is een DPIA nodig");
+  await expect(card).toContainText(/TC-\d{4}-\d{4}/);
+  await expect(card).toContainText("adviesregister");
+  // De coach legt uit in het chatvenster.
+  await expect(page.locator(".chat")).toContainText('Je advies is "Eerst toetsen"');
+
+  await page.getByRole("button", { name: "Aanvraag indienen voor toetsing" }).click();
+  await expect(card).toContainText("Status: In toetsing");
+
+  // Mijn aanvragen
+  await page.getByRole("link", { name: "Mijn aanvragen" }).click();
+  const rij = page.locator(".aanvraag").first();
+  await expect(rij).toContainText(/TC-\d{4}-\d{4}/);
+  await expect(rij).toContainText("Eerst toetsen");
+  await expect(rij).toContainText("In toetsing");
+});
+
+test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft een nieuw advies", async ({ page }) => {
+  await login(page, "Testmedewerker Anna");
+  await page.goto("/mijn-aanvragen");
+  await page.getByRole("button", { name: /Er is iets veranderd/ }).first().click();
+  await page.waitForURL("**/wizard");
+  await expect(page.getByText("Je past een eerder advies aan")).toBeVisible();
+  await expect(page.getByLabel("Jouw probleem of idee")).toHaveValue(/verzuimdashboard/);
+
+  await page.getByRole("button", { name: "Volgende →" }).click();
+  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+  // Vorige antwoorden staan er nog; de wijziging: alleen voor mezelf, met testdata.
+  await expect(page.getByRole("radio", { name: "Afdeling" })).toBeChecked();
+  await kies(page, "data", "Openbaar");
+  await kies(page, "systemen", "Geen");
+  await kies(page, "gebruikers", "Alleen ik");
+  await kies(page, "autonomie", "Assisteren");
+  await kies(page, "impact", "Nauwelijks");
+  await kies(page, "afhankelijkheid", "Experiment");
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+
+  await expect(page.getByRole("heading", { name: "Direct aan de slag", level: 2 })).toBeVisible();
+  await expect(page.locator(".adviescard")).toContainText(/TC-\d{4}-\d{4}/);
+  await page.getByRole("button", { name: "Account aanvragen voor Claude Code" }).click();
+  await expect(page.locator(".adviescard")).toContainText("Status: Account aangevraagd");
+
+  await page.goto("/mijn-aanvragen");
+  await expect(page.locator(".aanvraag")).toHaveCount(2);
+});
+
+test("een medewerker ziet alleen zijn eigen aanvragen", async ({ page }) => {
+  await login(page, "Testmedewerker Bram");
+  await page.goto("/mijn-aanvragen");
+  await expect(page.getByText("Je hebt nog geen adviezen")).toBeVisible();
+  const res = await page.request.get("/api/mijn-aanvragen");
+  expect((await res.json()).adviezen).toEqual([]);
+});
+
+test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", async ({ page }) => {
+  await login(page, "Testmedewerker Bram");
+  await naarStap3(page, "Ik wil klantgegevens in een gratis AI-tool plakken om mails te schrijven.");
+  await page.getByRole("button", { name: /past, verder/ }).click();
+  await kies(page, "niet_goedgekeurde_tool", "Ja");
+  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing"]) await kies(page, v, "Nee");
+  // Coach is onzeker over sommige checks: die moet de medewerker bevestigen of zijn al voorgesteld.
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+  const card = page.locator(".adviescard");
+  await expect(page.getByRole("heading", { name: "Niet op deze manier", level: 2 })).toBeVisible();
+  await expect(card).toContainText("Rode vlag: een tool die IJK niet heeft goedgekeurd");
+  await expect(card).toContainText("Zo kan het wel");
+  await expect(card.getByRole("button", { name: /Account aanvragen|Aanvraag indienen/ })).toHaveCount(0);
+});

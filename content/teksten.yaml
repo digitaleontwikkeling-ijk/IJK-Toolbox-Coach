@@ -1,0 +1,60 @@
+# Teksten in de interface. Beheer: Team Digitale Ontwikkeling.
+# Helder, laagdrempelig, zonder jargon.
+
+app:
+  naam: IJK Toolbox Coach
+  uitgangspunt: Niet de tool bepaalt wat mag, maar wat je ermee doet.
+  testdata_melding: "Proof of concept: gebruik alleen testgegevens en fictieve voorbeelden."
+
+fases:
+  - naam: Welke tool past?
+    stappen: [1, 2]
+  - naam: Mag ik dit doen?
+    stappen: [3, 4]
+
+stappen:
+  - nummer: 1
+    titel: Wat wil je bereiken?
+    instructie: Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt, nog zonder aan een tool te denken.
+  - nummer: 2
+    titel: Welke tool past?
+    instructie: Op basis van je beschrijving adviseert de coach een tool uit de IJK Toolbox.
+  - nummer: 3
+    titel: Zes checks
+    instructie: De coach heeft de checks alvast ingevuld op basis van je beschrijving. Klopt het? Pas aan waar nodig.
+  - nummer: 4
+    titel: Advies
+    instructie: Dit is je advies, berekend met de vaste spelregels van IJK.
+
+spelregels_kopjes:
+  zelf_doen: Wat mag je zelf doen?
+  eerst_toetsen: Wanneer laat je eerst toetsen?
+  altijd: Waar let je altijd op?
+
+vervolgacties:
+  accountaanvraag:
+    knop: "Account aanvragen voor {tool}"
+    uitleg: Je kunt direct aan de slag. Vraag een account aan voor de geadviseerde tool.
+  accountaanvraag_met_voorwaarden:
+    knop: "Account aanvragen voor {tool}"
+    uitleg: Je kunt aan de slag als je je aan de voorwaarden houdt. De voorwaarden gaan mee met je aanvraag.
+  toetsing:
+    knop: Aanvraag indienen voor toetsing
+    uitleg: Laat je idee eerst toetsen. Je aanvraag gaat naar de juiste toetser(s), die een melding in Teams krijgen.
+  alleen_vastleggen:
+    knop: ""
+    uitleg: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan de coach.
+
+statussen:
+  advies_gegeven: Advies gegeven
+  account_aangevraagd: Account aangevraagd
+  in_toetsing: In toetsing
+  goedgekeurd: Goedgekeurd
+  goedgekeurd_met_voorwaarden: Goedgekeurd met voorwaarden
+  afgewezen: Afgewezen
+
+dpia:
+  titel: Mogelijk is een DPIA nodig
+  uitleg: Een DPIA (gegevensbeschermingseffectbeoordeling) brengt de privacyrisico's van een toepassing in kaart. Bij jouw antwoorden is die mogelijk verplicht. De AI governance & compliance officer kijkt met je mee.
+
+coach_niet_beschikbaar: De coach is nu niet beschikbaar. Je kunt gewoon verder door zelf te kiezen.
