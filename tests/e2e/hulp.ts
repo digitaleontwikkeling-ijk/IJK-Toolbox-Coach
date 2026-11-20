@@ -16,14 +16,22 @@ export async function login(page: Page, naam: string, opties: { nieuwIdee?: bool
  * Bij een check met meerdere antwoorden worden andere aangevinkte antwoorden eerst uitgezet.
  */
 export async function kies(page: Page, veld: string, label: string) {
+  // Wacht tot het formulier er staat (niet meer "De coach vult de checks in…").
+  await expect(page.getByText("De coach vult de checks alvast voor je in…")).toHaveCount(0);
   const blok = page.locator(`#veld-${veld} > fieldset`).first();
-  const vakjes = blok.locator(':scope > .keuze__opties input[type="checkbox"]');
-  for (let i = 0; i < (await vakjes.count()); i++) {
-    const v = vakjes.nth(i);
-    const tekst = await page.locator(`label[for="${await v.getAttribute("id")}"]`).innerText();
-    if ((await v.isChecked()) !== (tekst === label)) await page.locator(`label[for="${await v.getAttribute("id")}"]`).click();
+  await blok.waitFor();
+  const opties = blok.locator(":scope > .keuze__opties input");
+  for (let i = 0; i < (await opties.count()); i++) {
+    const invoer = opties.nth(i);
+    const id = await invoer.getAttribute("id");
+    const isDit = (await page.locator(`label[for="${id}"]`).innerText()) === label;
+    const isVakje = (await invoer.getAttribute("type")) === "checkbox";
+    // Selectievakjes: precies dit antwoord aan, de rest uit. Keuzerondjes: alleen dit antwoord aanklikken.
+    if (isVakje ? (await invoer.isChecked()) !== isDit : isDit) {
+      await page.locator(`label[for="${id}"]`).click();
+      await expect(invoer).toBeChecked({ checked: isDit });
+    }
   }
-  if ((await vakjes.count()) === 0) await blok.getByText(label, { exact: true }).first().click();
 }
 
 /** Vinkt een extra antwoord aan bij een check met meerdere antwoorden. */

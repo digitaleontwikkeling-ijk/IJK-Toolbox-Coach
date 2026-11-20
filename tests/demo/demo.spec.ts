@@ -38,7 +38,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page.locator(".adviescard")).toContainText("Status: In toetsing");
 
   // Herladen: gegevens blijven (localStorage).
-  await page.getByRole("link", { name: "Mijn aanvragen" }).click();
+  await page.getByRole("link", { name: "Mijn aanvragen", exact: true }).click();
   await page.waitForURL(`**${B}/mijn-aanvragen/`);
   await page.reload();
   await expect(page.locator(".aanvraag", { hasText: ref })).toContainText("In toetsing");
@@ -58,7 +58,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   }
 
   await login(page, "Testmedewerker Anna");
-  await page.getByRole("link", { name: "Mijn aanvragen" }).click();
+  await page.getByRole("link", { name: "Mijn aanvragen", exact: true }).click();
   await expect(page.locator(".aanvraag", { hasText: ref })).toContainText("Goedgekeurd met voorwaarden");
   await page.locator(".aanvraag", { hasText: ref }).getByRole("link", { name: /Bekijk advies/ }).click();
   await expect(page.locator(".adviescard")).toContainText("Eerst een DPIA uitvoeren.");

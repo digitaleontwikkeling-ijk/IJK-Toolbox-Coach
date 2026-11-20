@@ -186,6 +186,13 @@ export const tekstenSchema = z.object({
   spelregels_kopjes: z.object({ zelf_doen: tekst, eerst_toetsen: tekst, altijd: tekst }),
   vervolgacties: z.record(z.enum(VERVOLGACTIES), z.object({ knop: z.string(), uitleg: tekst })),
   statussen: z.record(z.enum(STATUSSEN), tekst),
+  na_actie: z.object({
+    account_aangevraagd: tekst,
+    in_toetsing: tekst,
+    goedgekeurd: tekst,
+    goedgekeurd_met_voorwaarden: tekst,
+    afgewezen: tekst,
+  }),
   besluiten: z.object({ goedgekeurd: tekst, goedgekeurd_met_voorwaarden: tekst, afgewezen: tekst }),
   toetsing: z.object({ titel: tekst, intro: tekst, toelichting_voorwaarden: tekst, toelichting_afwijzing: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),

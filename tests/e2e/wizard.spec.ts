@@ -52,9 +52,14 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
 
   await page.getByRole("button", { name: "Aanvraag indienen voor toetsing" }).click();
   await expect(card).toContainText("Status: In toetsing");
+  // Na het indienen: uitleg wat er gebeurd is, en de weg naar Mijn aanvragen.
+  await expect(card).toContainText("Je aanvraag is ingediend bij AI governance & compliance officer en architect Digitale Ontwikkeling.");
+  await expect(card.getByRole("button", { name: "Aanvraag indienen voor toetsing" })).toHaveCount(0);
+  await expect(card.getByRole("button", { name: "Nieuw idee" })).toBeVisible();
+  await expect(card.getByRole("link", { name: "Naar Mijn aanvragen" })).toBeVisible();
 
   // Mijn aanvragen
-  await page.getByRole("link", { name: "Mijn aanvragen" }).click();
+  await page.getByRole("link", { name: "Mijn aanvragen", exact: true }).click();
   const rij = page.locator(".aanvraag").first();
   await expect(rij).toContainText(/TC-\d{4}-\d{4}/);
   await expect(rij).toContainText("Eerst toetsen");

@@ -4,6 +4,7 @@
  * beslisregels) en de content. Kleur is nooit de enige drager van betekenis:
  * de naam van de uitkomst staat er altijd bij.
  */
+import Link from "next/link";
 import { forwardRef } from "react";
 import { alsLijst } from "./Keuze";
 import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
@@ -146,19 +147,37 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         ) : (
         <section>
           <h3>Wat nu?</h3>
-          <p>{actie?.uitleg}</p>
+          {/* aria-live: na het indienen hoort een schermlezer meteen wat er is gebeurd. */}
+          <div aria-live="polite">
+            {advies.status === "advies_gegeven" ? (
+              <p>{actie?.uitleg}</p>
+            ) : (
+              <>
+                <p className="info" style={{ margin: "0 0 0.75rem" }}>
+                  <strong>Status: {t.statussen[advies.status]}.</strong>{" "}
+                  {t.na_actie[advies.status as keyof typeof t.na_actie]
+                    .replace("{tool}", tool)
+                    .replace("{toetsers}", toetserNamen.join(" en ") || "de toetsers")}
+                </p>
+              </>
+            )}
+          </div>
           {actieFout && <p className="foutmelding" role="alert">{actieFout}</p>}
-          {advies.status !== "advies_gegeven" && (
-            <p><strong>Status:</strong> {t.statussen[advies.status]}</p>
-          )}
           <div className="knoppen">
             {actieKanNog && onActie && (
               <button type="button" className="knop" onClick={onActie} disabled={actieBezig}>
                 {actie.knop.replace("{tool}", tool)}
               </button>
             )}
+            {advies.status !== "advies_gegeven" && (
+              <Link className="knop" href="/mijn-aanvragen">Naar Mijn aanvragen</Link>
+            )}
             {onVraag && <button type="button" className="knop knop--secundair" onClick={onVraag}>Vraag stellen</button>}
-            {onOpnieuw && <button type="button" className="knop knop--secundair" onClick={onOpnieuw}>Opnieuw beginnen</button>}
+            {onOpnieuw && (
+              <button type="button" className="knop knop--secundair" onClick={onOpnieuw}>
+                {advies.status === "advies_gegeven" ? "Opnieuw beginnen" : "Nieuw idee"}
+              </button>
+            )}
           </div>
         </section>
         )}
