@@ -27,7 +27,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   }
   await expect(page.getByRole("heading", { name: "HubBI", level: 3 })).toBeVisible();
   await page.getByRole("button", { name: "HubBI past, verder →" }).click();
-  await expect(page.getByRole("radio", { name: "Persoonsgegevens" })).toBeChecked();
+  await expect(page.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
   await kies(page, "bijzondere_persoonsgegevens", "Nee");
   for (const v of ["niet_goedgekeurde_tool", "persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing"]) await kies(page, v, "Nee");
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();

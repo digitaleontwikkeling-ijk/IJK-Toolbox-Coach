@@ -36,7 +36,7 @@ interface DemoAdvies {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: NonNullable<WizardData["tooladvies"]>;
-  antwoorden: { checks: Record<string, string>; extraVragen: Record<string, boolean> };
+  antwoorden: { checks: Record<string, string | string[]>; extraVragen: Record<string, boolean> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];

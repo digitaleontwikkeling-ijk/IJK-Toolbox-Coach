@@ -8,8 +8,8 @@ test("volledige wizard via Hermes: tooladvies, voorinvullen en uitleg", async ({
   await expect(page.getByText("Advies van de coach")).toBeVisible();
   await expect(page.getByRole("heading", { name: "Claude Code", level: 3 })).toBeVisible();
   await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
-  await expect(page.getByRole("radio", { name: "Openbaar" })).toBeChecked();
-  await expect(page.getByRole("radio", { name: "Experiment" })).toBeChecked();
+  await expect(page.getByLabel("Openbaar", { exact: true })).toBeChecked();
+  await expect(page.getByLabel("Experiment", { exact: true })).toBeChecked();
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Direct aan de slag", level: 2 })).toBeVisible();
@@ -41,6 +41,6 @@ test("coach geeft ongeldige checks: niets wordt voorgeselecteerd, handmatig invu
   await page.getByRole("button", { name: /past, verder/ }).click();
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
   for (const naam of ["Openbaar", "Intern", "Persoonsgegevens", "Vertrouwelijk/gevoelig"]) {
-    await expect(page.getByRole("radio", { name: naam })).not.toBeChecked();
+    await expect(page.getByLabel(naam, { exact: true })).not.toBeChecked();
   }
 });

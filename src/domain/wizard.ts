@@ -43,7 +43,8 @@ export const wizardDataSchema = z.object({
   tooladvies: tooladviesSchema.nullable().default(null),
   /** Tools die de medewerker niet wil (bij "andere tool vragen"). */
   uitgeslotenTools: z.array(id).max(10).default([]),
-  checks: z.record(id, id).default({}),
+  /** check-id → antwoord-id, of een lijst bij een check met meerdere antwoorden. */
+  checks: z.record(id, z.union([id, z.array(id).max(10)])).default({}),
   /** Voorstellen van de coach per check, om te tonen wat de coach dacht. */
   coachVoorstellen: z.record(id, checkVoorstelSchema).default({}),
   checksVoorgesteld: z.boolean().default(false),

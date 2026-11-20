@@ -5,6 +5,7 @@
  * de naam van de uitkomst staat er altijd bij.
  */
 import { forwardRef } from "react";
+import { alsLijst } from "./Keuze";
 import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
 
 interface Props {
@@ -87,16 +88,22 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             <caption className="sr-only">Antwoorden per check en rode vlaggen</caption>
             <tbody>
               {r.checks.map((c) => {
-                const a = c.antwoorden.find((x) => x.id === advies.antwoorden.checks[c.id]);
-                const ak = a ? kleurVan(content, a.kleur) : undefined;
+                const ids = alsLijst(advies.antwoorden.checks[c.id]);
+                const gekozen = c.antwoorden.filter((x) => ids.includes(x.id));
                 return (
                   <tr key={c.id}>
                     <th scope="row">{c.nummer}. {c.naam}</th>
                     <td>
-                      {a?.label ?? "—"}{" "}
-                      {ak && (
-                        <span className="badge-kleur" style={{ background: ak.hex, color: ak.tekstkleur }}>{ak.id}</span>
-                      )}
+                      {gekozen.length === 0 && "—"}
+                      {gekozen.map((a) => {
+                        const ak = kleurVan(content, a.kleur)!;
+                        return (
+                          <div key={a.id}>
+                            {a.label}{" "}
+                            <span className="badge-kleur" style={{ background: ak.hex, color: ak.tekstkleur }}>{ak.id}</span>
+                          </div>
+                        );
+                      })}
                     </td>
                   </tr>
                 );

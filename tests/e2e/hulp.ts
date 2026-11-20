@@ -11,9 +11,26 @@ export async function login(page: Page, naam: string, opties: { nieuwIdee?: bool
   }
 }
 
-/** Kiest een antwoord binnen het blok van een check, extra vraag of rode vlag. */
+/**
+ * Kiest precies dit antwoord binnen het blok van een check, extra vraag of rode vlag.
+ * Bij een check met meerdere antwoorden worden andere aangevinkte antwoorden eerst uitgezet.
+ */
 export async function kies(page: Page, veld: string, label: string) {
-  await page.locator(`#veld-${veld}`).getByText(label, { exact: true }).first().click();
+  const blok = page.locator(`#veld-${veld} > fieldset`).first();
+  const vakjes = blok.locator(':scope > .keuze__opties input[type="checkbox"]');
+  for (let i = 0; i < (await vakjes.count()); i++) {
+    const v = vakjes.nth(i);
+    const tekst = await page.locator(`label[for="${await v.getAttribute("id")}"]`).innerText();
+    if ((await v.isChecked()) !== (tekst === label)) await page.locator(`label[for="${await v.getAttribute("id")}"]`).click();
+  }
+  if ((await vakjes.count()) === 0) await blok.getByText(label, { exact: true }).first().click();
+}
+
+/** Vinkt een extra antwoord aan bij een check met meerdere antwoorden. */
+export async function vinkAan(page: Page, veld: string, label: string) {
+  const l = page.locator(`#veld-${veld} > fieldset > .keuze__opties`).getByText(label, { exact: true });
+  const id = await l.getAttribute("for");
+  if (!(await page.locator(`#${id}`).isChecked())) await l.click();
 }
 
 export async function geenRodeVlaggen(page: Page) {

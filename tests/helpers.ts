@@ -17,11 +17,11 @@ export function kopieRegelset(): Regelset {
  * Dit volgt de afspraak voor scenario's waarin niet alle checks zijn genoemd.
  */
 export function invoer(opties: {
-  checks?: Record<string, string>;
+  checks?: Record<string, string | string[]>;
   extraVragen?: Record<string, boolean>;
   rodeVlaggen?: Record<string, boolean>;
 } = {}, r: Regelset = regelset): BeslisInvoer {
-  const checks: Record<string, string> = {};
+  const checks: Record<string, string | string[]> = {};
   for (const c of r.checks) checks[c.id] = opties.checks?.[c.id] ?? c.antwoorden[0]!.id;
   const rodeVlaggen: Record<string, boolean> = {};
   for (const v of r.rode_vlaggen) rodeVlaggen[v.id] = opties.rodeVlaggen?.[v.id] ?? false;

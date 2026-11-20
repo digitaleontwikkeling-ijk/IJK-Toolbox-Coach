@@ -74,7 +74,7 @@ export interface AdviesRij {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: Tooladvies;
-  antwoorden: { checks: Record<string, string>; extraVragen: Record<string, boolean> };
+  antwoorden: { checks: Record<string, string | string[]>; extraVragen: Record<string, boolean> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];

@@ -35,7 +35,8 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
       const r = content().regelset;
       const antwoorden: Record<string, string> = {};
       for (const c of r.checks) {
-        antwoorden[c.naam] = c.antwoorden.find((a) => a.id === advies.antwoorden.checks[c.id])?.label ?? "";
+        const ids = ([] as string[]).concat(advies.antwoorden.checks[c.id] ?? []);
+        antwoorden[c.naam] = c.antwoorden.filter((a) => ids.includes(a.id)).map((a) => a.label).join(", ");
       }
       const kleur = r.kleuren.find((k) => k.id === advies.uitkomst)!;
       const uitleg = await coach.uitleg(

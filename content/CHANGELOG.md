@@ -3,6 +3,12 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.2 (concept)
+
+- Checks Data, Systemen, Gebruikers en Autonomie staan meerdere antwoorden toe (`meerdere: true`);
+  per check telt het antwoord met de hoogste kleur. Impact en Afhankelijkheid: één antwoord.
+- TODO: valideren door toetsers.
+
 ## tools.yaml 0.2 (concept)
 
 - n8n verwijderd uit de toolbox; Copilot workflows toegevoegd (waarschijnlijke opvolger, nog te bevestigen).

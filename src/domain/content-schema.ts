@@ -41,6 +41,8 @@ const checkSchema = z.object({
   naam: tekst,
   vraag: tekst,
   toetser: id,
+  /** Mag de medewerker meerdere antwoorden kiezen? De hoogste kleur telt. */
+  meerdere: z.boolean().default(false),
   antwoorden: z.array(antwoordSchema).min(1),
 });
 

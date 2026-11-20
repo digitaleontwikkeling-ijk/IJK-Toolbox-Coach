@@ -1,5 +1,5 @@
 "use client";
-import { Keuze, JA_NEE, naarJaNee } from "../Keuze";
+import { alsLijst, Keuze, JA_NEE, naarJaNee } from "../Keuze";
 import { kleurVan } from "../client";
 import type { StapProps } from "./types";
 
@@ -25,10 +25,17 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
       <h2>De zes checks</h2>
       {r.checks.map((c) => {
         const voorstel = data.coachVoorstellen[c.id];
-        const vanCoach = voorstel && voorstel.voorstel === data.checks[c.id];
+        const gekozen = alsLijst(data.checks[c.id]);
+        // Het label blijft staan zolang de keuze precies het voorstel van de coach is.
+        const vanCoach = voorstel && gekozen.length === 1 && gekozen[0] === voorstel.voorstel;
+        const zetChecks = (w: string | string[]) => wijzig((d) => ({ ...d, checks: { ...d.checks, [c.id]: w } }));
+        const keuzeProps = c.meerdere
+          ? ({ meerdere: true, waarde: gekozen, onKies: (ids: string[]) => zetChecks(ids) } as const)
+          : ({ waarde: gekozen[0], onKies: (id: string) => zetChecks(id) } as const);
         return (
           <div id={`veld-${c.id}`} key={c.id}>
             <Keuze
+              {...keuzeProps}
               naam={c.id}
               fout={ontbrekend.has(c.id)}
               legend={
@@ -43,10 +50,8 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
               }
               vraag={c.vraag}
               opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label }))}
-              waarde={data.checks[c.id]}
-              onKies={(id) => wijzig((d) => ({ ...d, checks: { ...d.checks, [c.id]: id } }))}
               extra={r.extra_vragen
-                .filter((e) => e.check === c.id && e.toon_bij.includes(data.checks[c.id] ?? ""))
+                .filter((e) => e.check === c.id && gekozen.some((g) => e.toon_bij.includes(g)))
                 .map((e) => (
                   <div id={`veld-${e.id}`} key={e.id} style={{ marginTop: "0.75rem" }}>
                     <Keuze
@@ -92,9 +97,10 @@ export function ontbrekendeVelden(content: StapProps["content"], data: StapProps
   const r = content.regelset;
   const uit: [string, string][] = [];
   for (const c of r.checks) {
-    if (!data.checks[c.id]) uit.push([c.id, `${c.nummer}. ${c.naam}`]);
+    const gekozen = alsLijst(data.checks[c.id]);
+    if (gekozen.length === 0) uit.push([c.id, `${c.nummer}. ${c.naam}`]);
     for (const e of r.extra_vragen) {
-      if (e.check === c.id && e.toon_bij.includes(data.checks[c.id] ?? "") && typeof data.extraVragen[e.id] !== "boolean") {
+      if (e.check === c.id && gekozen.some((g) => e.toon_bij.includes(g)) && typeof data.extraVragen[e.id] !== "boolean") {
         uit.push([e.id, e.vraag]);
       }
     }

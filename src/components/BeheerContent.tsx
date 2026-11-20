@@ -31,7 +31,10 @@ export function BeheerContent() {
         <tbody>
           {r.checks.map((ch) => (
             <tr key={ch.id}>
-              <th scope="row">{ch.nummer}. {ch.naam}<br /><span className="hulptekst">{ch.vraag}</span></th>
+              <th scope="row">
+                {ch.nummer}. {ch.naam}<br /><span className="hulptekst">{ch.vraag}</span>
+                {ch.meerdere && <><br /><span className="hulptekst">Meerdere antwoorden mogelijk (hoogste kleur telt)</span></>}
+              </th>
               <td>
                 {ch.antwoorden.map((a) => {
                   const k = kleurVan(c, a.kleur)!;

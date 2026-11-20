@@ -7,7 +7,7 @@
 # Startversie: nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.1"
+versie: "0.2"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -53,12 +53,15 @@ toetsers:
 # toetser: wie toetst als deze check oranje scoort.
 # voorwaarde: alleen bij antwoorden die geel scoren; wordt getoond als de uitkomst geel is.
 # alternatief: alleen bij antwoorden die rood scoren; wordt getoond als de uitkomst rood is.
+# meerdere: true = de medewerker mag meerdere antwoorden kiezen; het antwoord met de hoogste kleur telt.
+#   TODO: valideren door toetsers (welke checks meerdere antwoorden toestaan)
 checks:
   - id: data
     nummer: 1
     naam: Data
     vraag: Welke data gebruik je?
     toetser: toetser_compliance
+    meerdere: true
     antwoorden:
       - { id: openbaar, label: Openbaar, kleur: groen }
       - { id: intern, label: Intern, kleur: groen }
@@ -70,6 +73,7 @@ checks:
     naam: Systemen
     vraag: Welke systemen raak je?
     toetser: toetser_architect
+    meerdere: true
     antwoorden:
       - { id: geen, label: Geen, kleur: groen }
       - id: lezen
@@ -84,6 +88,7 @@ checks:
     naam: Gebruikers
     vraag: Wie gebruikt de oplossing?
     toetser: toetser_architect
+    meerdere: true
     antwoorden:
       - { id: alleen_ik, label: Alleen ik, kleur: groen }
       - id: collegas
@@ -99,6 +104,7 @@ checks:
     naam: Autonomie
     vraag: Wat mag de oplossing doen?
     toetser: toetser_compliance
+    meerdere: true
     antwoorden:
       - { id: assisteren, label: Assisteren, kleur: groen }
       - { id: adviseren, label: Adviseren, kleur: groen }

@@ -153,7 +153,9 @@ export function Wizard() {
       const coachVoorstellen = { ...x.coachVoorstellen };
       for (const v of voorstellen ?? []) {
         coachVoorstellen[v.check] = { voorstel: v.voorstel, zekerheid: v.zekerheid, vervolgvraag: v.vervolgvraag };
-        checks[v.check] ??= v.voorstel; // nooit een keuze van de medewerker overschrijven
+        // Nooit een keuze van de medewerker overschrijven.
+        const meerdere = r.checks.find((c) => c.id === v.check)?.meerdere;
+        checks[v.check] ??= meerdere ? [v.voorstel] : v.voorstel;
       }
       const vragen = (voorstellen ?? [])
         .filter((v) => v.vervolgvraag && v.zekerheid !== "hoog")

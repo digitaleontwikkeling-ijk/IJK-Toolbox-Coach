@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
+import { geenRodeVlaggen, kies, login, naarStap3, vinkAan } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 
@@ -16,8 +16,8 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
 
   // Stap 3: de coach heeft voorgesteld; voorgestelde waarde is geselecteerd.
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
-  await expect(page.getByRole("radio", { name: "Persoonsgegevens" })).toBeChecked();
-  await expect(page.getByRole("radio", { name: "Afdeling" })).toBeChecked();
+  await expect(page.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
+  await expect(page.getByLabel("Afdeling", { exact: true })).toBeChecked();
   await expect(page.getByText("Voorgesteld door de coach").first()).toBeVisible();
 
   // Zonder rode vlaggen kun je niet verder: duidelijke foutmelding.
@@ -32,7 +32,7 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await page.getByRole("button", { name: "← Terug" }).click();
   await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();
   await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
-  await expect(page.getByRole("radio", { name: "Ja" }).first()).toBeChecked();
+  await expect(page.getByLabel("Ja", { exact: true }).first()).toBeChecked();
 
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
 
@@ -72,7 +72,7 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await page.getByRole("button", { name: "Volgende →" }).click();
   await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
   // Vorige antwoorden staan er nog; de wijziging: alleen voor mezelf, met testdata.
-  await expect(page.getByRole("radio", { name: "Afdeling" })).toBeChecked();
+  await expect(page.getByLabel("Afdeling", { exact: true })).toBeChecked();
   await kies(page, "data", "Openbaar");
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Alleen ik");
@@ -114,4 +114,30 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
   await expect(card).toContainText("Rode vlag: een tool die IJK niet heeft goedgekeurd");
   await expect(card).toContainText("Zo kan het wel");
   await expect(card.getByRole("button", { name: /Account aanvragen|Aanvraag indienen/ })).toHaveCount(0);
+});
+
+test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste kleur telt", async ({ page }) => {
+  await login(page, "Testmedewerker Bram");
+  await naarStap3(page, "Een overzicht van openstaande facturen voor mijn team.");
+  await page.getByRole("button", { name: /past, verder/ }).click();
+  await expect(page.locator("#veld-gebruikers")).toContainText("Je kunt meerdere antwoorden kiezen.");
+  await expect(page.locator("#veld-impact")).not.toContainText("Je kunt meerdere antwoorden kiezen.");
+  await kies(page, "data", "Intern");
+  await kies(page, "systemen", "Geen");
+  await kies(page, "gebruikers", "Collega's");
+  await vinkAan(page, "gebruikers", "Extern/klanten");
+  await expect(page.locator("#veld-gebruikers").getByLabel("Collega's")).toBeChecked();
+  await expect(page.locator("#veld-gebruikers").getByLabel("Extern/klanten")).toBeChecked();
+  await kies(page, "autonomie", "Assisteren");
+  await kies(page, "impact", "Beperkt");
+  await kies(page, "afhankelijkheid", "Persoonlijke oplossing");
+  await geenRodeVlaggen(page);
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+  const card = page.locator(".adviescard");
+  await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
+  await expect(card).toContainText("Extern/klanten (Gebruikers).");
+  // Beide gekozen antwoorden staan op de adviescard.
+  const rij = card.getByRole("row", { name: /3\. Gebruikers/ });
+  await expect(rij).toContainText("Collega's");
+  await expect(rij).toContainText("Extern/klanten");
 });

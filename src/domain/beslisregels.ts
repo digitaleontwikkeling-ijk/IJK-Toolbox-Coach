@@ -6,13 +6,17 @@
  * Alle inhoud (kleuren, toetsers, DPIA-regels, teksten) komt uit de regelset.
  *
  * Regel: uitkomst = hoogste kleur over alle checks en rode vlaggen.
+ * Bij een check met meerdere antwoorden telt het antwoord met de hoogste kleur.
  */
 import type { Antwoord, Check, Kleur, Regelset, Vervolgactie } from "./content-schema";
 
 /** De antwoorden van de medewerker. Alles wordt aangeduid met id's uit de regelset. */
 export interface BeslisInvoer {
-  /** check-id → antwoord-id, bijvoorbeeld { data: "intern" } */
-  checks: Record<string, string>;
+  /**
+   * check-id → antwoord-id, of een lijst antwoord-id's bij een check met `meerdere: true`.
+   * Bijvoorbeeld { data: "intern", gebruikers: ["collegas", "extern"] }
+   */
+  checks: Record<string, string | string[]>;
   /** extra-vraag-id → ja/nee. Alleen nodig als de extra vraag van toepassing is. */
   extraVragen?: Record<string, boolean>;
   /** rode-vlag-id → ja/nee. Elke rode vlag moet beantwoord zijn. */
@@ -57,11 +61,17 @@ export function valideerInvoer(invoer: BeslisInvoer, regelset: Regelset): string
     if (!checkIds.has(id)) fouten.push(`onbekende check "${id}"`);
   }
   for (const check of regelset.checks) {
-    const gekozen = invoer.checks?.[check.id];
-    if (gekozen === undefined || gekozen === null || gekozen === "") {
+    const ruw = invoer.checks?.[check.id];
+    const gekozen = gekozenIds(invoer, check.id);
+    if (gekozen.length === 0) {
       fouten.push(`check "${check.id}" is niet beantwoord`);
-    } else if (!check.antwoorden.some((a) => a.id === gekozen)) {
-      fouten.push(`ongeldig antwoord "${gekozen}" bij check "${check.id}"`);
+      continue;
+    }
+    if (Array.isArray(ruw) && ruw.length > 1 && !check.meerdere) {
+      fouten.push(`check "${check.id}" heeft maar één antwoord`);
+    }
+    for (const id of gekozen) {
+      if (!check.antwoorden.some((a) => a.id === id)) fouten.push(`ongeldig antwoord "${id}" bij check "${check.id}"`);
     }
   }
 
@@ -88,8 +98,14 @@ export function valideerInvoer(invoer: BeslisInvoer, regelset: Regelset): string
 export function extraVraagVanToepassing(extraId: string, invoer: BeslisInvoer, regelset: Regelset): boolean {
   const extra = regelset.extra_vragen.find((e) => e.id === extraId);
   if (!extra) return false;
-  const gekozen = invoer.checks?.[extra.check];
-  return gekozen !== undefined && extra.toon_bij.includes(gekozen);
+  return gekozenIds(invoer, extra.check).some((id) => extra.toon_bij.includes(id));
+}
+
+/** De gekozen antwoord-id's bij een check, altijd als lijst (leeg = niet beantwoord). */
+export function gekozenIds(invoer: BeslisInvoer, checkId: string): string[] {
+  const ruw = invoer.checks?.[checkId];
+  const lijst = Array.isArray(ruw) ? ruw : ruw === undefined || ruw === null ? [] : [ruw];
+  return uniek(lijst.filter((x): x is string => typeof x === "string" && x !== ""));
 }
 
 export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkomst {
@@ -99,10 +115,12 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
   const rang = new Map(regelset.kleuren.map((k, i) => [k.id, i]));
   const rangVan = (kleurId: string) => rang.get(kleurId)!;
 
-  // 1. Kleur per check en per rode vlag (alleen vlaggen met "ja").
+  // 1. Kleur per check (hoogste kleur van de gekozen antwoorden) en per rode vlag (alleen "ja").
   const checkScores = regelset.checks.map((check) => {
-    const antwoord = gekozenAntwoord(check, invoer);
-    return { check, antwoord, kleur: antwoord.kleur };
+    const antwoorden = gekozenAntwoorden(check, invoer);
+    const kleur = antwoorden.reduce((max, a) => (rangVan(a.kleur) > rangVan(max) ? a.kleur : max), antwoorden[0]!.kleur);
+    // Alleen de antwoorden met de hoogste kleur bepalen de score van deze check.
+    return { check, kleur, bepalend: antwoorden.filter((a) => a.kleur === kleur) };
   });
   const vlaggenJa = regelset.rode_vlaggen.filter((v) => invoer.rodeVlaggen[v.id] === true);
 
@@ -117,13 +135,15 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
   const doorslagVlaggen = regelset.rode_vlag_kleur === kleur.id ? vlaggenJa : [];
   const redenen: Reden[] = [
     ...doorslagVlaggen.map((v): Reden => ({ soort: "rode_vlag", vlagId: v.id, kort: v.kort })),
-    ...doorslagChecks.map((s): Reden => ({
-      soort: "check",
-      checkId: s.check.id,
-      checkNaam: s.check.naam,
-      antwoordId: s.antwoord.id,
-      antwoordLabel: s.antwoord.label,
-    })),
+    ...doorslagChecks.flatMap((s) =>
+      s.bepalend.map((a): Reden => ({
+        soort: "check",
+        checkId: s.check.id,
+        checkNaam: s.check.naam,
+        antwoordId: a.id,
+        antwoordLabel: a.label,
+      })),
+    ),
   ];
 
   // 4. DPIA-signaal.
@@ -142,7 +162,7 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
   // 6. Voorwaarden (alleen bij een accountaanvraag met voorwaarden).
   const voorwaarden =
     kleur.vervolgactie === "accountaanvraag_met_voorwaarden"
-      ? uniek(doorslagChecks.map((s) => s.antwoord.voorwaarde).filter(isTekst))
+      ? uniek(doorslagChecks.flatMap((s) => s.bepalend.map((a) => a.voorwaarde)).filter(isTekst))
       : [];
 
   // 7. Alternatieven (alleen als er geen aanvraag mogelijk is).
@@ -150,7 +170,7 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     kleur.vervolgactie === "alleen_vastleggen"
       ? uniek([
           ...doorslagVlaggen.map((v) => v.alternatief),
-          ...doorslagChecks.map((s) => s.antwoord.alternatief),
+          ...doorslagChecks.flatMap((s) => s.bepalend.map((a) => a.alternatief)),
         ].filter(isTekst))
       : [];
 
@@ -179,9 +199,10 @@ export function maakMotivatie(kleur: Kleur, redenen: Reden[], regelset: Regelset
   return hoofdletter(tekst);
 }
 
-function gekozenAntwoord(check: Check, invoer: BeslisInvoer): Antwoord {
-  // Na valideerInvoer bestaat het antwoord altijd.
-  return check.antwoorden.find((a) => a.id === invoer.checks[check.id])!;
+function gekozenAntwoorden(check: Check, invoer: BeslisInvoer): Antwoord[] {
+  // Na valideerInvoer bestaat elk gekozen antwoord en is er minstens één.
+  const ids = gekozenIds(invoer, check.id);
+  return check.antwoorden.filter((a) => ids.includes(a.id));
 }
 
 type Conditie = Regelset["dpia"]["vereist"][number];
@@ -190,8 +211,7 @@ function conditieGeldt(c: Conditie, invoer: BeslisInvoer, regelset: Regelset): b
     // Een antwoord op een extra vraag telt alleen als die vraag van toepassing is.
     return extraVraagVanToepassing(c.extra_vraag, invoer, regelset) && invoer.extraVragen?.[c.extra_vraag] === true;
   }
-  const gekozen = invoer.checks[c.check];
-  return gekozen !== undefined && c.antwoorden.includes(gekozen);
+  return gekozenIds(invoer, c.check).some((id) => c.antwoorden.includes(id));
 }
 
 /** "a", "a en b", "a, b en c" */
