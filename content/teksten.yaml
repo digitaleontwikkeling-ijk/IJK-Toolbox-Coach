@@ -54,6 +54,11 @@ na_actie:
   goedgekeurd_met_voorwaarden: Je aanvraag is goedgekeurd met voorwaarden. Houd je aan de voorwaarden van de toetsers hierboven.
   afgewezen: Je aanvraag is afgewezen. Lees de motivatie van de toetsers hierboven. Heb je vragen, stel ze dan aan de coach of neem contact op met de toetser.
 
+# Knop en bevestiging om de wizard af te ronden als er niets meer te doen is.
+afronden:
+  knop: Afronden
+  bevestiging: "Klaar. Je advies {referentie} is afgerond en staat hieronder. Hier volg je ook de status."
+
 statussen:
   advies_gegeven: Advies gegeven
   account_aangevraagd: Account aangevraagd

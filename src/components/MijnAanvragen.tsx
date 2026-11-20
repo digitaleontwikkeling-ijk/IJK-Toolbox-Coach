@@ -9,6 +9,13 @@ export function MijnAanvragen() {
   const [adviezen, setAdviezen] = useState<AdviesDto[] | null>(null);
   const [fout, setFout] = useState<string | null>(null);
 
+  // Bevestiging na "Afronden" in de wizard (?afgerond=TC-JJJJ-NNNN).
+  const [afgerond, setAfgerond] = useState<string | null>(null);
+  useEffect(() => {
+    const ref = new URLSearchParams(window.location.search).get("afgerond");
+    if (ref && /^TC-\d{4}-\d{4}$/.test(ref)) setAfgerond(ref);
+  }, []);
+
   useEffect(() => {
     api<{ adviezen: AdviesDto[] }>("/api/mijn-aanvragen")
       .then((r) => setAdviezen(r.adviezen))
@@ -31,6 +38,9 @@ export function MijnAanvragen() {
         Hier staan je adviezen en aanvragen. Is er iets veranderd aan je idee? Doorloop de wizard dan opnieuw: elke nieuwe
         toepassing of wijziging krijgt een eigen advies.
       </p>
+      {afgerond && content && (
+        <p className="info" role="status">{content.teksten.afronden.bevestiging.replace("{referentie}", afgerond)}</p>
+      )}
       {fout && <p className="foutmelding" role="alert">{fout}</p>}
       {!content || !adviezen ? (
         !fout && <p role="status">Bezig met laden…</p>

@@ -4,7 +4,6 @@
  * beslisregels) en de content. Kleur is nooit de enige drager van betekenis:
  * de naam van de uitkomst staat er altijd bij.
  */
-import Link from "next/link";
 import { forwardRef } from "react";
 import { alsLijst } from "./Keuze";
 import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
@@ -16,13 +15,15 @@ interface Props {
   actieBezig?: boolean;
   onVraag?: () => void;
   onOpnieuw?: () => void;
+  /** Wizard afronden; alleen getoond als er geen vervolgactie meer openstaat. */
+  onAfronden?: () => void;
   actieFout?: string | null;
   /** "medewerker" (standaard) toont de vervolgactie; "inzage" is voor toetsers en beheerders. */
   weergave?: "medewerker" | "inzage";
 }
 
 export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviescard(
-  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, actieFout, weergave = "medewerker" },
+  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, onAfronden, actieFout, weergave = "medewerker" },
   kopRef,
 ) {
   const kleur = kleurVan(content, advies.uitkomst)!;
@@ -33,6 +34,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
   const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id]);
   const actieKanNog = advies.status === "advies_gegeven" && actie?.knop;
+  // Klaar = geen vervolgactie meer open: al uitgevoerd, of bij deze uitkomst hoort er geen.
+  const klaar = !actieKanNog;
 
   return (
     <article className="adviescard" aria-labelledby="advies-kop">
@@ -169,8 +172,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                 {actie.knop.replace("{tool}", tool)}
               </button>
             )}
-            {advies.status !== "advies_gegeven" && (
-              <Link className="knop" href="/mijn-aanvragen">Naar Mijn aanvragen</Link>
+            {klaar && onAfronden && (
+              <button type="button" className="knop" onClick={onAfronden}>{t.afronden.knop}</button>
             )}
             {onVraag && <button type="button" className="knop knop--secundair" onClick={onVraag}>Vraag stellen</button>}
             {onOpnieuw && (

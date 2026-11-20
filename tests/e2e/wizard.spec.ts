@@ -56,10 +56,12 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(card).toContainText("Je aanvraag is ingediend bij AI governance & compliance officer en architect Digitale Ontwikkeling.");
   await expect(card.getByRole("button", { name: "Aanvraag indienen voor toetsing" })).toHaveCount(0);
   await expect(card.getByRole("button", { name: "Nieuw idee" })).toBeVisible();
-  await expect(card.getByRole("link", { name: "Naar Mijn aanvragen" })).toBeVisible();
 
-  // Mijn aanvragen
-  await page.getByRole("link", { name: "Mijn aanvragen", exact: true }).click();
+  // Afronden: naar Mijn aanvragen, met een bevestiging.
+  const ref = (await page.locator(".adviescard__voet strong").innerText()).trim();
+  await card.getByRole("button", { name: "Afronden" }).click();
+  await page.waitForURL(/\/mijn-aanvragen\?afgerond=/);
+  await expect(page.locator(".info[role=status]")).toContainText(`Klaar. Je advies ${ref} is afgerond`);
   const rij = page.locator(".aanvraag").first();
   await expect(rij).toContainText(/TC-\d{4}-\d{4}/);
   await expect(rij).toContainText("Eerst toetsen");
@@ -119,6 +121,14 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
   await expect(card).toContainText("Rode vlag: een tool die IJK niet heeft goedgekeurd");
   await expect(card).toContainText("Zo kan het wel");
   await expect(card.getByRole("button", { name: /Account aanvragen|Aanvraag indienen/ })).toHaveCount(0);
+
+  // Ook hier kun je afronden: het gesprek wordt opgeruimd, het advies blijft in het register.
+  await card.getByRole("button", { name: "Afronden" }).click();
+  await page.waitForURL(/\/mijn-aanvragen\?afgerond=/);
+  await expect(page.locator(".aanvraag").first()).toContainText("Niet op deze manier");
+  // Er is geen concept (met gesprek) meer dat bij dit advies hoort.
+  const concept = await (await page.request.get("/api/concept")).json();
+  expect(concept.concept?.adviesId ?? null).toBeNull();
 });
 
 test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste kleur telt", async ({ page }) => {

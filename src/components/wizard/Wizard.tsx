@@ -12,6 +12,7 @@ import { Adviescard } from "../Adviescard";
 import { Chatvenster, CHAT_INVOER_ID } from "../Chatvenster";
 import { Stappenbalk } from "../Stappenbalk";
 import { api, ApiFoutClient, toolNaam, useContent, type AdviesDto } from "../client";
+import { afgerondPad, volledigPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
 import { ontbrekendeVelden, Stap3 } from "./Stap3";
@@ -242,6 +243,14 @@ export function Wizard() {
     }
   }
 
+  /** Wizard afronden: gesprek opruimen en naar Mijn aanvragen, met een bevestiging. */
+  async function afronden() {
+    if (!advies) return;
+    // Na een vervolgactie is het concept al verwijderd; bij "Niet op deze manier" ruimen we het hier op.
+    if (conceptId && !afgerond) await api(`/api/concept/${conceptId}`, { method: "DELETE" }).catch(() => undefined);
+    window.location.href = volledigPad(afgerondPad(advies.referentie));
+  }
+
   async function opnieuwBeginnen() {
     if (!afgerond && !window.confirm("Weet je zeker dat je opnieuw wilt beginnen? Je antwoorden en het gesprek worden gewist. Een gegeven advies blijft in het register.")) return;
     if (conceptId && !afgerond) await api(`/api/concept/${conceptId}`, { method: "DELETE" }).catch(() => undefined);
@@ -337,6 +346,7 @@ export function Wizard() {
               actieFout={actieFout}
               onVraag={() => document.getElementById(CHAT_INVOER_ID)?.focus()}
               onOpnieuw={opnieuwBeginnen}
+              onAfronden={afronden}
             />
           )}
 
