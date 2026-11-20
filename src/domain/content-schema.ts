@@ -187,6 +187,7 @@ export const tekstenSchema = z.object({
   vervolgacties: z.record(z.enum(VERVOLGACTIES), z.object({ knop: z.string(), uitleg: tekst })),
   statussen: z.record(z.enum(STATUSSEN), tekst),
   afronden: z.object({ knop: tekst, bevestiging: tekst }),
+  aanvullende_vragen: z.object({ titel: tekst, intro: tekst, vraag_label: tekst, geen: tekst }),
   na_actie: z.object({
     account_aangevraagd: tekst,
     in_toetsing: tekst,

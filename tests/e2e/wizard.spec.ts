@@ -20,10 +20,10 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(page.getByLabel("Afdeling", { exact: true })).toBeChecked();
   await expect(page.getByText("Voorgesteld door de coach").first()).toBeVisible();
 
-  // Zonder rode vlaggen kun je niet verder: duidelijke foutmelding.
+  // Zonder de aanvullende vragen (rode vlaggen) kun je niet verder: duidelijke foutmelding.
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.locator(".foutmelding")).toContainText("Nog niet alle vragen zijn beantwoord");
-  await expect(page.locator(".foutmelding")).toContainText("Rode vlag 1");
+  await expect(page.locator(".foutmelding")).toContainText("Vraag 1");
 
   await kies(page, "bijzondere_persoonsgegevens", "Ja");
   await geenRodeVlaggen(page);
@@ -118,7 +118,9 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");
   await expect(page.getByRole("heading", { name: "Niet op deze manier", level: 2 })).toBeVisible();
-  await expect(card).toContainText("Rode vlag: een tool die IJK niet heeft goedgekeurd");
+  await expect(card).toContainText("Een tool die IJK niet heeft goedgekeurd.");
+  await expect(card).toContainText("Ja: een tool die IJK niet heeft goedgekeurd");
+  await expect(card).not.toContainText("Rode vlag");
   await expect(card).toContainText("Zo kan het wel");
   await expect(card.getByRole("button", { name: /Account aanvragen|Aanvraag indienen/ })).toHaveCount(0);
 

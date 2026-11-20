@@ -89,7 +89,7 @@ describe("hoogste kleur en motivatie", () => {
       "impact",
     ]);
     expect(u.motivatie).toBe(
-      "Rode vlag: een tool die IJK niet heeft goedgekeurd, rode vlag: een persoonlijke inlog of wachtwoorden/API-keys in de code en Groot (Impact).",
+      "Een tool die IJK niet heeft goedgekeurd, een persoonlijke inlog of wachtwoorden/API-keys in de code en Groot (Impact).",
     );
   });
 

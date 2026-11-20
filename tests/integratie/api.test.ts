@@ -56,7 +56,7 @@ describe("content en concept", () => {
   it("I5. content bevat de regelset met versie", async () => {
     const r = await roep(contentRoute.GET as Handler);
     expect(r.status).toBe(200);
-    expect(r.json.regelset.versie).toBe("0.2");
+    expect(r.json.regelset.versie).toBe("0.3");
     expect(r.json.gebruiker).toEqual({ naam: "Anna", rollen: ["medewerker"] });
   });
 
@@ -99,7 +99,7 @@ describe("adviesregister", () => {
     expect(r.status).toBe(200);
     const a = r.json.advies;
     expect(a.referentie).toBe(`TC-${new Date().getFullYear()}-0001`);
-    expect(a).toMatchObject({ uitkomst: "oranje", dpiaSignaal: true, regelversie: "0.2", status: "advies_gegeven" });
+    expect(a).toMatchObject({ uitkomst: "oranje", dpiaSignaal: true, regelversie: "0.3", status: "advies_gegeven" });
     expect(a.toetsers).toEqual(["toetser_compliance", "toetser_architect"]);
     expect(a.pseudoniemId).toBeUndefined();
     const rij = (await db().query("SELECT * FROM advies")).rows[0];

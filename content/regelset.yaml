@@ -7,7 +7,7 @@
 # Startversie: nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.2"
+versie: "0.3"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -204,4 +204,4 @@ dpia:
 # {redenen} wordt vervangen door de doorslaggevende checks en rode vlaggen,
 # bijvoorbeeld "Persoonsgegevens (Data) en Koppelen (Systemen)".
 # Zo wordt een rode vlag in die opsomming beschreven ({kort} = korte omschrijving van de vlag):
-motivatie_rode_vlag: "rode vlag: {kort}"
+motivatie_rode_vlag: "{kort}"

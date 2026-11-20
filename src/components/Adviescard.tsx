@@ -89,7 +89,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         <section>
           <h3>{weergave === "inzage" ? "Antwoorden" : "Je antwoorden"}</h3>
           <table className="antwoorden">
-            <caption className="sr-only">Antwoorden per check en rode vlaggen</caption>
+            <caption className="sr-only">Antwoorden per check en op de aanvullende vragen</caption>
             <tbody>
               {r.checks.map((c) => {
                 const ids = alsLijst(advies.antwoorden.checks[c.id]);
@@ -121,8 +121,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                   </tr>
                 ))}
               <tr>
-                <th scope="row">Rode vlaggen</th>
-                <td>{vlaggenJa.length ? vlaggenJa.map((v) => v.kort).join("; ") : "Geen"}</td>
+                <th scope="row">{t.aanvullende_vragen.titel}</th>
+                <td>{vlaggenJa.length ? vlaggenJa.map((v) => `Ja: ${v.kort}`).join("; ") : t.aanvullende_vragen.geen}</td>
               </tr>
             </tbody>
           </table>

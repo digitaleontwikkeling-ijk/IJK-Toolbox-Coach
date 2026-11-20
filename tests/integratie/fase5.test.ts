@@ -183,7 +183,7 @@ describe("toetsing", () => {
       rodeVlaggen: VOLLEDIG.rodeVlaggen,
       uitkomst: "oranje",
       dpiaSignaal: true,
-      regelversie: "0.2",
+      regelversie: "0.3",
       besluiten: [],
     });
     await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE });

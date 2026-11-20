@@ -53,7 +53,7 @@ export function BeheerContent() {
         </tbody>
       </table>
 
-      <h3>Rode vlaggen</h3>
+      <h3>{c.teksten.aanvullende_vragen.titel} (rode vlaggen: ja = altijd {kleurVan(c, r.rode_vlag_kleur)?.uitkomst})</h3>
       <ol>{r.rode_vlaggen.map((v) => <li key={v.id}>{v.vraag}</li>)}</ol>
 
       <h3>Tools en spelregels</h3>

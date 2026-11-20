@@ -1,6 +1,5 @@
 "use client";
 import { alsLijst, Keuze, JA_NEE, naarJaNee } from "../Keuze";
-import { kleurVan } from "../client";
 import type { StapProps } from "./types";
 
 interface Props extends StapProps {
@@ -70,17 +69,14 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
         );
       })}
 
-      <h2>Rode vlaggen</h2>
-      <p className="instructie">
-        Beantwoord deze vragen eerlijk. Is het antwoord op één van deze vragen &quot;ja&quot;, dan is de uitkomst altijd{" "}
-        &quot;{kleurVan(content, r.rode_vlag_kleur)?.uitkomst}&quot;.
-      </p>
+      <h2>{content.teksten.aanvullende_vragen.titel}</h2>
+      <p className="instructie">{content.teksten.aanvullende_vragen.intro}</p>
       {r.rode_vlaggen.map((v) => (
         <div id={`veld-${v.id}`} key={v.id}>
           <Keuze
             naam={v.id}
             fout={ontbrekend.has(v.id)}
-            legend={`Rode vlag ${v.nummer}`}
+            legend={content.teksten.aanvullende_vragen.vraag_label.replace("{nummer}", String(v.nummer))}
             vraag={v.vraag}
             opties={JA_NEE}
             waarde={naarJaNee(data.rodeVlaggen[v.id])}
@@ -106,7 +102,7 @@ export function ontbrekendeVelden(content: StapProps["content"], data: StapProps
     }
   }
   for (const v of r.rode_vlaggen) {
-    if (typeof data.rodeVlaggen[v.id] !== "boolean") uit.push([v.id, `Rode vlag ${v.nummer}`]);
+    if (typeof data.rodeVlaggen[v.id] !== "boolean") uit.push([v.id, content.teksten.aanvullende_vragen.vraag_label.replace("{nummer}", String(v.nummer))]);
   }
   return uit;
 }

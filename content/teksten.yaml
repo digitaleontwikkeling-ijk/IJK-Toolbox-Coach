@@ -54,6 +54,14 @@ na_actie:
   goedgekeurd_met_voorwaarden: Je aanvraag is goedgekeurd met voorwaarden. Houd je aan de voorwaarden van de toetsers hierboven.
   afgewezen: Je aanvraag is afgewezen. Lees de motivatie van de toetsers hierboven. Heb je vragen, stel ze dan aan de coach of neem contact op met de toetser.
 
+# De rode vlaggen uit het kader, zoals de medewerker ze ziet. Neutraal geformuleerd:
+# een "ja" is geen fout, de coach helpt dan verder.
+aanvullende_vragen:
+  titel: Aanvullende vragen
+  intro: Nog een paar vragen over hoe je de oplossing maakt en gebruikt. Is het antwoord "ja", dan laat de coach zien hoe het wel veilig kan.
+  vraag_label: "Vraag {nummer}"
+  geen: Nee op alle vragen
+
 # Knop en bevestiging om de wizard af te ronden als er niets meer te doen is.
 afronden:
   knop: Afronden

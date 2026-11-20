@@ -125,7 +125,7 @@ describe("testscenario's hoofdstuk 7", () => {
     const u = evalueer(invoer({ rodeVlaggen: { niet_goedgekeurde_tool: true } }), regelset);
     expect(u.kleur).toBe("rood");
     expect(u.redenen).toEqual([{ soort: "rode_vlag", vlagId: "niet_goedgekeurde_tool", kort: expect.any(String) }]);
-    expect(u.motivatie).toBe("Rode vlag: een tool die IJK niet heeft goedgekeurd.");
+    expect(u.motivatie).toBe("Een tool die IJK niet heeft goedgekeurd.");
     expect(u.alternatieven.length).toBeGreaterThan(0);
   });
 

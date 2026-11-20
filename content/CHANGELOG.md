@@ -3,6 +3,11 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.3 (concept)
+
+- "Waarom deze kleur?" noemt een rode vlag zonder het woord "rode vlag" (bijv. "Een tool die IJK niet heeft goedgekeurd.").
+  In de interface heten de rode vlaggen nu "Aanvullende vragen" (zie teksten.yaml). Geen wijziging in de uitkomsten.
+
 ## regelset 0.2 (concept)
 
 - Checks Data, Systemen, Gebruikers en Autonomie staan meerdere antwoorden toe (`meerdere: true`);
