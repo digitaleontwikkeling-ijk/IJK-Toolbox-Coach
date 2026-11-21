@@ -6,6 +6,9 @@ import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
 async function controleer(page: Page, waar: string) {
   // Next.js vult de paginatitel bij dynamische pagina's iets later in; wacht daarop.
   await expect(page).toHaveTitle(/IJK Toolbox Coach/);
+  // En tot de pagina klaar is met laden (geen "Bezig met laden…" meer).
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("Bezig met laden…")).toHaveCount(0);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   const samenvatting = r.violations.map((v) => `${waar}: ${v.id} (${v.nodes.length}×) ${v.help}`);
   expect(samenvatting).toEqual([]);

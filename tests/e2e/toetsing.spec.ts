@@ -9,6 +9,9 @@ let referentie = "";
 async function geenOvertredingen(page: Page) {
   // Next.js vult de paginatitel bij dynamische pagina's iets later in; wacht daarop.
   await expect(page).toHaveTitle(/IJK Toolbox Coach/);
+  // En tot de pagina klaar is met laden (geen "Bezig met laden…" meer).
+  await page.waitForLoadState("networkidle");
+  await expect(page.getByText("Bezig met laden…")).toHaveCount(0);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(r.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 }
