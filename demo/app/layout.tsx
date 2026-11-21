@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import "../../src/app/globals.css";
 import { DemoKop, DemoMelding } from "./DemoOnderdelen";
+import { hoeWerktHetHref } from "@/lib/paden";
+import content from "@/demo/content.generated.json";
 
 export const metadata: Metadata = {
   title: "IJK Toolbox Coach (demo)",
@@ -16,6 +18,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <DemoKop />
         <DemoMelding />
         <main id="inhoud" tabIndex={-1}>{children}</main>
+        <footer className="voet">
+          <a href={hoeWerktHetHref()}>{content.teksten.hoe_werkt_het.link}</a>
+          <span aria-hidden="true"> · </span>
+          <span>{content.teksten.app.uitgangspunt}</span>
+        </footer>
       </body>
     </html>
   );

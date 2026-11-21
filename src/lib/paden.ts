@@ -25,6 +25,9 @@ export function startPad(rollen: readonly string[]): string {
 export const afgerondPad = (referentie: string) =>
   `${IS_DEMO ? "/mijn-aanvragen/" : "/mijn-aanvragen"}?afgerond=${encodeURIComponent(referentie)}`;
 
+/** Uitlegpagina, voor gewone <a>-links (inclusief basispad en, in de demo, slash). */
+export const hoeWerktHetHref = () => volledigPad(IS_DEMO ? "/hoe-werkt-het/" : "/hoe-werkt-het");
+
 export const adviesPad = (id: string) => (IS_DEMO ? `/advies/?id=${id}` : `/advies/${id}`);
 export const toetsingPad = (id: string) => (IS_DEMO ? `/toetsing/advies/?id=${id}` : `/toetsing/${id}`);
 export const beheerAdviesPad = (id: string) => (IS_DEMO ? `/beheer/advies/?id=${id}` : `/beheer/advies/${id}`);

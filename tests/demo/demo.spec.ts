@@ -77,6 +77,11 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await page.goto(`${B}/toetsing/`);
   await expect(page.getByRole("heading", { name: "Geen toegang" })).toBeVisible();
 
+  // Uitlegpagina in de demo, met de melding over de oefencoach.
+  await page.goto(`${B}/hoe-werkt-het/`);
+  await expect(page.getByRole("heading", { name: "Hoe werkt de coach?", level: 1 })).toBeVisible();
+  await expect(page.getByText("In deze demo is de coach een oefencoach zonder AI.")).toBeVisible();
+
   // Demo leegmaken
   await page.getByRole("button", { name: "Demo leegmaken" }).click();
   await page.waitForURL(`**${B}/login/`);

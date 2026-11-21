@@ -1,5 +1,7 @@
 import { TESTGEBRUIKERS } from "@/auth/testgebruikers";
 import { NepLogin } from "@/components/NepLogin";
+import { hoeWerktHetHref } from "@/lib/paden";
+import content from "@/demo/content.generated.json";
 
 export const metadata = { title: "Inloggen · IJK Toolbox Coach (demo)" };
 
@@ -8,6 +10,7 @@ export default function LoginPagina() {
     <>
       <h1>Inloggen</h1>
       <p>Niet de tool bepaalt wat mag, maar wat je ermee doet.</p>
+      <p><a href={hoeWerktHetHref()}>{content.teksten.hoe_werkt_het.link}</a></p>
       <div className="info">
         <p>
           In deze demo kies je een fictieve testgebruiker. Probeer ook de rollen van toetser en beheerder: dien eerst als

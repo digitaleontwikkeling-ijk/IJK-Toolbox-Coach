@@ -1,6 +1,7 @@
 import { TESTGEBRUIKERS } from "@/auth/testgebruikers";
 import { content } from "@/content/laad-content";
 import { config } from "@/lib/config";
+import { hoeWerktHetHref } from "@/lib/paden";
 import { EntraLogin } from "@/components/EntraLogin";
 import { NepLogin } from "@/components/NepLogin";
 
@@ -21,6 +22,7 @@ export default async function LoginPagina({ searchParams }: { searchParams: Prom
       <>
         <h1>Inloggen</h1>
         <p>{t.app.uitgangspunt}</p>
+      <p><a href={hoeWerktHetHref()}>{t.hoe_werkt_het.link}</a></p>
         <EntraLogin
           clientId={e.clientId}
           tenantId={e.tenantId}
@@ -36,6 +38,7 @@ export default async function LoginPagina({ searchParams }: { searchParams: Prom
     <>
       <h1>Inloggen</h1>
       <p>{t.app.uitgangspunt}</p>
+      <p><a href={hoeWerktHetHref()}>{t.hoe_werkt_het.link}</a></p>
       <div className="info">
         <p>
           Dit is een proof of concept. In plaats van inloggen met je IJK-account (Microsoft Entra ID) kies je hier een

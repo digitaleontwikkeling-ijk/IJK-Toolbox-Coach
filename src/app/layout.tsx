@@ -3,6 +3,7 @@ import "./globals.css";
 import { huidigeGebruiker } from "@/auth/server";
 import { content } from "@/content/laad-content";
 import { Kop } from "@/components/Kop";
+import { hoeWerktHetHref } from "@/lib/paden";
 
 export const metadata: Metadata = {
   title: "IJK Toolbox Coach",
@@ -24,6 +25,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
         <p className="melding-testdata">{teksten.app.testdata_melding}</p>
         <main id="inhoud" tabIndex={-1}>{children}</main>
+        <footer className="voet">
+          <a href={hoeWerktHetHref()}>{teksten.hoe_werkt_het.link}</a>
+          <span aria-hidden="true"> · </span>
+          <span>{teksten.app.uitgangspunt}</span>
+        </footer>
       </body>
     </html>
   );

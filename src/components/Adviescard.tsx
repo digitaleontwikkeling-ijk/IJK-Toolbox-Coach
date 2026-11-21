@@ -6,6 +6,8 @@
  */
 import { forwardRef } from "react";
 import { alsLijst } from "./Keuze";
+import { HoeWerktHetLink } from "./HoeWerktHet";
+import { hoeWerktHetHref } from "@/lib/paden";
 import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
 
 interface Props {
@@ -56,6 +58,10 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         <section>
           <h3>Waarom deze kleur?</h3>
           <p>{advies.motivatie}</p>
+          <p className="hulptekst" style={{ margin: 0 }}>
+            {t.hoe_werkt_het.kleur_hint}{" "}
+            <HoeWerktHetLink tekst={t.hoe_werkt_het.link} href={hoeWerktHetHref()} />
+          </p>
         </section>
 
         {advies.voorwaarden.length > 0 && (

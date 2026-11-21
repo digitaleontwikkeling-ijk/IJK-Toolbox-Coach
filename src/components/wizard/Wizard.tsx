@@ -376,7 +376,7 @@ export function Wizard() {
           </div>
         </div>
 
-        <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} />
+        <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} uitlegLink={t.hoe_werkt_het.link} />
       </div>
     </>
   );

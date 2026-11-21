@@ -19,6 +19,8 @@ de uitkomst met vaste beslisregels; het taalmodel bepaalt nooit de kleur.** De a
 
 **https://timbrons.github.io/IJK-Toolbox-Coach/**
 
+Wat de AI precies doet (en niet doet) staat op de pagina **Hoe werkt de coach?** (`/hoe-werkt-het`).
+
 De demo draait volledig in je browser: geen server, geen database, geen AI (oefencoach), geen echte aanvragen.
 Gegevens blijven in de localStorage van je eigen browser ("Demo leegmaken" wist ze). Kies een testgebruiker;
 probeer ook de rollen toetser en beheerder. De demo gebruikt dezelfde schermen, content en beslisregels als de app.

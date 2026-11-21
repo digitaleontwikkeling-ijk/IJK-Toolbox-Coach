@@ -95,3 +95,53 @@ dpia:
   uitleg: Een DPIA (gegevensbeschermingseffectbeoordeling) brengt de privacyrisico's van een toepassing in kaart. Bij jouw antwoorden is die mogelijk verplicht. De AI governance & compliance officer kijkt met je mee.
 
 coach_niet_beschikbaar: De coach is nu niet beschikbaar. Je kunt gewoon verder door zelf te kiezen.
+
+# Uitlegpagina "Hoe werkt de coach?" (/hoe-werkt-het) en korte verwijzingen ernaar.
+hoe_werkt_het:
+  titel: Hoe werkt de coach?
+  link: Hoe werkt de coach?
+  intro: >-
+    De IJK Toolbox Coach gebruikt AI om met je mee te denken. Maar de AI beslist niet of je idee mag.
+    Dat doen vaste spelregels van IJK. Zo is elk advies uitlegbaar en krijgt iedereen met dezelfde
+    antwoorden hetzelfde advies.
+  wie_titel: Wie doet wat?
+  rijen:
+    - onderdeel: Je idee begrijpen
+      wie: AI-coach
+      hoe: De coach leest je beschrijving en stelt hooguit twee vragen als iets nog niet duidelijk is.
+    - onderdeel: Welke tool past?
+      wie: AI-coach
+      hoe: De coach kiest een tool uit de IJK Toolbox en legt uit waarom. Je kunt het advies accepteren, om een andere tool vragen of zelf kiezen.
+    - onderdeel: De zes checks
+      wie: AI-coach stelt voor, jij bevestigt
+      hoe: De coach vult de checks alvast in. Twijfelt hij, dan vraagt hij door in de chat. Jij ziet de voorstellen en past ze aan waar nodig.
+    - onderdeel: Aanvullende vragen
+      wie: Jij
+      hoe: Deze vragen beantwoord je altijd zelf.
+    - onderdeel: Het advies (de kleur)
+      wie: Vaste spelregels
+      hoe: De tool berekent de kleur, de toetsers en of een DPIA mogelijk nodig is. Dat gebeurt met de spelregels van IJK, niet door AI.
+    - onderdeel: Uitleg bij het advies
+      wie: AI-coach
+      hoe: De coach legt het berekende advies uit in gewone taal. Hij kan het advies niet veranderen.
+    - onderdeel: Vragen tussendoor
+      wie: AI-coach
+      hoe: In de chat kun je op elk moment een vraag stellen over de tools en de spelregels.
+    - onderdeel: Vervolgactie
+      wie: Jij en de tool
+      hoe: Pas als jij op de knop klikt, vraagt de tool een account aan of stuurt je aanvraag naar de toetsers. De AI kan dat niet zelf.
+  waarom_titel: Waarom bepaalt de AI niet de kleur?
+  waarom:
+    - "Uitlegbaar: bij elk advies staat welke antwoorden de doorslag gaven en met welke versie van de spelregels het is berekend."
+    - "Eerlijk: dezelfde antwoorden geven altijd hetzelfde advies. Een taalmodel kan op dezelfde vraag verschillende antwoorden geven."
+    - "Controleerbaar: de spelregels worden beheerd door Team Digitale Ontwikkeling en de AI governance & compliance officer."
+  privacy_titel: Wat gaat er naar de AI?
+  privacy:
+    - Alleen wat nodig is voor de vraag, zoals je beschrijving en je antwoorden.
+    - Niet je naam of e-mailadres. De coach kent je alleen als een willekeurige code.
+    - E-mailadressen, telefoonnummers en rekeningnummers in je tekst worden er eerst uitgehaald. Gebruik toch liever geen namen of andere persoonsgegevens.
+    - Het gesprek wordt niet bewaard in het adviesregister. Na het afronden wordt het verwijderd.
+  zonder_ai_titel: En als de AI niet werkt?
+  zonder_ai: Dan vul je alles zelf in. Je krijgt hetzelfde advies, want dat wordt altijd met de vaste spelregels berekend.
+  demo_melding: In deze demo is de coach een oefencoach zonder AI. Die geeft eenvoudige voorbeeldantwoorden.
+  kleur_hint: Deze kleur is berekend met de vaste spelregels van IJK, niet door AI.
