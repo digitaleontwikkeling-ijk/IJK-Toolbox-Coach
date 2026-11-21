@@ -11,6 +11,16 @@ export function volledigPad(pad: string): string {
   return `${BASIS}${pad}`;
 }
 
+/**
+ * Startpagina na het inloggen: toetsers beginnen bij hun toetsing, beheerders bij beheer,
+ * alle anderen in de wizard. (Toetsers en beheerders zijn ook medewerker.)
+ */
+export function startPad(rollen: readonly string[]): string {
+  if (rollen.some((r) => r.startsWith("toetser_"))) return "/toetsing";
+  if (rollen.includes("beheerder")) return "/beheer";
+  return "/wizard";
+}
+
 /** "Mijn aanvragen" met een bevestiging dat dit advies is afgerond. */
 export const afgerondPad = (referentie: string) =>
   `${IS_DEMO ? "/mijn-aanvragen/" : "/mijn-aanvragen"}?afgerond=${encodeURIComponent(referentie)}`;

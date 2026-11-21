@@ -7,6 +7,8 @@ test.describe.configure({ mode: "serial" });
 let referentie = "";
 
 async function geenOvertredingen(page: Page) {
+  // Next.js vult de paginatitel bij dynamische pagina's iets later in; wacht daarop.
+  await expect(page).toHaveTitle(/IJK Toolbox Coach/);
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(r.violations.map((v) => `${v.id}: ${v.help}`)).toEqual([]);
 }
@@ -83,4 +85,24 @@ test("beheerder ziet alle adviezen en de inhoud, zonder besluitformulier", async
   await page.getByRole("link", { name: referentie }).click();
   await expect(page.locator(".adviescard")).toContainText("Besluiten van de toetsers");
   await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
+});
+
+test("na het inloggen begint iedereen op de pagina die bij de rol hoort; eigen werk staat vooraan in het menu", async ({ page }) => {
+  for (const [naam, pad, eerste] of [
+    ["Testmedewerker Bram", "/wizard", "Nieuw idee"],
+    ["Testtoetser Compliance", "/toetsing", "Toetsing"],
+    ["Testtoetser Architect", "/toetsing", "Toetsing"],
+    ["Testbeheerder", "/beheer", "Beheer"],
+  ] as const) {
+    await login(page, naam, { nieuwIdee: false });
+    await expect(page).toHaveURL(new RegExp(`${pad}$`));
+    const menu = page.getByRole("navigation", { name: "Hoofdmenu" }).getByRole("link");
+    await expect(menu.first()).toHaveText(eerste);
+    // Toetsers en beheerders kunnen ook zelf een idee indienen.
+    await expect(menu.filter({ hasText: "Nieuw idee" })).toHaveCount(1);
+    await expect(menu.filter({ hasText: "Mijn aanvragen" })).toHaveCount(1);
+  }
+  // De startpagina (/) stuurt ook naar de pagina bij de rol.
+  await page.goto("/");
+  await expect(page).toHaveURL(/\/beheer$/);
 });

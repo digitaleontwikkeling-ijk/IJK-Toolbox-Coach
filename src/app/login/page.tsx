@@ -6,9 +6,9 @@ import { NepLogin } from "@/components/NepLogin";
 
 export const metadata = { title: "Inloggen · IJK Toolbox Coach" };
 
-/** Alleen interne paden als terugadres (geen open redirect). */
-function veiligTerug(t: string | undefined): string {
-  return t && t.startsWith("/") && !t.startsWith("//") && !t.startsWith("/\\") ? t : "/wizard";
+/** Alleen interne paden als terugadres (geen open redirect). Zonder terugadres: startpagina bij de rol. */
+function veiligTerug(t: string | undefined): string | undefined {
+  return t && t.startsWith("/") && !t.startsWith("//") && !t.startsWith("/\\") ? t : undefined;
 }
 
 export default async function LoginPagina({ searchParams }: { searchParams: Promise<{ inTeams?: string; terug?: string }> }) {

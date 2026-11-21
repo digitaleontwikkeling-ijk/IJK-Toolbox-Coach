@@ -8,7 +8,8 @@ const kies = (p: Page, veld: string, label: string) => p.locator(`#veld-${veld}`
 async function login(page: Page, naam: string) {
   await page.goto(`${B}/login/`);
   await page.getByRole("button", { name: new RegExp(naam) }).click();
-  await page.waitForURL(`**${B}/wizard/`);
+  await page.waitForURL((url) => !url.pathname.includes("/login"));
+  await page.waitForLoadState("networkidle");
 }
 
 test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredingen", async ({ page }) => {
@@ -20,6 +21,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page.getByText("Alles blijft in je eigen browser")).toBeVisible();
 
   await login(page, "Testmedewerker Anna");
+  await expect(page).toHaveURL(new RegExp(`${B}/wizard/$`));
   await page.getByLabel("Jouw probleem of idee").fill("HR-gegevens van mijn afdeling wekelijks automatisch in AFAS verwerken.");
   await page.getByRole("button", { name: "Volgende →" }).click();
   if (await page.getByRole("heading", { name: /De coach heeft nog/ }).isVisible().catch(() => false)) {
@@ -50,7 +52,8 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
     ["Testtoetser Architect", "Goedgekeurd", ""],
   ] as const) {
     await login(page, naam);
-    await page.getByRole("link", { name: "Toetsing" }).click();
+    // Toetsers beginnen op hun eigen pagina.
+    await expect(page).toHaveURL(new RegExp(`${B}/toetsing/$`));
     await page.getByRole("link", { name: ref }).click();
     await page.getByText(besluit, { exact: true }).click();
     if (toelichting) await page.getByLabel(/Welke voorwaarden gelden/).fill(toelichting);
@@ -65,7 +68,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page.locator(".adviescard")).toContainText("Eerst een DPIA uitvoeren.");
 
   await login(page, "Testbeheerder");
-  await page.getByRole("link", { name: "Beheer" }).click();
+  await expect(page).toHaveURL(new RegExp(`${B}/beheer/$`));
   await expect(page.getByText("Regelset versie")).toBeVisible();
   await expect(page.getByRole("link", { name: ref })).toBeVisible();
 

@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { volledigPad } from "@/lib/paden";
+import { startPad, volledigPad } from "@/lib/paden";
 import { api } from "./client";
 
 const ROLNAMEN: Record<string, string> = {
@@ -10,14 +10,15 @@ const ROLNAMEN: Record<string, string> = {
   beheerder: "beheerder",
 };
 
-export function NepLogin({ gebruikers, terug = "/wizard" }: { gebruikers: { oid: string; naam: string; rollen: string[] }[]; terug?: string }) {
+export function NepLogin({ gebruikers, terug }: { gebruikers: { oid: string; naam: string; rollen: string[] }[]; terug?: string }) {
   const [fout, setFout] = useState<string | null>(null);
 
   async function kies(oid: string) {
     setFout(null);
     try {
       await api("/api/login", { body: { oid } });
-      window.location.href = volledigPad(terug);
+      const rollen = gebruikers.find((g) => g.oid === oid)?.rollen ?? [];
+      window.location.href = volledigPad(terug ?? startPad(rollen));
     } catch {
       setFout("Inloggen is niet gelukt. Probeer het opnieuw.");
     }

@@ -14,7 +14,7 @@ export default function LoginPagina() {
           medewerker een aanvraag in met de uitkomst &quot;Eerst toetsen&quot; en log daarna in als toetser.
         </p>
       </div>
-      <NepLogin gebruikers={TESTGEBRUIKERS.map((g) => ({ oid: g.oid, naam: g.naam, rollen: g.rollen }))} terug="/wizard/" />
+      <NepLogin gebruikers={TESTGEBRUIKERS.map((g) => ({ oid: g.oid, naam: g.naam, rollen: g.rollen }))} />
     </>
   );
 }

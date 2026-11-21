@@ -1,13 +1,16 @@
 import { expect, type Page } from "@playwright/test";
 
-/** Inloggen en met een nieuw, leeg idee beginnen (tests delen één database). */
+/**
+ * Inloggen. Standaard daarna naar de wizard met een nieuw, leeg idee (tests delen één database).
+ * Met { nieuwIdee: false } blijf je op de startpagina die bij de rol hoort.
+ */
 export async function login(page: Page, naam: string, opties: { nieuwIdee?: boolean } = {}) {
   await page.goto("/login");
   await page.getByRole("button", { name: new RegExp(naam) }).click();
-  await page.waitForURL("**/wizard");
+  await page.waitForURL((url) => !url.pathname.startsWith("/login"));
   if (opties.nieuwIdee !== false) {
     await page.request.post("/api/concept");
-    await page.reload();
+    await page.goto("/wizard");
   }
 }
 

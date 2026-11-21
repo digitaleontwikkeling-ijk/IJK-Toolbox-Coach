@@ -30,7 +30,7 @@ describe("Teams-manifest", () => {
   it("T3. SSO-gegevens en domein zijn ingevuld", () => {
     expect(m.webApplicationInfo).toEqual({ id: waarden.ENTRA_CLIENT_ID, resource: `api://coach.voorbeeld.invalid/${waarden.ENTRA_CLIENT_ID}` });
     expect(m.validDomains).toEqual(["coach.voorbeeld.invalid"]);
-    expect(m.staticTabs[0].contentUrl).toBe("https://coach.voorbeeld.invalid/login?inTeams=1&terug=/wizard");
+    expect(m.staticTabs[0].contentUrl).toBe("https://coach.voorbeeld.invalid/login?inTeams=1");
   });
 
   it("T4. een bot, een kanaaltab of een extra scope wordt afgekeurd", () => {

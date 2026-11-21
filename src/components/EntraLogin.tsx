@@ -6,6 +6,7 @@
  * Het token gaat naar /api/sessie/entra; de server controleert het en maakt een sessie.
  */
 import { useEffect, useState } from "react";
+import { startPad } from "@/lib/paden";
 
 interface Props {
   clientId: string;
@@ -13,7 +14,8 @@ interface Props {
   /** Scope van de eigen API, bijvoorbeeld api://coach.ijk.nl/<clientId>/access_as_user */
   scope: string;
   inTeams: boolean;
-  terug: string;
+  /** Terug naar deze pagina na het inloggen; zonder: de startpagina bij de rol. */
+  terug?: string;
 }
 
 async function probeerTeams(): Promise<boolean> {
@@ -74,7 +76,8 @@ export function EntraLogin(props: Props) {
           body: JSON.stringify({ token }),
         });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        window.location.replace(props.terug);
+        const { rollen } = (await res.json()) as { rollen: string[] };
+        window.location.replace(props.terug ?? startPad(rollen));
       } catch (e) {
         console.warn("Inloggen mislukt", e);
         if (actief) setStatus("fout");

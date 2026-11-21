@@ -26,7 +26,7 @@
     {
       "entityId": "toolbox-coach",
       "name": "Toolbox Coach",
-      "contentUrl": "https://{{APP_DOMEIN}}/login?inTeams=1&terug=/wizard",
+      "contentUrl": "https://{{APP_DOMEIN}}/login?inTeams=1",
       "websiteUrl": "https://{{APP_DOMEIN}}/wizard",
       "scopes": ["personal"]
     }

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { volledigPad } from "@/lib/paden";
+import { startPad, volledigPad } from "@/lib/paden";
 import { api } from "./client";
 
 interface Props {
@@ -26,19 +26,20 @@ export function Kop({ appNaam, gebruiker }: Props) {
   return (
     <header className="kop">
       <div className="kop__binnen">
-        <Link href="/wizard" className="kop__naam">
+        <Link href={gebruiker ? startPad(gebruiker.rollen) : "/login"} className="kop__naam">
           <span>{ijk}</span> {rest.join(" ")}
         </Link>
         {gebruiker && (
           <nav aria-label="Hoofdmenu">
-            <Link href="/wizard" aria-current={huidig("/wizard")}>Nieuw idee</Link>
-            <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
+            {/* Eigen werk van toetsers en beheerders vooraan; de wizard is er ook voor hen. */}
             {gebruiker.rollen.some((r) => r.startsWith("toetser_")) && (
               <Link href="/toetsing" aria-current={huidig("/toetsing")}>Toetsing</Link>
             )}
             {gebruiker.rollen.includes("beheerder") && (
               <Link href="/beheer" aria-current={huidig("/beheer")}>Beheer</Link>
             )}
+            <Link href="/wizard" aria-current={huidig("/wizard")}>Nieuw idee</Link>
+            <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
           </nav>
         )}
         {gebruiker && (

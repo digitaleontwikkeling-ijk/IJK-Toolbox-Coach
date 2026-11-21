@@ -8,6 +8,9 @@ kanaal of groepschat) en is ook los te openen via een link.
 | In Teams | Teams-SSO (`authentication.getAuthToken` uit de Teams JavaScript SDK), zonder extra klik |
 | Los in de browser | MSAL (`@azure/msal-browser`) met een redirect naar de Microsoft-inlogpagina |
 
+Na het inloggen komt iedereen op de pagina die bij de rol hoort: toetsers op "Toetsing", beheerders op "Beheer",
+medewerkers in de wizard. Toetsers en beheerders zijn ook medewerker en kunnen dus zelf een idee indienen.
+
 In beide gevallen stuurt de browser het token naar `POST /api/sessie/entra`. De server controleert het
 (`src/auth/entra.ts`: handtekening, eigen tenant, doelgroep, geldigheid) en maakt een sessiecookie.
 In Teams draait de app in een iframe op een andere site; daarom is de cookie `SameSite=None; Secure; Partitioned`.
