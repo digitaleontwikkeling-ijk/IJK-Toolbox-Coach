@@ -101,9 +101,9 @@ hoe_werkt_het:
   titel: Hoe werkt de coach?
   link: Hoe werkt de coach?
   intro: >-
-    De IJK Toolbox Coach gebruikt AI om met je mee te denken. Maar de AI beslist niet of je idee mag.
-    Dat doen vaste spelregels van IJK. Zo is elk advies uitlegbaar en krijgt iedereen met dezelfde
-    antwoorden hetzelfde advies.
+    De IJK Toolbox Coach gebruikt een AI agent om met je mee te denken. Maar de AI agent beslist niet
+    of je idee goedgekeurd wordt. Dat bepalen de vaste spelregels van IJK en, als dat nodig is, de toetsers.
+    Zo is elk advies uitlegbaar en krijgt iedereen met dezelfde antwoorden hetzelfde advies.
   wie_titel: Wie doet wat?
   rijen:
     - onderdeel: Je idee begrijpen
@@ -120,7 +120,7 @@ hoe_werkt_het:
       hoe: Deze vragen beantwoord je altijd zelf.
     - onderdeel: Het advies (de kleur)
       wie: Vaste spelregels
-      hoe: De tool berekent de kleur, de toetsers en of een DPIA mogelijk nodig is. Dat gebeurt met de spelregels van IJK, niet door AI.
+      hoe: De tool berekent de kleur, de toetsers en of een DPIA mogelijk nodig is. Dat gebeurt met de spelregels van IJK, niet door de AI agent.
     - onderdeel: Uitleg bij het advies
       wie: AI-coach
       hoe: De coach legt het berekende advies uit in gewone taal. Hij kan het advies niet veranderen.
@@ -129,19 +129,19 @@ hoe_werkt_het:
       hoe: In de chat kun je op elk moment een vraag stellen over de tools en de spelregels.
     - onderdeel: Vervolgactie
       wie: Jij en de tool
-      hoe: Pas als jij op de knop klikt, vraagt de tool een account aan of stuurt je aanvraag naar de toetsers. De AI kan dat niet zelf.
-  waarom_titel: Waarom bepaalt de AI niet de kleur?
+      hoe: Pas als jij op de knop klikt, vraagt de tool een account aan of stuurt je aanvraag naar de toetsers. De AI agent kan dat niet zelf.
+  waarom_titel: Waarom bepaalt de AI agent niet de kleur?
   waarom:
     - "Uitlegbaar: bij elk advies staat welke antwoorden de doorslag gaven en met welke versie van de spelregels het is berekend."
     - "Eerlijk: dezelfde antwoorden geven altijd hetzelfde advies. Een taalmodel kan op dezelfde vraag verschillende antwoorden geven."
     - "Controleerbaar: de spelregels worden beheerd door Team Digitale Ontwikkeling en de AI governance & compliance officer."
-  privacy_titel: Wat gaat er naar de AI?
+  privacy_titel: Wat gaat er naar de AI agent?
   privacy:
     - Alleen wat nodig is voor de vraag, zoals je beschrijving en je antwoorden.
     - Niet je naam of e-mailadres. De coach kent je alleen als een willekeurige code.
     - E-mailadressen, telefoonnummers en rekeningnummers in je tekst worden er eerst uitgehaald. Gebruik toch liever geen namen of andere persoonsgegevens.
     - Het gesprek wordt niet bewaard in het adviesregister. Na het afronden wordt het verwijderd.
-  zonder_ai_titel: En als de AI niet werkt?
+  zonder_ai_titel: En als de AI agent niet werkt?
   zonder_ai: Dan vul je alles zelf in. Je krijgt hetzelfde advies, want dat wordt altijd met de vaste spelregels berekend.
   demo_melding: In deze demo is de coach een oefencoach zonder AI. Die geeft eenvoudige voorbeeldantwoorden.
-  kleur_hint: Deze kleur is berekend met de vaste spelregels van IJK, niet door AI.
+  kleur_hint: Deze kleur is berekend met de vaste spelregels van IJK, niet door de AI agent.
