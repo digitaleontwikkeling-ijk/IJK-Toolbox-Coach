@@ -5,7 +5,7 @@ import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3 } from "./hulp";
 test.describe.configure({ mode: "serial" });
 let referentie = "";
 
-test("stap 3 toont Impact in drie deelvragen met voorbeelden, hulpteksten en 'Wat moet je extra regelen?'", async ({ page }) => {
+test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten en 'Wat moet je extra regelen?'", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
   await page.getByRole("button", { name: /past, verder/ }).click();
@@ -14,7 +14,8 @@ test("stap 3 toont Impact in drie deelvragen met voorbeelden, hulpteksten en 'Wa
   for (const naam of ["Beschikbaarheid", "Integriteit", "Vertrouwelijkheid"]) {
     await expect(impact.getByRole("group", { name: new RegExp(naam) })).toBeVisible();
   }
-  await expect(impact).toContainText("Een afdeling of klantproces ligt stil.");
+  // Geen voorbeelden bij de keuzes (keuze IJK: verwarrend, sluiten vaak niet aan op de use case).
+  await expect(impact).not.toContainText("Een afdeling of klantproces ligt stil.");
   await expect(impact).toContainText("De hoogste score telt.");
   await expect(page.locator("#veld-data")).toContainText("Een kopie van echte gegevens of een testomgeving met productiegegevens is géén testdata.");
   await expect(page.locator("#veld-autonomie")).toContainText("Beslist de tool, of beslis jij op basis van wat de tool aangeeft?");
@@ -66,4 +67,28 @@ test("toetser ziet het rode advies ter informatie, zonder besluitformulier", asy
   await page.getByRole("link", { name: referentie }).click();
   await expect(page.getByText("Bij deze uitkomst is er geen aanvraag en hoef je geen besluit te nemen.")).toBeVisible();
   await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
+});
+
+test("'i'-knopje bij een keuze toont de toelichting, kiest het antwoord niet, en sluit met Escape", async ({ page }) => {
+  await login(page, "Testmedewerker Chris");
+  await naarStap3(page, "Een prototype voor mezelf met testdata.");
+  await page.getByRole("button", { name: /past, verder/ }).click();
+
+  const data = page.locator("#veld-data");
+  const info = data.getByRole("button", { name: "Uitleg bij Persoonsgegevens" });
+  await expect(info).toHaveAttribute("aria-expanded", "false");
+  await info.click();
+  await expect(info).toHaveAttribute("aria-expanded", "true");
+  await expect(data.locator(".keuze__uitleg")).toContainText("Persoonsgegevens: Naam, e-mailadres, personeelsnummer");
+  await expect(data.getByLabel("Persoonsgegevens", { exact: true })).not.toBeChecked();
+
+  // Een ander knopje vervangt de toelichting; Escape sluit hem.
+  await data.getByRole("button", { name: "Uitleg bij Openbaar" }).click();
+  await expect(data.locator(".keuze__uitleg")).toContainText("Openbaar: Informatie die iedereen mag zien");
+  await page.keyboard.press("Escape");
+  await expect(data.locator(".keuze__uitleg")).toBeHidden();
+
+  // Elke keuze bij de checks (behalve Impact, met voorbeelden) heeft een knopje.
+  await expect(page.locator("#veld-autonomie").getByRole("button", { name: /^Uitleg bij/ })).toHaveCount(6);
+  await expect(page.locator("#veld-impact").getByRole("button", { name: /^Uitleg bij/ })).toHaveCount(0);
 });

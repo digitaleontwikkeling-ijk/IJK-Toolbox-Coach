@@ -36,6 +36,8 @@ const antwoordSchema = z.object({
   label: tekst,
   /** Korte naam voor "Waarom deze kleur?" (standaard het label). */
   kort: tekst.optional(),
+  /** Toelichting achter het "i"-knopje bij deze keuze. */
+  uitleg: tekst.optional(),
   kleur: id,
   voorwaarde: tekst.optional(),
   alternatief: tekst.optional(),
@@ -49,7 +51,7 @@ const deelvraagSchema = z.object({
   id,
   naam: tekst,
   vraag: tekst,
-  /** Voorbeeld per antwoord-id, als hulptekst bij de keuzeknoppen. */
+  /** Voorbeeld per antwoord-id. Alleen voor de coach; niet zichtbaar in de wizard. */
   voorbeelden: z.record(id, tekst).default({}),
 });
 

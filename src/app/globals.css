@@ -286,3 +286,14 @@ fieldset.keuze legend + * { clear: both; }
 .extra-regelen { margin-top: 0.75rem; font-size: 0.9rem; }
 .extra-regelen h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
 .extra-regelen ul { margin: 0; padding-left: 1.1rem; }
+
+/* ---------- "i"-knopje met toelichting per keuze ---------- */
+.keuze__optie { display: inline-flex; align-items: center; gap: 0.25rem; }
+.keuze__info {
+  flex: none; width: 1.75rem; height: 1.75rem; border-radius: 50%;
+  border: 2px solid var(--rand-invoer); background: var(--wit); color: var(--lucht);
+  font: italic 700 0.9rem/1 Georgia, "Times New Roman", serif; cursor: pointer; padding: 0;
+}
+.keuze__info:hover, .keuze__info[aria-expanded="true"] { background: var(--lucht); border-color: var(--lucht); color: var(--wit); }
+.keuze__uitleg { margin-top: 0.6rem; padding: 0.6rem 0.8rem; background: var(--wolk); border-left: 4px solid var(--water); border-radius: var(--radius); font-size: 0.95rem; }
+.keuze__uitleg[hidden] { display: none; }

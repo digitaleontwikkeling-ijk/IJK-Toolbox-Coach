@@ -8,7 +8,7 @@ import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
   it("C1. de meegeleverde content is geldig en heeft een versie", () => {
-    expect(regelset.versie).toBe("0.5");
+    expect(regelset.versie).toBe("0.6");
     expect(regelset.checks.map((c) => c.id)).toEqual(["data", "systemen", "gebruikers", "autonomie", "impact", "afhankelijkheid"]);
     expect(regelset.rode_vlaggen).toHaveLength(5);
     expect(regelset.checks.find((c) => c.id === "impact")!.deelvragen.map((d) => d.id)).toEqual(["beschikbaarheid", "integriteit", "vertrouwelijkheid"]);
@@ -51,6 +51,15 @@ describe("content-bestanden", () => {
     for (const b of content.tools.behoeften) expect(b.tools).not.toContain("n8n");
     expect(content.tools.keuzehints.join(" ")).not.toMatch(/n8n/);
     expect(systeemPrompt("tooladvies", content)).toContain("IJK gebruikt geen n8n. Stel het nooit voor.");
+  });
+
+  it("C8. elke keuze bij de checks heeft een toelichting (Impact: voorbeelden per deelvraag, alleen voor de coach)", () => {
+    for (const c of regelset.checks) {
+      for (const a of c.antwoorden) {
+        if (c.deelvragen.length > 0) expect(c.deelvragen.every((d) => d.voorbeelden[a.id]), `${c.id}.${a.id}`).toBe(true);
+        else expect(a.uitleg, `${c.id}.${a.id}`).toBeTruthy();
+      }
+    }
   });
 
   it("C7. spelregels per tool komen letterlijk uit de presentatie (steekproef)", () => {

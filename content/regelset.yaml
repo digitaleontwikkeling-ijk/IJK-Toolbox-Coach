@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.5"
+versie: "0.6"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -64,12 +64,14 @@ toetsers:
 # meerdere: true = de medewerker mag meerdere antwoorden kiezen; het antwoord met de hoogste kleur telt.
 #   TODO: valideren door toetsers (welke checks meerdere antwoorden toestaan)
 # Per antwoord:
+#   uitleg: toelichting achter het "i"-knopje. TODO: valideren door toetsers (conceptteksten)
 #   kort: korte naam voor "Waarom deze kleur?" (anders het label)
 #   voorwaarde: alleen bij antwoorden die geel scoren; getoond als de uitkomst geel is.
 #   alternatief: alleen bij antwoorden die rood scoren; getoond als de uitkomst rood is.
 #   extra_regelen: wat je extra moet regelen bij dit antwoord (lijst "Wat moet je extra regelen?").
 # deelvragen: de check bestaat uit deelvragen met dezelfde schaal; de hoogste kleur telt.
-#   voorbeelden: hulptekst per antwoord.
+#   voorbeelden: per antwoord een voorbeeld. Alleen voor de coach (niet zichtbaar in de wizard: keuze IJK,
+#   omdat voorbeelden vaak niet aansluiten op de use case van de medewerker).
 checks:
   - id: data
     nummer: 1
@@ -86,10 +88,14 @@ checks:
           personen, klanten of vertrouwelijke IJK-informatie. Een kopie van echte gegevens of een testomgeving met
           productiegegevens is géén testdata.
     antwoorden:
-      - { id: openbaar, label: Openbaar, kleur: groen }
-      - { id: intern, label: Intern, kleur: groen }
-      - { id: persoonsgegevens, label: Persoonsgegevens, kleur: oranje }
-      - { id: vertrouwelijk, label: Vertrouwelijk/gevoelig, kleur: oranje }
+      - { id: openbaar, label: Openbaar, kleur: groen,
+          uitleg: "Informatie die iedereen mag zien, zoals teksten op de website van IJK of openbare cijfers." }
+      - { id: intern, label: Intern, kleur: groen,
+          uitleg: "Informatie voor medewerkers van IJK, zoals werkinstructies of interne overzichten, zonder gegevens over personen." }
+      - { id: persoonsgegevens, label: Persoonsgegevens, kleur: oranje,
+          uitleg: "Naam, e-mailadres, personeelsnummer, of alles wat je direct of indirect aan een persoon kunt koppelen." }
+      - { id: vertrouwelijk, label: Vertrouwelijk/gevoelig, kleur: oranje,
+          uitleg: "Informatie die niet naar buiten mag of maar voor een kleine groep bedoeld is, zoals contracten, financiële gegevens of klantgegevens." }
 
   - id: systemen
     nummer: 2
@@ -101,14 +107,18 @@ checks:
       - kop: Voorwaarde bij Lezen
         tekst: Via een goedgekeurde koppeling en met IJK-credentials (alleen lezen).
     antwoorden:
-      - { id: geen, label: Geen, kleur: groen }
+      - { id: geen, label: Geen, kleur: groen,
+          uitleg: "De oplossing werkt los van IJK-systemen, bijvoorbeeld met gegevens die je zelf invoert of met testdata." }
       - id: lezen
+        uitleg: "De oplossing haalt gegevens op uit een IJK-systeem, maar wijzigt niets. Via een goedgekeurde koppeling en met IJK-credentials (alleen lezen)."
         label: Lezen (uit een goedgekeurde IJK-bron)
         kort: Lezen
         kleur: geel
         voorwaarde: Gebruik de goedgekeurde koppeling en IJK-credentials met alleen leesrechten.
-      - { id: koppelen, label: Koppelen, kleur: oranje }
-      - { id: schrijven, label: Schrijven in bedrijfssystemen, kleur: oranje }
+      - { id: koppelen, label: Koppelen, kleur: oranje,
+          uitleg: "De oplossing verbindt twee of meer systemen met elkaar, zodat er gegevens worden uitgewisseld." }
+      - { id: schrijven, label: Schrijven in bedrijfssystemen, kleur: oranje,
+          uitleg: "De oplossing maakt, wijzigt of verwijdert gegevens in een bedrijfssysteem, zoals AFAS." }
 
   - id: gebruikers
     nummer: 3
@@ -122,14 +132,19 @@ checks:
           Hoe breder een oplossing wordt gebruikt, hoe minder het nog een persoonlijk experiment is en hoe meer eisen
           we stellen aan beheer, beveiliging en continuïteit.
     antwoorden:
-      - { id: alleen_ik, label: Alleen ik, kleur: groen }
+      - { id: alleen_ik, label: Alleen ik, kleur: groen,
+          uitleg: "Alleen jij gebruikt de oplossing, voor je eigen werk." }
       - id: collegas
+        uitleg: "Een paar directe collega's gebruiken de oplossing ook."
         label: Collega's
         kleur: geel
         voorwaarde: Gaat je team erop vertrouwen? Wijs een eigenaar aan en documenteer.
-      - { id: afdeling, label: Afdeling, kleur: oranje }
-      - { id: organisatie, label: Organisatie, kleur: oranje }
-      - { id: extern, label: Extern/klanten, kleur: oranje }
+      - { id: afdeling, label: Afdeling, kleur: oranje,
+          uitleg: "Je hele afdeling gebruikt de oplossing." }
+      - { id: organisatie, label: Organisatie, kleur: oranje,
+          uitleg: "Medewerkers in heel IJK, of in meerdere afdelingen, gebruiken de oplossing." }
+      - { id: extern, label: Extern/klanten, kleur: oranje,
+          uitleg: "Klanten, klantmedewerkers of andere mensen buiten IJK gebruiken de oplossing of zien de uitkomst." }
 
   - id: autonomie
     nummer: 4
@@ -141,16 +156,22 @@ checks:
       - kop: Reflectievraag
         tekst: Beslist de tool, of beslis jij op basis van wat de tool aangeeft?
     antwoorden:
-      - { id: assisteren, label: Assisteren, kleur: groen }
-      - { id: adviseren, label: Adviseren, kleur: groen }
+      - { id: assisteren, label: Assisteren, kleur: groen,
+          uitleg: "De oplossing helpt je bij je werk, zoals een tekst opstellen of samenvatten. Jij doet de rest." }
+      - { id: adviseren, label: Adviseren, kleur: groen,
+          uitleg: "De oplossing doet een voorstel of geeft advies. Jij beslist wat je ermee doet." }
       - id: lezen
+        uitleg: "De oplossing zoekt of haalt zelfstandig gegevens op, maar verandert niets."
         label: Lezen
         kleur: geel
         # TODO: valideren door toetsers (placeholder, tekst nog aan te leveren door IJK)
         voorwaarde: "[Placeholder] Voorwaarde bij Autonomie = Lezen wordt nog vastgesteld door de toetsers."
-      - { id: schrijven, label: Schrijven, kleur: oranje }
-      - { id: handelen, label: Handelen, kleur: oranje }
+      - { id: schrijven, label: Schrijven, kleur: oranje,
+          uitleg: "De oplossing maakt of wijzigt zelf gegevens of documenten." }
+      - { id: handelen, label: Handelen, kleur: oranje,
+          uitleg: "De oplossing voert zelfstandig acties uit, zoals een mail versturen, een betaling goedkeuren of een proces starten." }
       - id: beslissen
+        uitleg: "De oplossing neemt zelf een besluit over mensen, bijvoorbeeld wie wordt uitgenodigd voor een sollicitatiegesprek."
         label: Beslissen (over mensen)
         kleur: rood
         # Alternatief uit testscenario 6 van de opdracht. TODO: valideren door toetsers
@@ -207,25 +228,27 @@ checks:
     naam: Afhankelijkheid
     vraag: Hoe ga je de oplossing gebruiken?
     toetser: toetser_architect
-    hulp:
-      - tekst: Hoe vaster de oplossing onderdeel wordt van het werk, hoe meer je moet regelen.
     antwoorden:
       - id: experiment
+        uitleg: "Je probeert iets uit, eenmalig of voor korte tijd. Als het stopt, heeft niemand er last van."
         label: Eenmalig of om uit te proberen (experiment)
         kort: Experiment
         kleur: groen
         extra_regelen: Niets extra's.
       - id: persoonlijk
+        uitleg: "Je gebruikt de oplossing regelmatig voor je eigen werk. Als hij stopt, heb jij er last van."
         label: Regelmatig, voor mijn eigen werk (persoonlijke oplossing)
         kort: Persoonlijke oplossing
         kleur: groen
         extra_regelen: "+ documentatie, security"
       - id: team
+        uitleg: "Je team rekent op de oplossing in het dagelijkse werk. Als hij stopt, heeft je team er last van."
         label: Vast onderdeel van het werk van mijn team (teamoplossing)
         kort: Teamoplossing
         kleur: oranje
         extra_regelen: "+ eigenaarschap, beheer, logging"
       - id: bedrijf
+        uitleg: "Een IJK-proces of de dienstverlening aan klanten hangt van de oplossing af."
         label: Vast onderdeel van een IJK-proces (bedrijfsoplossing)
         kort: Bedrijfsoplossing
         kleur: oranje

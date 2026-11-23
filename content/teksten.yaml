@@ -59,7 +59,7 @@ na_actie:
 # een "ja" is geen fout, de coach helpt dan verder.
 aanvullende_vragen:
   titel: Aanvullende vragen
-  intro: Nog een paar vragen over hoe je de oplossing maakt en gebruikt. Is het antwoord "ja", dan laat de coach zien hoe het wel veilig kan.
+  intro: Nog een paar vragen over hoe je de oplossing maakt en gebruikt.
   vraag_label: "Vraag {nummer}"
   geen: Nee op alle vragen
 

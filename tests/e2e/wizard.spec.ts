@@ -143,8 +143,8 @@ test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste k
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Collega's");
   await vinkAan(page, "gebruikers", "Extern/klanten");
-  await expect(page.locator("#veld-gebruikers").getByLabel("Collega's")).toBeChecked();
-  await expect(page.locator("#veld-gebruikers").getByLabel("Extern/klanten")).toBeChecked();
+  await expect(page.locator("#veld-gebruikers").getByLabel("Collega's", { exact: true })).toBeChecked();
+  await expect(page.locator("#veld-gebruikers").getByLabel("Extern/klanten", { exact: true })).toBeChecked();
   await kies(page, "autonomie", "Assisteren");
   await kiesImpact(page, { beschikbaarheid: "Beperkt" });
   await kies(page, "afhankelijkheid", "Regelmatig, voor mijn eigen werk (persoonlijke oplossing)");

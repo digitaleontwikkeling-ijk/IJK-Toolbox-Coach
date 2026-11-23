@@ -3,6 +3,15 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.6 (concept)
+
+- Toelichting per keuzemogelijkheid bij de checks (achter een "i"-knopje). Conceptteksten, deels uit de opdracht
+  (definitie persoonsgegevens, voorwaarde bij Lezen), verder geformuleerd door de bouwer.
+  TODO: valideren door toetsers. Geen wijziging in de uitkomsten.
+- De voorbeelden bij de keuzes van Impact (B, I, V) worden niet meer in de wizard getoond (verwarrend, sluiten vaak
+  niet aan op de use case). Ze blijven in de regelset als achtergrond voor de coach.
+- Hulptekst bij Afhankelijkheid ("Hoe vaster de oplossing onderdeel wordt van het werk, …") verwijderd.
+
 ## tools 0.4 (concept)
 
 - "IJK gebruikt geen n8n" staat niet meer in de keuzehulp in de wizard, alleen nog in de instructies voor de coach

@@ -3,7 +3,7 @@
  * Een vraag met keuzeknoppen. Toegankelijk: fieldset + legend + echte radio's,
  * of echte selectievakjes als meerdere antwoorden mogen.
  */
-import type { ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 
 interface Basis {
   naam: string;
@@ -11,8 +11,8 @@ interface Basis {
   vraag?: string;
   /** Hulptekst onder de vraag (bijvoorbeeld definities of een reflectievraag). */
   toelichting?: ReactNode;
-  /** Opties; met `hulp` staat er een voorbeeld of uitleg bij de knop. */
-  opties: { id: string; label: string; hulp?: string }[];
+  /** Opties; met `hulp` staat er een voorbeeld bij de knop, met `uitleg` een "i"-knopje met toelichting. */
+  opties: { id: string; label: string; hulp?: string; uitleg?: string }[];
   extra?: ReactNode;
   fout?: boolean;
 }
@@ -24,6 +24,25 @@ type Props =
 export function Keuze(props: Props) {
   const { naam, legend, vraag, toelichting, opties, extra, fout } = props;
   const metHulp = opties.some((o) => o.hulp);
+  // Toelichting achter het "i"-knopje: één tegelijk open, onder de keuzes van deze vraag.
+  const [open, setOpen] = useState<string | null>(null);
+  const uitlegId = `${useId()}-uitleg`;
+  const vak = useRef<HTMLFieldSetElement>(null);
+  const openOptie = opties.find((o) => o.id === open);
+  useEffect(() => {
+    if (!open) return;
+    const buiten = (e: MouseEvent) => {
+      if (vak.current && !vak.current.contains(e.target as Node)) setOpen(null);
+    };
+    document.addEventListener("mousedown", buiten);
+    return () => document.removeEventListener("mousedown", buiten);
+  }, [open]);
+  const sluitMetEscape = (e: KeyboardEvent) => {
+    if (e.key === "Escape" && open) {
+      setOpen(null);
+      e.stopPropagation();
+    }
+  };
   const gekozen = (id: string) => (props.meerdere ? props.waarde.includes(id) : props.waarde === id);
   const wissel = (id: string) => {
     if (props.meerdere) {
@@ -36,7 +55,7 @@ export function Keuze(props: Props) {
   };
 
   return (
-    <fieldset className="keuze" aria-invalid={fout || undefined} style={fout ? { borderColor: "var(--avondrood)" } : undefined}>
+    <fieldset className="keuze" ref={vak} onKeyDown={sluitMetEscape} aria-invalid={fout || undefined} style={fout ? { borderColor: "var(--avondrood)" } : undefined}>
       <legend>
         {legend}
         {vraag && <span className="keuze__vraag">{vraag}</span>}
@@ -66,10 +85,32 @@ export function Keuze(props: Props) {
                   o.label
                 )}
               </label>
+              {o.uitleg && (
+                <button
+                  type="button"
+                  className="keuze__info"
+                  aria-label={`Uitleg bij ${o.label}`}
+                  aria-expanded={open === o.id}
+                  aria-controls={uitlegId}
+                  onClick={() => setOpen(open === o.id ? null : o.id)}
+                >
+                  <span aria-hidden="true">i</span>
+                </button>
+              )}
             </div>
           );
         })}
       </div>
+      {opties.some((o) => o.uitleg) && (
+        <div id={uitlegId} className="keuze__uitleg" role="status" hidden={!openOptie}>
+          {openOptie && (
+            <>
+              <strong>{openOptie.label}: </strong>
+              {openOptie.uitleg}
+            </>
+          )}
+        </div>
+      )}
       {extra}
     </fieldset>
   );

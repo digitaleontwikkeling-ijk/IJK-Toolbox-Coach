@@ -95,7 +95,7 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
                       </>
                     }
                     vraag={d.vraag}
-                    opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label, hulp: d.voorbeelden[a.id] }))}
+                    opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label }))}
                     waarde={perDeel[d.id]}
                     onKies={(id) => zetCheck(c.id, { ...perDeel, [d.id]: id })}
                   />
@@ -129,7 +129,7 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
           }
           vraag={c.vraag}
           toelichting={c.hulp.length > 0 ? <Hulp check={c} /> : undefined}
-          opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label }))}
+          opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label, uitleg: a.uitleg }))}
           extra={
             <>
               {extraRegelen.length > 0 && (
