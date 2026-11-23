@@ -90,7 +90,7 @@ test("beheerder ziet alle adviezen en de inhoud, zonder besluitformulier", async
   await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
 });
 
-test("na het inloggen begint iedereen op de pagina die bij de rol hoort; eigen werk staat vooraan in het menu", async ({ page }) => {
+test("na het inloggen begint iedereen op de pagina die bij de rol hoort; alleen medewerkers zien Nieuw idee", async ({ page }) => {
   for (const [naam, pad, eerste] of [
     ["Testmedewerker Bram", "/wizard", "Nieuw idee"],
     ["Testtoetser Compliance", "/toetsing", "Toetsing"],
@@ -101,11 +101,17 @@ test("na het inloggen begint iedereen op de pagina die bij de rol hoort; eigen w
     await expect(page).toHaveURL(new RegExp(`${pad}(\\?|$)`));
     const menu = page.getByRole("navigation", { name: "Hoofdmenu" }).getByRole("link");
     await expect(menu.first()).toHaveText(eerste);
-    // Toetsers en beheerders kunnen ook zelf een idee indienen.
-    await expect(menu.filter({ hasText: "Nieuw idee" })).toHaveCount(1);
-    await expect(menu.filter({ hasText: "Mijn aanvragen" })).toHaveCount(1);
+    // Alleen medewerkers dienen ideeën in; toetsers en beheerders niet.
+    const medewerker = naam.startsWith("Testmedewerker");
+    await expect(menu.filter({ hasText: "Nieuw idee" })).toHaveCount(medewerker ? 1 : 0);
+    await expect(menu.filter({ hasText: "Mijn aanvragen" })).toHaveCount(medewerker ? 1 : 0);
+    if (!medewerker) {
+      await page.goto("/wizard");
+      await expect(page.getByRole("heading", { name: "Geen toegang" })).toBeVisible();
+    }
   }
   // De startpagina (/) stuurt ook naar de pagina bij de rol.
+  await login(page, "Testbeheerder", { nieuwIdee: false });
   await page.goto("/");
   await expect(page).toHaveURL(/\/beheer$/);
 });

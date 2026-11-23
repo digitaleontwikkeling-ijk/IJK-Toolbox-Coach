@@ -15,7 +15,7 @@ async function controleer(page: Page, waar: string) {
 }
 
 test("geen WCAG 2.1 AA-overtredingen in de wizard", async ({ page }) => {
-  await login(page, "Testtoetser Compliance");
+  await login(page, "Testmedewerker Chris");
   await controleer(page, "stap 1");
   await naarStap3(page, "Ik wil voor mezelf een prototype bouwen met testdata.");
   await controleer(page, "stap 2");

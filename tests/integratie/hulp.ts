@@ -51,9 +51,9 @@ export async function nieuwConcept(gebruiker: TestGebruiker = ANNA, data: unknow
 
 
 export type TestGebruiker = { oid: string; naam: string; upn?: string; rollen: Rol[] };
-export const COMPLIANCE: TestGebruiker = { oid: "int-c", naam: "C", upn: "c@voorbeeld.invalid", rollen: ["medewerker", "toetser_compliance"] };
-export const ARCHITECT: TestGebruiker = { oid: "int-a", naam: "A", rollen: ["medewerker", "toetser_architect"] };
-export const BEHEERDER: TestGebruiker = { oid: "int-b", naam: "B", rollen: ["medewerker", "beheerder"] };
+export const COMPLIANCE: TestGebruiker = { oid: "int-c", naam: "C", upn: "c@voorbeeld.invalid", rollen: ["toetser_compliance"] };
+export const ARCHITECT: TestGebruiker = { oid: "int-a", naam: "A", rollen: ["toetser_architect"] };
+export const BEHEERDER: TestGebruiker = { oid: "int-b", naam: "B", rollen: ["beheerder"] };
 
 /** Maakt een advies voor `gebruiker` met de gegeven wizardgegevens en geeft het terug. */
 export async function nieuwAdvies(gebruiker: TestGebruiker = ANNA, data: unknown = VOLLEDIG) {

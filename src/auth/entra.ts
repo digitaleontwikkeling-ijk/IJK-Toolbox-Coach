@@ -4,13 +4,13 @@
  * - Handtekening tegen de openbare sleutels (JWKS) van de tenant.
  * - Uitgever: de eigen tenant (v1- of v2-token). Tokens van andere tenants worden geweigerd.
  * - Doelgroep (aud): de client-ID of de Application ID URI van deze app.
- * - Rollen: App Roles uit de claim `roles`, plus de standaardrol (medewerker).
+ * - Rollen: App Roles uit de claim `roles`, plus de standaardrol (medewerker), behalve voor toetsers en beheerders.
  *
  * Er wordt niets uit het token opgeslagen behalve, via de sessie, het pseudoniem
  * dat van het object-ID (oid) wordt afgeleid.
  */
 import { createRemoteJWKSet, jwtVerify, type JWTVerifyGetKey } from "jose";
-import { ROLLEN, type Rol } from "./rollen";
+import { dientGeenAanvragenIn, ROLLEN, type Rol } from "./rollen";
 
 export interface EntraInstellingen {
   tenantId: string;
@@ -54,7 +54,9 @@ export async function controleerEntraToken(token: string, e: EntraInstellingen, 
   if (typeof oid !== "string" || !oid) throw new OngeldigTokenFout("Token mist het object-ID (oid).");
 
   const tokenRollen = Array.isArray(payload.roles) ? (payload.roles as unknown[]).filter((r): r is string => typeof r === "string") : [];
-  const rollen = [...new Set([e.standaardRol, ...tokenRollen])].filter((r): r is Rol =>
+  // Iedereen krijgt de standaardrol (medewerker), behalve toetsers en beheerders: die dienen zelf geen aanvragen in.
+  const standaard = tokenRollen.some(dientGeenAanvragenIn) ? [] : [e.standaardRol];
+  const rollen = [...new Set([...standaard, ...tokenRollen])].filter((r): r is Rol =>
     (ROLLEN as readonly string[]).includes(r),
   );
   const upn = [payload.upn, payload.preferred_username].find((x): x is string => typeof x === "string");

@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { geenRodeVlaggen, kies, login } from "./hulp";
 
 test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet terug", async ({ page }) => {
-  await login(page, "Testtoetser Architect");
+  await login(page, "Testmedewerker Chris");
   const beschrijving = page.getByLabel("Jouw probleem of idee");
   await expect(beschrijving).toHaveValue("");
   await expect(page).toHaveURL(/\/wizard\?concept=/);

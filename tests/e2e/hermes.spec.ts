@@ -36,7 +36,7 @@ test("Hermes faalt: de wizard valt terug op handmatig invullen en blijft bruikba
 });
 
 test("coach geeft ongeldige checks: niets wordt voorgeselecteerd, handmatig invullen werkt", async ({ page }) => {
-  await login(page, "Testtoetser Architect");
+  await login(page, "Testmedewerker Chris");
   await naarStap3(page, "Een dashboard bouwen voor mijn team #ongeldige-checks");
   await page.getByRole("button", { name: /past, verder/ }).click();
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();

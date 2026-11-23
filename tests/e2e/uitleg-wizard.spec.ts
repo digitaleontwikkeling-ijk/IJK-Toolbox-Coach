@@ -19,8 +19,8 @@ test("links naar de uitleg: inlogpagina, voet, chatvenster en bij 'Waarom deze k
   await expect(page.getByRole("main").getByRole("link", { name: "Hoe werkt de coach?" })).toHaveAttribute("href", "/hoe-werkt-het");
   await expect(page.getByRole("contentinfo").getByRole("link", { name: "Hoe werkt de coach?" })).toBeVisible();
 
-  // Testbeheerder: andere tests verwachten dat Bram geen adviezen heeft (gedeelde testdatabase).
-  await login(page, "Testbeheerder");
+  // Chris: andere tests verwachten dat Bram geen adviezen heeft (gedeelde testdatabase).
+  await login(page, "Testmedewerker Chris");
   const chatLink = page.locator(".chat").getByRole("link", { name: /Hoe werkt de coach\?/ });
   await expect(chatLink).toHaveAttribute("target", "_blank");
 

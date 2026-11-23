@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
 
 test("wizard en adviescard werken op een smal scherm", async ({ page }) => {
-  await login(page, "Testtoetser Architect");
+  await login(page, "Testmedewerker Chris");
   await expect(page.getByRole("heading", { name: /Wat wil je bereiken/ })).toBeVisible();
   await expect(page.getByLabel("Je vraag aan de coach")).toBeVisible();
 

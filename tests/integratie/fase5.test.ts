@@ -14,6 +14,7 @@ import * as toetsingIdRoute from "@/app/api/toetsing/[id]/route";
 import * as besluitRoute from "@/app/api/toetsing/[id]/besluit/route";
 import * as beheerRoute from "@/app/api/beheer/adviezen/route";
 import * as beheerIdRoute from "@/app/api/beheer/adviezen/[id]/route";
+import * as mijnRoute from "@/app/api/mijn-aanvragen/route";
 import { startWebhookMock } from "../../mocks/webhook-mock";
 import { content } from "../helpers";
 import { ANNA, ARCHITECT, BEHEERDER, BRAM, COMPLIANCE, leegDatabase, nieuwAdvies, roep, VOLLEDIG, type Handler } from "./hulp";
@@ -226,10 +227,17 @@ describe("toetsing", () => {
     expect((await besluit(a.id, ARCHITECT, { besluit: "goedgekeurd" })).json.status).toBe("afgewezen");
   });
 
-  it("F14. een toetser kan zijn eigen aanvraag niet toetsen", async () => {
-    const a = await nieuwAdvies(COMPLIANCE, ALLEEN_COMPLIANCE);
-    await actie(a.id, COMPLIANCE);
-    expect((await besluit(a.id, COMPLIANCE, { besluit: "goedgekeurd" })).status).toBe(403);
+  it("F14. vangnet: iemand die in Entra toch zowel medewerker als toetser is, kan zijn eigen aanvraag niet toetsen", async () => {
+    const beide = { ...COMPLIANCE, oid: "int-beide", rollen: ["medewerker", "toetser_compliance"] as typeof COMPLIANCE.rollen };
+    const a = await nieuwAdvies(beide, ALLEEN_COMPLIANCE);
+    await actie(a.id, beide);
+    expect((await besluit(a.id, beide, { besluit: "goedgekeurd" })).status).toBe(403);
+  });
+
+  it("F14b. toetsers en beheerders dienen zelf geen ideeën in (403 op de wizard-API)", async () => {
+    for (const g of [COMPLIANCE, ARCHITECT, BEHEERDER]) {
+      expect((await roep(mijnRoute.GET as Handler, { gebruiker: g })).status).toBe(403);
+    }
   });
 
   it("F15. een toetser kan niet besluiten over een aanvraag van een andere rol", async () => {

@@ -54,7 +54,10 @@ afterAll(() => {
 describe("tokencontrole", () => {
   it("E1. geldig token: identiteit met standaardrol en App Roles", async () => {
     const id = await controleerEntraToken(await token({ roles: ["toetser_architect", "onbekende_rol"] }), instellingen);
-    expect(id).toEqual({ oid: "oid-anna", naam: "Anna Test", upn: "anna@voorbeeld.invalid", rollen: ["medewerker", "toetser_architect"] });
+    // Toetsers krijgen de rol medewerker niet automatisch: zij dienen zelf geen aanvragen in.
+    expect(id).toEqual({ oid: "oid-anna", naam: "Anna Test", upn: "anna@voorbeeld.invalid", rollen: ["toetser_architect"] });
+    expect((await controleerEntraToken(await token({ roles: ["beheerder"] }), instellingen)).rollen).toEqual(["beheerder"]);
+    expect((await controleerEntraToken(await token({ roles: [] }), instellingen)).rollen).toEqual(["medewerker"]);
   });
 
   it("E2. v1-token (sts.windows.net) met client-ID als doelgroep wordt ook geaccepteerd", async () => {
@@ -97,7 +100,7 @@ describe("sessie via Entra", () => {
     expect(cookie).toMatch(/HttpOnly/);
     expect(cookie).toMatch(/SameSite=None; Secure; Partitioned/);
     const g = gebruikerUitRequest(new Request("http://test", { headers: { cookie: cookie.split(";")[0]! } }));
-    expect(g).toMatchObject({ pseudoniemId: maakPseudoniem("oid-anna"), rollen: ["medewerker", "beheerder"] });
+    expect(g).toMatchObject({ pseudoniemId: maakPseudoniem("oid-anna"), rollen: ["beheerder"] });
   });
 
   it("E5. ongeldig token: 401, geen cookie", async () => {

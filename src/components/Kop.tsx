@@ -40,8 +40,12 @@ export function Kop({ appNaam, gebruiker }: Props) {
             )}
             {/* Gewone link (geen client-navigatie): de wizard moet altijd opnieuw starten met een leeg idee,
                 ook als je er al in staat. */}
-            <a href={volledigPad(wizardPad())} aria-current={huidig("/wizard")}>Nieuw idee</a>
-            <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
+            {gebruiker.rollen.includes("medewerker") && (
+              <>
+                <a href={volledigPad(wizardPad())} aria-current={huidig("/wizard")}>Nieuw idee</a>
+                <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
+              </>
+            )}
           </nav>
         )}
         {gebruiker && (

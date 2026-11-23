@@ -16,7 +16,8 @@ export interface Testgebruiker {
 export const TESTGEBRUIKERS: Testgebruiker[] = [
   { oid: "test-0001", upn: "anna@voorbeeld.invalid", naam: "Testmedewerker Anna", rollen: ["medewerker"] },
   { oid: "test-0002", upn: "bram@voorbeeld.invalid", naam: "Testmedewerker Bram", rollen: ["medewerker"] },
-  { oid: "test-0003", upn: "compliance@voorbeeld.invalid", naam: "Testtoetser Compliance", rollen: ["medewerker", "toetser_compliance"] },
-  { oid: "test-0004", upn: "architect@voorbeeld.invalid", naam: "Testtoetser Architect", rollen: ["medewerker", "toetser_architect"] },
-  { oid: "test-0005", upn: "beheer@voorbeeld.invalid", naam: "Testbeheerder", rollen: ["medewerker", "beheerder"] },
+  { oid: "test-0003", upn: "compliance@voorbeeld.invalid", naam: "Testtoetser Compliance", rollen: ["toetser_compliance"] },
+  { oid: "test-0004", upn: "architect@voorbeeld.invalid", naam: "Testtoetser Architect", rollen: ["toetser_architect"] },
+  { oid: "test-0006", upn: "chris@voorbeeld.invalid", naam: "Testmedewerker Chris", rollen: ["medewerker"] },
+  { oid: "test-0005", upn: "beheer@voorbeeld.invalid", naam: "Testbeheerder", rollen: ["beheerder"] },
 ];

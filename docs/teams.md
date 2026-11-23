@@ -9,7 +9,8 @@ kanaal of groepschat) en is ook los te openen via een link.
 | Los in de browser | MSAL (`@azure/msal-browser`) met een redirect naar de Microsoft-inlogpagina |
 
 Na het inloggen komt iedereen op de pagina die bij de rol hoort: toetsers op "Toetsing", beheerders op "Beheer",
-medewerkers in de wizard. Toetsers en beheerders zijn ook medewerker en kunnen dus zelf een idee indienen.
+medewerkers in de wizard. Iedereen krijgt de rol medewerker, behalve toetsers en beheerders: zij dienen zelf
+geen aanvragen in.
 
 In beide gevallen stuurt de browser het token naar `POST /api/sessie/entra`. De server controleert het
 (`src/auth/entra.ts`: handtekening, eigen tenant, doelgroep, geldigheid) en maakt een sessiecookie.

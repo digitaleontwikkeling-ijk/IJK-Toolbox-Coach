@@ -190,3 +190,5 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Eerdere keuzes blijven: kleuren uit het huisstijlhandboek, meerdere antwoorden bij checks 1–4, "Aanvullende vragen".
 - Regelset 0.5: een AI Act-signaal maakt de uitkomst minstens *Eerst toetsen* (`ai_act.minimale_uitkomst`), zodat de
   compliance officer altijd meekijkt (keuze IJK).
+- Toetsers en beheerders dienen zelf geen aanvragen in (keuze IJK): zij krijgen de rol medewerker niet,
+  ook niet automatisch bij Entra ID. Vangnet: wie toch beide rollen heeft, kan zijn eigen aanvraag niet toetsen.
