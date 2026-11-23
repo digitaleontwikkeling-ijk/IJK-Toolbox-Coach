@@ -3,6 +3,12 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## tools 0.5 (concept)
+
+- Logo's bij alle zes tools (`icoon`, uit de toolbox-sheet "Onze huidige digitale toolbox (2026)"); alleen het
+  beeldmerk, want de naam staat er al naast. Bij Azure OpenAI de beeldmerken van Azure en OpenAI samen.
+  Geen wijziging in de uitkomsten.
+
 ## regelset 0.7 (concept)
 
 - Nieuw: in stap 2 kan de medewerker kiezen voor "Een andere tool (nog niet in de IJK Toolbox)", met de naam en

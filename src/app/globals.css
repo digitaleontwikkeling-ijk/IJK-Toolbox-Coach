@@ -313,3 +313,5 @@ fieldset.keuze legend + * { clear: both; }
 /* ---------- Logo's van tools ---------- */
 .tool-icoon { display: inline-block; height: 1.25em; width: auto; max-width: 4em; object-fit: contain; vertical-align: -0.25em; margin-right: 0.4em; }
 .tool-icoon--groot { height: 1.6em; max-width: 6em; vertical-align: -0.35em; margin-right: 0.5em; }
+/* Op een gekozen (donkere) knop: logo op een wit vlakje, zodat donkere logo's zichtbaar blijven. */
+.keuze__optie input:checked + label .tool-icoon { background: var(--wit); border-radius: 4px; padding: 1px 3px; box-sizing: content-box; }

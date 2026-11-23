@@ -3,12 +3,13 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.4"
+versie: "0.5"
 
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
     spelregels: spelregels/m365_copilot.yaml
+    icoon: iconen/m365_copilot.png
   - id: copilot_workflows
     naam: Copilot workflows
     omschrijving: >-
@@ -16,20 +17,25 @@ tools:
       Kan niet koppelen met systemen buiten Microsoft 365. De workflow draait op het account van de medewerker.
       Functie in vroege toegang (Microsoft Frontier-programma) die nog kan veranderen.
     spelregels: spelregels/copilot_workflows.yaml
+    icoon: iconen/copilot_workflows.png
   - id: hubbi
     naam: HubBI
     omschrijving: >-
       IJK's eigen automatiserings- en integratieplatform voor AFAS: voor handmatige, repeterende taken in en om AFAS.
     spelregels: spelregels/hubbi.yaml
+    icoon: iconen/hubbi.png
   - id: ai_flows
     naam: AI Flows
     spelregels: spelregels/ai_flows.yaml
+    icoon: iconen/ai_flows.png
   - id: claude_code
     naam: Claude Code
     spelregels: spelregels/claude_code.yaml
+    icoon: iconen/claude_code.png
   - id: azure_openai
     naam: Azure OpenAI
     spelregels: spelregels/azure_openai.yaml
+    icoon: iconen/azure_openai.png
 
 behoeften:
   - id: sneller_afhandelen
