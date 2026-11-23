@@ -1,6 +1,7 @@
 "use client";
 /** Inzage in de inhoud van de coach (alleen lezen; wijzigen gaat via Git). */
 import { Spelregels } from "./Spelregels";
+import { ToolIcoon } from "./ToolIcoon";
 import { kleurVan, toetserNaam, useContent } from "./client";
 
 export function BeheerContent() {
@@ -62,7 +63,7 @@ export function BeheerContent() {
       <h3>Tools en spelregels</h3>
       {c.tools.tools.map((t) => (
         <details key={t.id} style={{ marginBottom: "0.5rem" }}>
-          <summary><strong>{t.naam}</strong></summary>
+          <summary><ToolIcoon content={c} tool={t.id} /><strong>{t.naam}</strong></summary>
           <Spelregels content={c} tool={t.id} />
         </details>
       ))}

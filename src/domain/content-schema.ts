@@ -226,7 +226,21 @@ export const ANDERE_TOOL = "andere_tool";
 export const toolsSchema = z
   .object({
     versie: tekst,
-    tools: z.array(z.object({ id, naam: tekst, omschrijving: tekst.optional(), spelregels: tekst })).min(1),
+    tools: z
+      .array(
+        z.object({
+          id,
+          naam: tekst,
+          omschrijving: tekst.optional(),
+          spelregels: tekst,
+          /** Optioneel logo, bijvoorbeeld iconen/hubbi.png (png, svg of webp, max. 200 kB). */
+          icoon: z
+            .string()
+            .regex(/^iconen\/[a-z0-9_-]+\.(png|svg|webp)$/, "icoon: verwacht iconen/<naam>.png, .svg of .webp")
+            .optional(),
+        }),
+      )
+      .min(1),
     behoeften: z.array(z.object({ id, omschrijving: tekst, tools: z.array(id).min(1) })).min(1),
     keuzehints: z.array(tekst).default([]),
     /** Alleen voor de coach; niet zichtbaar in de wizard. */

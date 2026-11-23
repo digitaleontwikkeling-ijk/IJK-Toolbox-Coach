@@ -10,6 +10,7 @@ import { HoeWerktHetLink } from "./HoeWerktHet";
 import { hoeWerktHetHref } from "@/lib/paden";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
+import { ToolIcoon } from "./ToolIcoon";
 import { datum, kleurVan, toetserNaam, toolWeergave, type AdviesDto, type ContentDto } from "./client";
 
 interface Props {
@@ -59,7 +60,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
       <div className="adviescard__inhoud">
         <section>
           <h3>Tooladvies</h3>
-          <p><strong>{tool}</strong>{advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
+          <p><ToolIcoon content={content} tool={advies.tooladvies.tool} /><strong>{tool}</strong>{advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
           {link && (
             <p className="hulptekst" style={{ margin: 0, overflowWrap: "anywhere" }}>
               Link: <a href={link} rel="noopener noreferrer nofollow" target="_blank">{link}</a>

@@ -10,6 +10,7 @@ export const GET = route([...ROLLEN], async ({ gebruiker }) => {
     tools: c.tools,
     spelregels: c.spelregels,
     teksten: c.teksten,
+    iconen: c.iconen,
     gebruiker: { naam: gebruiker.naam, rollen: gebruiker.rollen },
   };
 });

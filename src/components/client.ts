@@ -10,6 +10,8 @@ export interface ContentDto {
   tools: ToolsConfig;
   spelregels: Record<string, Spelregels>;
   teksten: Teksten;
+  /** tool-id → logo (data-URI); alleen tools met een icoon. */
+  iconen: Record<string, string>;
   gebruiker: { naam: string; rollen: string[] };
 }
 

@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { adviesPad, volledigPad, wizardPad } from "@/lib/paden";
+import { ToolIcoon } from "./ToolIcoon";
 import { api, datum, kleurVan, toolWeergave, useContent, type AdviesDto } from "./client";
 
 export function MijnAanvragen() {
@@ -61,7 +62,7 @@ export function MijnAanvragen() {
                   <span className="status">Status: {content.teksten.statussen[a.status]}</span>
                 </div>
                 <p style={{ margin: 0 }}>
-                  <strong>{toolWeergave(content, a.tooladvies)}</strong> · {a.beschrijving.length > 160 ? `${a.beschrijving.slice(0, 160)}…` : a.beschrijving}
+                  <ToolIcoon content={content} tool={a.tooladvies.tool} /><strong>{toolWeergave(content, a.tooladvies)}</strong> · {a.beschrijving.length > 160 ? `${a.beschrijving.slice(0, 160)}…` : a.beschrijving}
                 </p>
                 <div className="knoppen" style={{ marginTop: 0 }}>
                   <Link className="knop knop--secundair" href={adviesPad(a.id)}>

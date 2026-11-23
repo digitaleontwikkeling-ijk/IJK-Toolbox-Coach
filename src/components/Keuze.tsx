@@ -12,7 +12,7 @@ interface Basis {
   /** Hulptekst onder de vraag (bijvoorbeeld definities of een reflectievraag). */
   toelichting?: ReactNode;
   /** Opties; met `hulp` staat er een voorbeeld bij de knop, met `uitleg` een "i"-knopje met toelichting. */
-  opties: { id: string; label: string; hulp?: string; uitleg?: string }[];
+  opties: { id: string; label: string; hulp?: string; uitleg?: string; icoon?: ReactNode }[];
   extra?: ReactNode;
   fout?: boolean;
 }
@@ -76,6 +76,7 @@ export function Keuze(props: Props) {
                 onChange={() => wissel(o.id)}
               />
               <label htmlFor={id}>
+                {o.icoon}
                 {o.hulp ? (
                   <span>
                     <span className="keuze__label">{o.label}</span>

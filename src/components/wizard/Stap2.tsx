@@ -4,6 +4,7 @@ import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
 import { Keuze } from "../Keuze";
 import { Spelregels } from "../Spelregels";
+import { ToolIcoon } from "../ToolIcoon";
 import { toolNaam } from "../client";
 import type { StapProps } from "./types";
 
@@ -49,7 +50,7 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
           <p className="hulptekst" style={{ margin: 0 }}>
             {advies.bron === "coach" ? "Advies van de coach" : "Door jou gekozen"}
           </p>
-          <h3>{toolNaam(content, advies.tool)}</h3>
+          <h3 className="tool-naam"><ToolIcoon content={content} tool={advies.tool} groot />{toolNaam(content, advies.tool)}</h3>
           {advies.motivatie && <p>{advies.motivatie}</p>}
           <Spelregels content={content} tool={advies.tool} />
         </div>
@@ -72,7 +73,7 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
             naam="tool"
             legend="Kies een tool"
             opties={[
-              ...content.tools.tools.map((x) => ({ id: x.id, label: x.naam })),
+              ...content.tools.tools.map((x) => ({ id: x.id, label: x.naam, icoon: <ToolIcoon content={content} tool={x.id} /> })),
               { id: ANDERE_TOOL, label: t.optie },
             ]}
             waarde={advies?.tool}

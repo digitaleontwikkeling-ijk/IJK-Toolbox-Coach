@@ -309,3 +309,7 @@ fieldset.keuze legend + * { clear: both; }
 .fase-uitleg__waarom { display: block; color: var(--tekst-zacht); }
 .fase-uitleg__uitkomsten { list-style: none; padding-left: 0 !important; }
 .fase-uitleg__uitkomsten li { margin-bottom: 0.6rem; }
+
+/* ---------- Logo's van tools ---------- */
+.tool-icoon { display: inline-block; height: 1.25em; width: auto; max-width: 4em; object-fit: contain; vertical-align: -0.25em; margin-right: 0.4em; }
+.tool-icoon--groot { height: 1.6em; max-width: 6em; vertical-align: -0.35em; margin-right: 0.5em; }

@@ -23,6 +23,24 @@ export interface Content {
   /** tool-id → spelregels */
   spelregels: Record<string, Spelregels>;
   teksten: Teksten;
+  /** tool-id → logo als data-URI (alleen tools met een icoon). */
+  iconen: Record<string, string>;
+}
+
+const MAX_ICOON_BYTES = 200 * 1024;
+const MIME: Record<string, string> = { png: "image/png", svg: "image/svg+xml", webp: "image/webp" };
+
+/** Leest een logo en geeft het als data-URI (werkt zo ook in de statische demo, zonder aparte bestanden). */
+function leesIcoon(map: string, bestand: string): string {
+  let data: Buffer;
+  try {
+    data = readFileSync(path.join(map, bestand));
+  } catch (e) {
+    throw new ContentFout(bestand, [(e as Error).message]);
+  }
+  if (data.length > MAX_ICOON_BYTES) throw new ContentFout(bestand, [`icoon is groter dan ${MAX_ICOON_BYTES / 1024} kB`]);
+  const ext = bestand.split(".").pop()!;
+  return `data:${MIME[ext]};base64,${data.toString("base64")}`;
 }
 
 export class ContentFout extends Error {
@@ -66,7 +84,9 @@ export function laadContent(map: string = standaardContentMap()): Content {
     spelregels[tool.id] = s;
   }
   const teksten = leesYaml(map, "teksten.yaml", tekstenSchema);
-  return { regelset, tools, spelregels, teksten };
+  const iconen: Record<string, string> = {};
+  for (const tool of tools.tools) if (tool.icoon) iconen[tool.id] = leesIcoon(map, tool.icoon);
+  return { regelset, tools, spelregels, teksten, iconen };
 }
 
 let cache: Content | undefined;

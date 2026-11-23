@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { beheerAdviesPad, toetsingPad } from "@/lib/paden";
+import { ToolIcoon } from "./ToolIcoon";
 import { api, datum, isTerInformatie, kleurVan, toetserNaam, toolWeergave, useContent, type AdviesDto, type ContentDto } from "./client";
 
 export function AdviezenLijst({ modus }: { modus: "toetsing" | "beheer" }) {
@@ -62,7 +63,7 @@ function Lijst({ adviezen, content, modus }: { adviezen: AdviesDto[]; content: C
               {a.dpiaSignaal && <span className="status">DPIA-signaal</span>}
             </div>
             <p style={{ margin: 0 }}>
-              <strong>{toolWeergave(content, a.tooladvies)}</strong> ·{" "}
+              <ToolIcoon content={content} tool={a.tooladvies.tool} /><strong>{toolWeergave(content, a.tooladvies)}</strong> ·{" "}
               {a.beschrijving.length > 160 ? `${a.beschrijving.slice(0, 160)}…` : a.beschrijving}
             </p>
             {a.toetsers.length > 0 && (
