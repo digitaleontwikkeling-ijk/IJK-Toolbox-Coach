@@ -3,6 +3,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { regelsetSchema } from "@/domain/content-schema";
+import { systeemPrompt } from "@/coach/prompts";
 import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
@@ -45,9 +46,11 @@ describe("content-bestanden", () => {
     }
   });
 
-  it("C6. IJK gebruikt geen n8n: de tool komt nergens als keuze voor", () => {
+  it("C6. IJK gebruikt geen n8n: geen keuze, niet in de keuzehulp van de wizard, wel als instructie voor de coach", () => {
     expect(content.tools.tools.map((t) => t.id)).not.toContain("n8n");
     for (const b of content.tools.behoeften) expect(b.tools).not.toContain("n8n");
+    expect(content.tools.keuzehints.join(" ")).not.toMatch(/n8n/);
+    expect(systeemPrompt("tooladvies", content)).toContain("IJK gebruikt geen n8n. Stel het nooit voor.");
   });
 
   it("C7. spelregels per tool komen letterlijk uit de presentatie (steekproef)", () => {

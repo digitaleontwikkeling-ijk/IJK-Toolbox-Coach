@@ -23,7 +23,7 @@ function toolsTekst(c: Content): string {
   const behoeften = c.tools.behoeften
     .map((b) => `- ${b.id}: ${b.omschrijving} → ${b.tools.join(" of ")}`)
     .join("\n");
-  const hints = c.tools.keuzehints.map((h) => `- ${h}`).join("\n");
+  const hints = [...c.tools.keuzehints, ...c.tools.coach_instructies].map((h) => `- ${h}`).join("\n");
   return `Tools in de IJK Toolbox (id: naam):\n${tools}\n\nBehoeften (id: omschrijving → tool-id's):\n${behoeften}${hints ? `\n\nKeuzehulp:\n${hints}` : ""}`;
 }
 

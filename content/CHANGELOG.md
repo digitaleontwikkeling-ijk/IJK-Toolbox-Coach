@@ -3,6 +3,11 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## tools 0.4 (concept)
+
+- "IJK gebruikt geen n8n" staat niet meer in de keuzehulp in de wizard, alleen nog in de instructies voor de coach
+  (`coach_instructies`).
+
 ## regelset 0.5 (concept)
 
 - Een AI Act-signaal maakt de uitkomst minstens "Eerst toetsen" (oranje), zodat de compliance officer altijd

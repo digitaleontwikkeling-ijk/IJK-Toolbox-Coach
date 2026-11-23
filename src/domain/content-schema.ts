@@ -212,6 +212,8 @@ export const toolsSchema = z
     tools: z.array(z.object({ id, naam: tekst, omschrijving: tekst.optional(), spelregels: tekst })).min(1),
     behoeften: z.array(z.object({ id, omschrijving: tekst, tools: z.array(id).min(1) })).min(1),
     keuzehints: z.array(tekst).default([]),
+    /** Alleen voor de coach; niet zichtbaar in de wizard. */
+    coach_instructies: z.array(tekst).default([]),
   })
   .superRefine((t, ctx) => {
     const toolIds = new Set(t.tools.map((x) => x.id));

@@ -3,7 +3,7 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.3"
+versie: "0.4"
 
 tools:
   - id: m365_copilot
@@ -51,9 +51,12 @@ behoeften:
     omschrijving: Een AI-model gebruiken in een eigen oplossing
     tools: [azure_openai]
 
-# Toelichting voor de coach bij het kiezen van een tool.
+# Toelichting bij het kiezen van een tool. Wordt in de wizard getoond én aan de coach meegegeven.
 keuzehints:
   - HubBI is voor handmatige, repeterende taken in en om AFAS. Gebruik HubBI bij voorkeur ook voor data van klantmedewerkers waarvoor IJK verwerker is.
   - Copilot workflows automatiseert terugkerende taken binnen Microsoft 365 en kan niet koppelen met systemen buiten Microsoft 365.
   - AI Flows en Copilot workflows zijn beide geschikt om AI-stappen in werkprocessen in te bouwen. Kies AI Flows bij data van klantmedewerkers waarvoor IJK verwerker is.
+
+# Alleen voor de coach (niet zichtbaar in de wizard).
+coach_instructies:
   - IJK gebruikt geen n8n. Stel het nooit voor.
