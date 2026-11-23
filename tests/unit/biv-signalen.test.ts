@@ -4,7 +4,7 @@
  */
 import { describe, expect, it } from "vitest";
 import { evalueer, OngeldigeInvoerFout } from "@/domain/beslisregels";
-import { invoer, regelset } from "../helpers";
+import { invoer, kopieRegelset, regelset } from "../helpers";
 
 const BEIDE = ["toetser_compliance", "toetser_architect"];
 const fouten = (fn: () => unknown): string[] => {
@@ -109,6 +109,39 @@ describe("AI Act-signaal", () => {
       regelset,
     );
     expect([u.dpiaSignaal, u.aiActSignaal]).toEqual([true, true]);
+  });
+});
+
+describe("AI Act-signaal maakt de uitkomst minstens 'Eerst toetsen'", () => {
+  it("A5. alles groen, maar AI adviseert over mensen → oranje, compliance officer, met uitleg", () => {
+    const u = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }), regelset);
+    expect(u.kleur).toBe("oranje");
+    expect(u.uitkomst).toBe("Eerst toetsen");
+    expect(u.toetsers).toEqual(["toetser_compliance"]);
+    expect(u.motivatie).toBe("AI Act-classificatie nodig (de AI adviseert over mensen, handelt of beslist).");
+  });
+
+  it("A6. geel met AI Act-signaal → oranje, zonder voorwaarden (die horen bij geel)", () => {
+    const u = evalueer(
+      invoer({ checks: { gebruikers: "collegas", autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }),
+      regelset,
+    );
+    expect(u.kleur).toBe("oranje");
+    expect(u.voorwaarden).toEqual([]);
+  });
+
+  it("A7. al oranje door een check: het signaal staat niet in 'Waarom deze kleur?'", () => {
+    const u = evalueer(invoer({ checks: { autonomie: "handelen" } }), regelset);
+    expect(u.kleur).toBe("oranje");
+    expect(u.motivatie).toBe("Handelen (Autonomie).");
+  });
+
+  it("A8. instelbaar: zonder minimale uitkomst blijft groen groen (wel met signaal)", () => {
+    const r = kopieRegelset();
+    delete r.ai_act.minimale_uitkomst;
+    const u = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }, r), r);
+    expect(u.kleur).toBe("groen");
+    expect(u.aiActSignaal).toBe(true);
   });
 });
 

@@ -7,7 +7,7 @@ import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
   it("C1. de meegeleverde content is geldig en heeft een versie", () => {
-    expect(regelset.versie).toBe("0.4");
+    expect(regelset.versie).toBe("0.5");
     expect(regelset.checks.map((c) => c.id)).toEqual(["data", "systemen", "gebruikers", "autonomie", "impact", "afhankelijkheid"]);
     expect(regelset.rode_vlaggen).toHaveLength(5);
     expect(regelset.checks.find((c) => c.id === "impact")!.deelvragen.map((d) => d.id)).toEqual(["beschikbaarheid", "integriteit", "vertrouwelijkheid"]);

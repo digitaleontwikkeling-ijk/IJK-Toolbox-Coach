@@ -84,7 +84,7 @@ describe("hoogste kleur en motivatie", () => {
       }),
       regelset,
     );
-    expect(u.redenen.map((r) => (r.soort === "check" ? r.checkId : r.vlagId))).toEqual([
+    expect(u.redenen.map((r) => (r.soort === "check" ? r.checkId : r.soort === "rode_vlag" ? r.vlagId : r.signaal))).toEqual([
       "niet_goedgekeurde_tool",
       "persoonlijke_inlog_of_secrets",
       "impact",

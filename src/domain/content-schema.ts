@@ -110,6 +110,10 @@ export const regelsetSchema = z
     ai_act: z.object({
       minstens_een_van: z.array(conditieSchema).min(1),
       toetser: id,
+      /** Bij een AI Act-signaal is de uitkomst minstens deze kleur. */
+      minimale_uitkomst: id.optional(),
+      /** Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde. */
+      motivatie: tekst.optional(),
     }),
     motivatie_rode_vlag: tekst,
   })
@@ -171,6 +175,9 @@ export const regelsetSchema = z
     };
     if (!toetserIds.has(r.dpia.toetser)) fout(`dpia: onbekende toetser "${r.dpia.toetser}"`);
     if (!toetserIds.has(r.ai_act.toetser)) fout(`ai_act: onbekende toetser "${r.ai_act.toetser}"`);
+    if (r.ai_act.minimale_uitkomst && !kleurIds.has(r.ai_act.minimale_uitkomst)) {
+      fout(`ai_act: onbekende kleur "${r.ai_act.minimale_uitkomst}"`);
+    }
     for (const c of [...r.dpia.vereist, ...r.dpia.minstens_een_van, ...r.dpia.altijd_bij]) controleer("dpia", c);
     for (const c of r.ai_act.minstens_een_van) controleer("ai_act", c);
   });

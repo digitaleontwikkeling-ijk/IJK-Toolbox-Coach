@@ -104,7 +104,8 @@ ai_act:
   titel: AI Act-classificatie nodig
   uitleg: >-
     De AI Act is de Europese wet voor AI. Omdat de oplossing zelfstandig handelt of adviseert of beslist over
-    mensen, bepaalt de AI governance & compliance officer in welke risicoklasse je toepassing valt.
+    mensen, bepaalt de AI governance & compliance officer in welke risicoklasse je toepassing valt. Daarom laat je
+    je idee in dat geval altijd eerst toetsen.
 
 # Bij check 6: lijst met wat je extra moet regelen per antwoord.
 extra_regelen_titel: Wat moet je extra regelen?

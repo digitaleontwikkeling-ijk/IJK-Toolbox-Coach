@@ -3,6 +3,12 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.5 (concept)
+
+- Een AI Act-signaal maakt de uitkomst minstens "Eerst toetsen" (oranje), zodat de compliance officer altijd
+  meekijkt, ook als alle checks groen of geel zijn (keuze IJK). Instelbaar met `ai_act.minimale_uitkomst`.
+  TODO: valideren door toetsers.
+
 ## regelset 0.4 en tools 0.3 (concept)
 
 Bijgewerkt naar de opdracht op basis van de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).

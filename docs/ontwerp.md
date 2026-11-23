@@ -188,3 +188,5 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - DPIA bij Vertrouwelijkheid Serieus/Groot ook zonder aangevinkte persoonsgegevens (keuze IJK).
 - Extra vraag "Gaat het advies over mensen?" bij Autonomie = Adviseren, voor het AI Act-signaal (keuze IJK).
 - Eerdere keuzes blijven: kleuren uit het huisstijlhandboek, meerdere antwoorden bij checks 1–4, "Aanvullende vragen".
+- Regelset 0.5: een AI Act-signaal maakt de uitkomst minstens *Eerst toetsen* (`ai_act.minimale_uitkomst`), zodat de
+  compliance officer altijd meekijkt (keuze IJK).

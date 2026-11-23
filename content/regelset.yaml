@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.4"
+versie: "0.5"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -302,6 +302,11 @@ ai_act:
     - { extra_vraag: advies_over_mensen }
     - { rode_vlag: ai_beslist_over_mensen }
   toetser: toetser_compliance
+  # Bij een AI Act-signaal is de uitkomst minstens deze kleur, zodat de compliance officer altijd meekijkt
+  # (keuze IJK). TODO: valideren door toetsers
+  minimale_uitkomst: oranje
+  # Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde.
+  motivatie: AI Act-classificatie nodig (de AI adviseert over mensen, handelt of beslist)
 
 # "Waarom deze kleur?": per kleur staat de tekst bij de kleur (veld motivatie).
 # {redenen} wordt vervangen door de doorslaggevende checks en rode vlaggen,
