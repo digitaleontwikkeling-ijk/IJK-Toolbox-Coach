@@ -7,9 +7,10 @@ import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
   it("C1. de meegeleverde content is geldig en heeft een versie", () => {
-    expect(regelset.versie).toBe("0.3");
+    expect(regelset.versie).toBe("0.4");
     expect(regelset.checks.map((c) => c.id)).toEqual(["data", "systemen", "gebruikers", "autonomie", "impact", "afhankelijkheid"]);
-    expect(regelset.rode_vlaggen).toHaveLength(4);
+    expect(regelset.rode_vlaggen).toHaveLength(5);
+    expect(regelset.checks.find((c) => c.id === "impact")!.deelvragen.map((d) => d.id)).toEqual(["beschikbaarheid", "integriteit", "vertrouwelijkheid"]);
   });
 
   it("C2. elke tool heeft spelregels met drie lijsten", () => {
@@ -34,13 +35,24 @@ describe("content-bestanden", () => {
     }
   });
 
-  it("C5. elk geel antwoord heeft een voorwaarde en elk rood antwoord een alternatief", () => {
+  it("C5. elk geel antwoord heeft een voorwaarde; rood zonder alternatief kan alleen als er dan contact volgt", () => {
+    const rood = regelset.kleuren.find((k) => k.id === "rood")!;
     for (const c of regelset.checks) {
       for (const a of c.antwoorden) {
         if (a.kleur === "geel") expect(a.voorwaarde, `${c.id}.${a.id}`).toBeTruthy();
-        if (a.kleur === "rood") expect(a.alternatief, `${c.id}.${a.id}`).toBeTruthy();
+        if (a.kleur === "rood" && !a.alternatief) expect(rood.contact_als_geen_alternatief, `${c.id}.${a.id}`).toBe(true);
       }
     }
+  });
+
+  it("C6. IJK gebruikt geen n8n: de tool komt nergens als keuze voor", () => {
+    expect(content.tools.tools.map((t) => t.id)).not.toContain("n8n");
+    for (const b of content.tools.behoeften) expect(b.tools).not.toContain("n8n");
+  });
+
+  it("C7. spelregels per tool komen letterlijk uit de presentatie (steekproef)", () => {
+    expect(content.spelregels.copilot_workflows!.altijd).toContain("Je geeft geen dienstverleningsprocessen vorm met Copilot workflows");
+    expect(content.spelregels.azure_openai!.altijd).toContain("Alleen EU Data Zone- of regionale deployments van IJK gebruiken, nooit Global");
   });
 });
 

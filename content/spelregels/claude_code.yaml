@@ -1,16 +1,22 @@
-# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: claude_code
 zelf_doen:
-  - Experimenteren
+  - Experimenteren en leren
   - Prototypes maken
-  - Kleine interne tools bouwen
+  - "Code laten genereren en lokaal (op je laptop) opslaan"
+  - Een kleine, interne tool of applicatie bouwen
+  - Bestaande code begrijpen of verbeteren
+  - Apps en dashboards ontwikkelen
 eerst_toetsen:
-  - Als je persoonsgegevens gebruikt
-  - Koppelingen met IJK-systemen
-  - Gebruik door meerdere collega's
-  - Bedrijfskritische toepassingen
+  - De tool/applicatie verwerkt persoonsgegevens
+  - De tool/applicatie gebruikt vertrouwelijke gegevens
+  - Er wordt verbinding gemaakt met IJK-systemen
+  - Meerdere collega's gaan de applicatie gebruiken
+  - De applicatie wordt bedrijfskritisch
+  - AI kan zelfstandig acties uitvoeren
 altijd:
-  - Gebruik alleen de Claude Enterprise-omgeving van IJK
-  - Controleer de code
-  - Geen secrets (wachtwoorden, API-keys) in de code
-  - Minimale rechten
+  - Alleen het zakelijke Claude-account van IJK gebruiken
+  - Geen credentials of secrets hardcoded opslaan
+  - Alleen toegestane repositories en data gebruiken
+  - Testen voordat iets echt gebruikt wordt
+  - "Geef de tool alleen toegang tot wat echt nodig is (bijvoorbeeld alleen leesrechten als je alleen gegevens ophaalt, en laat de tool alleen in je projectmap werken)"

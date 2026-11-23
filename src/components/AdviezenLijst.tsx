@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { beheerAdviesPad, toetsingPad } from "@/lib/paden";
-import { api, datum, kleurVan, toetserNaam, toolNaam, useContent, type AdviesDto, type ContentDto } from "./client";
+import { api, datum, isTerInformatie, kleurVan, toetserNaam, toolNaam, useContent, type AdviesDto, type ContentDto } from "./client";
 
 export function AdviezenLijst({ modus }: { modus: "toetsing" | "beheer" }) {
   const content = useContent();
@@ -20,7 +20,8 @@ export function AdviezenLijst({ modus }: { modus: "toetsing" | "beheer" }) {
   if (!content || !adviezen) return <p role="status">Bezig met laden…</p>;
 
   const open = modus === "toetsing" ? adviezen.filter((a) => a.status === "in_toetsing") : adviezen;
-  const klaar = modus === "toetsing" ? adviezen.filter((a) => a.status !== "in_toetsing") : [];
+  const info = modus === "toetsing" ? adviezen.filter((a) => a.status !== "in_toetsing" && isTerInformatie(content, a.uitkomst)) : [];
+  const klaar = modus === "toetsing" ? adviezen.filter((a) => a.status !== "in_toetsing" && !isTerInformatie(content, a.uitkomst)) : [];
 
   return (
     <>
@@ -28,6 +29,13 @@ export function AdviezenLijst({ modus }: { modus: "toetsing" | "beheer" }) {
         <h2 id="open-titel">{modus === "toetsing" ? `Te beoordelen (${open.length})` : `Alle adviezen (${open.length})`}</h2>
         {open.length === 0 ? <p>Er zijn geen aanvragen.</p> : <Lijst adviezen={open} content={content} modus={modus} />}
       </section>
+      {info.length > 0 && (
+        <section aria-labelledby="info-titel" style={{ marginTop: "2rem" }}>
+          <h2 id="info-titel">{content.teksten.toetsing.ter_informatie} ({info.length})</h2>
+          <p className="instructie">{content.teksten.toetsing.ter_informatie_uitleg}</p>
+          <Lijst adviezen={info} content={content} modus={modus} />
+        </section>
+      )}
       {modus === "toetsing" && klaar.length > 0 && (
         <section aria-labelledby="klaar-titel" style={{ marginTop: "2rem" }}>
           <h2 id="klaar-titel">Afgehandeld ({klaar.length})</h2>

@@ -1,11 +1,18 @@
-# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: ai_flows
 zelf_doen:
-  - Experimenteren met testdata
+  - Bij voorkeur AI Flows gebruiken voor data van klantmedewerkers waarvoor IJK verwerker is
+  - Teksten samenvatten of classificeren binnen een werkproces
+  - Informatie uit documenten halen voor eigen gebruik
   - AI-voorstellen die een mens controleert
 eerst_toetsen:
-  - Persoonsgegevens in de AI-stap
-  - Uitkomsten die automatisch doorwerken
+  - Persoonsgegevens of vertrouwelijke gegevens gaan door de AI-stap
+  - De AI-uitkomst werkt automatisch door in een systeem
+  - De uitkomst gaat naar klanten of externen
+  - AI bepaalt de route of uitkomst van een proces
 altijd:
-  - Gebruik goedgekeurde modellen
-  - Zorg voor menselijke controle
+  - Alleen goedgekeurde AI-modellen gebruiken
+  - Menselijke controle waar fouten gevolgen hebben
+  - Prompts en instellingen documenteren
+  - De kwaliteit van de uitkomsten periodiek controleren
+  - "Een eigenaar (per flow) aanwijzen"

@@ -15,7 +15,7 @@ Status: concept, wacht op akkoord. Alle domeininhoud is startversie `v0.1` en mo
 | Auth | MSAL (`@azure/msal-browser`) + Teams JS SDK v2 (`authentication.getAuthToken`), backend valideert Entra-JWT via JWKS (`jose`) | Conform voorkeur; rollen via Entra **App Roles** |
 | Tests | Vitest (unit + API-integratie tegen echte Postgres in Docker), Playwright (e2e met mock-coach) | Snel, TypeScript-native |
 | UI | React + CSS Modules, geen UI-framework | Volledige controle over IJK-huisstijl en WCAG |
-| Acties | Generieke HTTP-webhooks (URL + gedeeld geheim per actie). Het ontvangende platform (n8n, Copilot workflows, Power Automate) maakt voor de app niet uit | IJK kan van platform wisselen zonder codewijziging |
+| Acties | Generieke HTTP-webhooks (URL + gedeeld geheim per actie). Het ontvangende platform (bijvoorbeeld HubBI of Microsoft 365) maakt voor de app niet uit | IJK kan van platform wisselen zonder codewijziging |
 | Container | Dockerfile (multi-stage) + docker-compose: app, postgres, mock-webhooks, mock-hermes | Lokaal alles zonder externe afhankelijkheden |
 
 ## 2. Mappenstructuur
@@ -177,3 +177,14 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
   in de browser met localStorage. Workflow `.github/workflows/demo-pages.yml` bouwt en publiceert bij elke push naar `main`.
   De echte app bevat geen democode (gecontroleerd in de bundel).
 - In Teams (iframe) wordt de knop "Uitloggen" verborgen.
+
+## 16. Regelset 0.4 (opdracht bijgewerkt na feedback)
+
+- Impact (check 5) in drie deelvragen (BIV); de hoogste deelscore telt; de deelscores staan apart in het register.
+- AI Act-signaal (kolom `ai_act_signaal`, migratie 003); de compliance officer classificeert.
+- Rood: beide toetsers kijken mee, ter informatie (keuze IJK: geen besluit).
+- Rood zonder alternatief: direct een melding aan Team DO (`ACTIE_CONTACT_URL`), maximaal één keer per advies;
+  status *contact volgt* (keuze IJK).
+- DPIA bij Vertrouwelijkheid Serieus/Groot ook zonder aangevinkte persoonsgegevens (keuze IJK).
+- Extra vraag "Gaat het advies over mensen?" bij Autonomie = Adviseren, voor het AI Act-signaal (keuze IJK).
+- Eerdere keuzes blijven: kleuren uit het huisstijlhandboek, meerdere antwoorden bij checks 1–4, "Aanvullende vragen".

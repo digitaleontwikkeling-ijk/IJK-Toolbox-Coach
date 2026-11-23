@@ -129,7 +129,11 @@ Hermes API-server (profiel toolbox-coach)     Webhooks naar flows van IJK
 
 ## Nog open (te valideren door IJK)
 
-- Regelset `0.1`: placeholders voor voorwaarden (Autonomie = Lezen, Impact = Beperkt) en alternatieven bij rood.
-- Spelregels voor Copilot workflows (placeholder).
+- Regelset `0.4` is nog niet gevalideerd door de toetsers. Zoek in `content/` op `TODO:` voor de open punten:
+  - placeholders voor de voorwaarden bij Autonomie = Lezen en Impact = Beperkt;
+  - de BIV-voorbeelden bij Impact (afstemmen op het IJK-risicomanagementproces);
+  - of oranje op Impact-Beschikbaarheid ook naar de architect moet;
+  - het AI Act-signaal en de extra vraag "Gaat het advies over mensen?";
+  - de uitzondering bij rode vlag 2 (Copilot workflows) en welke checks meerdere antwoorden toestaan.
 - Eerste test met echte Hermes, echte Entra-tenant en echte Teams (zie de documenten hierboven).
 - Lettertypes Riona Sans en Ratio en het IJK-logo (op te vragen bij marketing).

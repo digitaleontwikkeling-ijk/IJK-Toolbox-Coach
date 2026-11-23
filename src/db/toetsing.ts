@@ -19,13 +19,16 @@ export interface BesluitRij {
 const besluitVelden = `id, advies_id AS "adviesId", toetser_rol AS "toetserRol",
   toetser_pseudoniem_id AS "toetserPseudoniemId", besluit, toelichting, datum`;
 
-/** Aanvragen die naar (één van) deze toetserrollen zijn gestuurd. Niet-ingediende adviezen niet. */
-export async function adviezenVoorToetsers(rollen: string[]): Promise<AdviesRij[]> {
+/**
+ * Adviezen voor (één van) deze toetserrollen: ingediende aanvragen, plus adviezen met een
+ * uitkomst "ter informatie" (Niet op deze manier), ook als er geen aanvraag is.
+ */
+export async function adviezenVoorToetsers(rollen: string[], terInformatie: string[]): Promise<AdviesRij[]> {
   const r = await db().query(
     `SELECT ${adviesVelden} FROM advies
-     WHERE toetsers && $1::text[] AND status <> 'advies_gegeven'
+     WHERE toetsers && $1::text[] AND (status <> 'advies_gegeven' OR uitkomst = ANY($2::text[]))
      ORDER BY aangemaakt_op DESC`,
-    [rollen],
+    [rollen, terInformatie],
   );
   return r.rows;
 }

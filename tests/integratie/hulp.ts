@@ -35,9 +35,9 @@ export const VOLLEDIG = {
   beschrijving: "Verzuimdashboard van mijn afdeling (testscenario).",
   verduidelijkingGevraagd: true,
   tooladvies: { tool: "claude_code", behoefte: "bouwen", motivatie: "Dashboard bouwen.", bron: "coach", geaccepteerd: true },
-  checks: { data: "persoonsgegevens", systemen: "lezen", gebruikers: "afdeling", autonomie: "lezen", impact: "serieus", afhankelijkheid: "experiment" },
+  checks: { data: "persoonsgegevens", systemen: "lezen", gebruikers: "afdeling", autonomie: "lezen", impact: { beschikbaarheid: "serieus", integriteit: "nauwelijks", vertrouwelijkheid: "nauwelijks" }, afhankelijkheid: "experiment" },
   extraVragen: { bijzondere_persoonsgegevens: true },
-  rodeVlaggen: { niet_goedgekeurde_tool: false, persoonlijke_inlog_of_secrets: false, ai_beslist_over_mensen: false, open_zonder_toetsing: false },
+  rodeVlaggen: { niet_goedgekeurde_tool: false, persoonlijke_inlog_of_secrets: false, ai_beslist_over_mensen: false, open_zonder_toetsing: false, proces_zonder_eigenaar: false },
   chat: [{ rol: "medewerker", tekst: "Dit gesprek mag niet in het register." }],
 };
 

@@ -24,15 +24,33 @@ const kleurSchema = z.object({
   hex,
   tekstkleur: hex,
   vervolgactie: z.enum(VERVOLGACTIES),
+  /** Welke toetsers horen bij deze uitkomst: geen, per oranje check, of alle toetsers samen. */
+  toetsers: z.enum(["geen", "per_check", "alle"]).default("geen"),
+  /** Geen alternatief bij deze uitkomst? Dan neemt Team Digitale Ontwikkeling contact op. */
+  contact_als_geen_alternatief: z.boolean().default(false),
   motivatie: tekst,
 });
 
 const antwoordSchema = z.object({
   id,
   label: tekst,
+  /** Korte naam voor "Waarom deze kleur?" (standaard het label). */
+  kort: tekst.optional(),
   kleur: id,
   voorwaarde: tekst.optional(),
   alternatief: tekst.optional(),
+  /** Wat je extra moet regelen bij dit antwoord. */
+  extra_regelen: tekst.optional(),
+});
+
+const hulpSchema = z.array(z.object({ kop: tekst.optional(), tekst })).default([]);
+
+const deelvraagSchema = z.object({
+  id,
+  naam: tekst,
+  vraag: tekst,
+  /** Voorbeeld per antwoord-id, als hulptekst bij de keuzeknoppen. */
+  voorbeelden: z.record(id, tekst).default({}),
 });
 
 const checkSchema = z.object({
@@ -43,7 +61,10 @@ const checkSchema = z.object({
   toetser: id,
   /** Mag de medewerker meerdere antwoorden kiezen? De hoogste kleur telt. */
   meerdere: z.boolean().default(false),
+  hulp: hulpSchema,
   antwoorden: z.array(antwoordSchema).min(1),
+  /** Deelvragen met dezelfde schaal (bijvoorbeeld Impact: B, I, V). De hoogste kleur telt. */
+  deelvragen: z.array(deelvraagSchema).default([]),
 });
 
 const extraVraagSchema = z.object({
@@ -58,14 +79,17 @@ const rodeVlagSchema = z.object({
   id,
   nummer: z.number().int().positive(),
   vraag: tekst,
+  uitleg: tekst.optional(),
   kort: tekst,
   alternatief: tekst.optional(),
 });
 
-const dpiaConditieSchema = z.union([
-  z.object({ check: id, antwoorden: z.array(id).min(1) }).strict(),
+const conditieSchema = z.union([
+  z.object({ check: id, deelvraag: id.optional(), antwoorden: z.array(id).min(1) }).strict(),
   z.object({ extra_vraag: id }).strict(),
+  z.object({ rode_vlag: id }).strict(),
 ]);
+export type Conditie = z.infer<typeof conditieSchema>;
 
 export const regelsetSchema = z
   .object({
@@ -78,8 +102,13 @@ export const regelsetSchema = z
     rode_vlag_kleur: id,
     rode_vlaggen: z.array(rodeVlagSchema).default([]),
     dpia: z.object({
-      vereist: z.array(dpiaConditieSchema).min(1),
-      minstens_een_van: z.array(dpiaConditieSchema).min(1),
+      vereist: z.array(conditieSchema).min(1),
+      minstens_een_van: z.array(conditieSchema).min(1),
+      altijd_bij: z.array(conditieSchema).default([]),
+      toetser: id,
+    }),
+    ai_act: z.object({
+      minstens_een_van: z.array(conditieSchema).min(1),
       toetser: id,
     }),
     motivatie_rode_vlag: tekst,
@@ -90,6 +119,7 @@ export const regelsetSchema = z
     const toetserIds = new Set(r.toetsers.map((t) => t.id));
     const checkById = new Map(r.checks.map((c) => [c.id, c]));
     const extraIds = new Set(r.extra_vragen.map((e) => e.id));
+    const vlagIds = new Set(r.rode_vlaggen.map((v) => v.id));
 
     dubbel(r.kleuren.map((k) => k.id), "kleur", fout);
     dubbel(r.checks.map((c) => c.id), "check", fout);
@@ -104,6 +134,13 @@ export const regelsetSchema = z
       for (const a of c.antwoorden) {
         if (!kleurIds.has(a.kleur)) fout(`check ${c.id}, antwoord ${a.id}: onbekende kleur "${a.kleur}"`);
       }
+      if (c.deelvragen.length && c.meerdere) fout(`check ${c.id}: deelvragen en meerdere antwoorden gaan niet samen`);
+      dubbel(c.deelvragen.map((d) => d.id), `deelvraag in check ${c.id}`, fout);
+      for (const d of c.deelvragen) {
+        for (const a of Object.keys(d.voorbeelden)) {
+          if (!c.antwoorden.some((x) => x.id === a)) fout(`check ${c.id}, deelvraag ${d.id}: onbekend antwoord "${a}"`);
+        }
+      }
     }
 
     for (const e of r.extra_vragen) {
@@ -114,18 +151,28 @@ export const regelsetSchema = z
       }
     }
 
-    if (!toetserIds.has(r.dpia.toetser)) fout(`dpia: onbekende toetser "${r.dpia.toetser}"`);
-    for (const cond of [...r.dpia.vereist, ...r.dpia.minstens_een_van]) {
+    const controleer = (waar: string, cond: Conditie) => {
       if ("extra_vraag" in cond) {
-        if (!extraIds.has(cond.extra_vraag)) fout(`dpia: onbekende extra vraag "${cond.extra_vraag}"`);
-        continue;
+        if (!extraIds.has(cond.extra_vraag)) fout(`${waar}: onbekende extra vraag "${cond.extra_vraag}"`);
+        return;
+      }
+      if ("rode_vlag" in cond) {
+        if (!vlagIds.has(cond.rode_vlag)) fout(`${waar}: onbekende rode vlag "${cond.rode_vlag}"`);
+        return;
       }
       const c = checkById.get(cond.check);
-      if (!c) { fout(`dpia: onbekende check "${cond.check}"`); continue; }
-      for (const a of cond.antwoorden) {
-        if (!c.antwoorden.some((x) => x.id === a)) fout(`dpia: onbekend antwoord "${a}" bij check ${c.id}`);
+      if (!c) return fout(`${waar}: onbekende check "${cond.check}"`);
+      if (cond.deelvraag && !c.deelvragen.some((d) => d.id === cond.deelvraag)) {
+        fout(`${waar}: onbekende deelvraag "${cond.deelvraag}" bij check ${c.id}`);
       }
-    }
+      for (const a of cond.antwoorden) {
+        if (!c.antwoorden.some((x) => x.id === a)) fout(`${waar}: onbekend antwoord "${a}" bij check ${c.id}`);
+      }
+    };
+    if (!toetserIds.has(r.dpia.toetser)) fout(`dpia: onbekende toetser "${r.dpia.toetser}"`);
+    if (!toetserIds.has(r.ai_act.toetser)) fout(`ai_act: onbekende toetser "${r.ai_act.toetser}"`);
+    for (const c of [...r.dpia.vereist, ...r.dpia.minstens_een_van, ...r.dpia.altijd_bij]) controleer("dpia", c);
+    for (const c of r.ai_act.minstens_een_van) controleer("ai_act", c);
   });
 
 function dubbel(ids: string[], wat: string, fout: (m: string) => void) {
@@ -141,6 +188,7 @@ export type Kleur = Regelset["kleuren"][number];
 export type Check = Regelset["checks"][number];
 export type Antwoord = Check["antwoorden"][number];
 export type RodeVlag = Regelset["rode_vlaggen"][number];
+export type Deelvraag = Check["deelvragen"][number];
 export type Vervolgactie = (typeof VERVOLGACTIES)[number];
 
 export const spelregelsSchema = z.object({
@@ -176,6 +224,7 @@ export const STATUSSEN = [
   "goedgekeurd",
   "goedgekeurd_met_voorwaarden",
   "afgewezen",
+  "contact_volgt",
 ] as const;
 export type Status = (typeof STATUSSEN)[number];
 
@@ -210,9 +259,20 @@ export const tekstenSchema = z.object({
     goedgekeurd: tekst,
     goedgekeurd_met_voorwaarden: tekst,
     afgewezen: tekst,
+    contact_volgt: tekst,
   }),
   besluiten: z.object({ goedgekeurd: tekst, goedgekeurd_met_voorwaarden: tekst, afgewezen: tekst }),
-  toetsing: z.object({ titel: tekst, intro: tekst, toelichting_voorwaarden: tekst, toelichting_afwijzing: tekst }),
+  toetsing: z.object({
+    titel: tekst,
+    intro: tekst,
+    toelichting_voorwaarden: tekst,
+    toelichting_afwijzing: tekst,
+    ter_informatie: tekst,
+    ter_informatie_uitleg: tekst,
+  }),
+  ai_act: z.object({ titel: tekst, uitleg: tekst }),
+  extra_regelen_titel: tekst,
+  contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
   dpia: z.object({ titel: tekst, uitleg: tekst }),
   coach_niet_beschikbaar: tekst,

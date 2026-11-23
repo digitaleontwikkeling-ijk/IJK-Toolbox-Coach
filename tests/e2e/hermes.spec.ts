@@ -1,6 +1,6 @@
 /** De wizard via het Hermes-protocol (nagebootste Hermes API-server). */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3 } from "./hulp";
 
 test("volledige wizard via Hermes: tooladvies, voorinvullen en uitleg", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
@@ -9,7 +9,7 @@ test("volledige wizard via Hermes: tooladvies, voorinvullen en uitleg", async ({
   await expect(page.getByRole("heading", { name: "Claude Code", level: 3 })).toBeVisible();
   await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
   await expect(page.getByLabel("Openbaar", { exact: true })).toBeChecked();
-  await expect(page.getByLabel("Experiment", { exact: true })).toBeChecked();
+  await expect(page.getByLabel("Eenmalig of om uit te proberen (experiment)", { exact: true })).toBeChecked();
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Direct aan de slag", level: 2 })).toBeVisible();
@@ -28,8 +28,8 @@ test("Hermes faalt: de wizard valt terug op handmatig invullen en blijft bruikba
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Collega's");
   await kies(page, "autonomie", "Assisteren");
-  await kies(page, "impact", "Beperkt");
-  await kies(page, "afhankelijkheid", "Persoonlijke oplossing");
+  await kiesImpact(page, { beschikbaarheid: "Beperkt" });
+  await kies(page, "afhankelijkheid", "Regelmatig, voor mijn eigen werk (persoonlijke oplossing)");
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Aan de slag met voorwaarden", level: 2 })).toBeVisible();

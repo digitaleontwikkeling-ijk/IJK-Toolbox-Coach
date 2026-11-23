@@ -6,6 +6,7 @@ import { z } from "zod";
 import { haalEigenAdvies } from "@/db/adviezen";
 import { body, nietGevonden, route, vereisUuid } from "@/lib/api";
 import { coachService, content } from "@/lib/app";
+import { antwoordLabels } from "@/domain/weergave";
 
 const beschrijving = z.string().trim().min(1).max(4000);
 const verduidelijking = z.array(z.object({ vraag: z.string().max(500), antwoord: z.string().max(1000) })).max(2).default([]);
@@ -33,11 +34,7 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
       const advies = await haalEigenAdvies(vereisUuid(b.adviesId), gebruiker.pseudoniemId);
       if (!advies) throw nietGevonden();
       const r = content().regelset;
-      const antwoorden: Record<string, string> = {};
-      for (const c of r.checks) {
-        const ids = ([] as string[]).concat(advies.antwoorden.checks[c.id] ?? []);
-        antwoorden[c.naam] = c.antwoorden.filter((a) => ids.includes(a.id)).map((a) => a.label).join(", ");
-      }
+      const antwoorden = antwoordLabels(r, advies.antwoorden.checks);
       const kleur = r.kleuren.find((k) => k.id === advies.uitkomst)!;
       const uitleg = await coach.uitleg(
         {
@@ -52,7 +49,7 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
             redenen: [],
             motivatie: advies.motivatie,
             toetsers: advies.toetsers,
-            dpiaSignaal: advies.dpiaSignaal,
+            dpiaSignaal: advies.dpiaSignaal, aiActSignaal: advies.aiActSignaal, contactNodig: false,
             voorwaarden: advies.voorwaarden,
             alternatieven: advies.alternatieven,
           },

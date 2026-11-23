@@ -1,13 +1,14 @@
 # Regelset van de IJK Toolbox Coach
 #
+# Bron: presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 # Beheer: Team Digitale Ontwikkeling + AI governance & compliance officer.
 # Verhoog bij ELKE inhoudelijke wijziging het versienummer en noteer de wijziging
 # in content/CHANGELOG.md. Het versienummer wordt bij elk advies opgeslagen.
 #
-# Startversie: nog NIET gevalideerd door beide toetsers.
+# Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.3"
+versie: "0.4"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -16,33 +17,40 @@ gevalideerd: false
 #   daarvoor gebruiken we de kleur uit de opdracht.
 # tekstkleur: kleur van tekst op dit vlak, gekozen voor voldoende contrast (WCAG AA).
 # motivatie: tekst voor "Waarom deze kleur?"; zie onderaan dit bestand.
+# toetsers: geen | per_check (de toetser van elke check met deze kleur) | alle (beide toetsers samen)
+# contact_als_geen_alternatief: is er geen alternatief, dan neemt Team Digitale Ontwikkeling contact op.
 kleuren:
   - id: groen
     uitkomst: Direct aan de slag
     hex: "#50A78A"
     tekstkleur: "#1E0E3B"
     vervolgactie: accountaanvraag
+    toetsers: geen
     motivatie: Alle checks scoren groen.
   - id: geel
     uitkomst: Aan de slag met voorwaarden
     hex: "#EFBE2E"
     tekstkleur: "#1E0E3B"
     vervolgactie: accountaanvraag_met_voorwaarden
+    toetsers: geen
     motivatie: "{redenen}."
   - id: oranje
     uitkomst: Eerst toetsen
     hex: "#F69B37"
     tekstkleur: "#1E0E3B"
     vervolgactie: toetsing
+    toetsers: per_check
     motivatie: "{redenen}."
   - id: rood
     uitkomst: Niet op deze manier
     hex: "#D61539"
     tekstkleur: "#FFFFFF"
     vervolgactie: alleen_vastleggen
+    toetsers: alle
+    contact_als_geen_alternatief: true
     motivatie: "{redenen}."
 
-# Toetsers die een aanvraag kunnen krijgen.
+# Toetsers.
 toetsers:
   - id: toetser_compliance
     naam: AI governance & compliance officer
@@ -51,10 +59,17 @@ toetsers:
 
 # De zes checks.
 # toetser: wie toetst als deze check oranje scoort.
-# voorwaarde: alleen bij antwoorden die geel scoren; wordt getoond als de uitkomst geel is.
-# alternatief: alleen bij antwoorden die rood scoren; wordt getoond als de uitkomst rood is.
+#   TODO: valideren door toetsers of oranje op Impact-Beschikbaarheid (continuïteit) ook naar de architect moet.
+# hulp: hulpteksten bij de check (kop is optioneel).
 # meerdere: true = de medewerker mag meerdere antwoorden kiezen; het antwoord met de hoogste kleur telt.
 #   TODO: valideren door toetsers (welke checks meerdere antwoorden toestaan)
+# Per antwoord:
+#   kort: korte naam voor "Waarom deze kleur?" (anders het label)
+#   voorwaarde: alleen bij antwoorden die geel scoren; getoond als de uitkomst geel is.
+#   alternatief: alleen bij antwoorden die rood scoren; getoond als de uitkomst rood is.
+#   extra_regelen: wat je extra moet regelen bij dit antwoord (lijst "Wat moet je extra regelen?").
+# deelvragen: de check bestaat uit deelvragen met dezelfde schaal; de hoogste kleur telt.
+#   voorbeelden: hulptekst per antwoord.
 checks:
   - id: data
     nummer: 1
@@ -62,6 +77,14 @@ checks:
     vraag: Welke data gebruik je?
     toetser: toetser_compliance
     meerdere: true
+    hulp:
+      - kop: Persoonsgegevens
+        tekst: Naam, e-mailadres, personeelsnummer, of alles wat je direct of indirect aan een persoon kunt koppelen.
+      - kop: Testdata
+        tekst: >-
+          Gegevens die speciaal zijn gemaakt of geselecteerd om te testen, en die niet herleidbaar zijn tot echte
+          personen, klanten of vertrouwelijke IJK-informatie. Een kopie van echte gegevens of een testomgeving met
+          productiegegevens is géén testdata.
     antwoorden:
       - { id: openbaar, label: Openbaar, kleur: groen }
       - { id: intern, label: Intern, kleur: groen }
@@ -74,10 +97,14 @@ checks:
     vraag: Welke systemen raak je?
     toetser: toetser_architect
     meerdere: true
+    hulp:
+      - kop: Voorwaarde bij Lezen
+        tekst: Via een goedgekeurde koppeling en met IJK-credentials (alleen lezen).
     antwoorden:
       - { id: geen, label: Geen, kleur: groen }
       - id: lezen
         label: Lezen (uit een goedgekeurde IJK-bron)
+        kort: Lezen
         kleur: geel
         voorwaarde: Gebruik de goedgekeurde koppeling en IJK-credentials met alleen leesrechten.
       - { id: koppelen, label: Koppelen, kleur: oranje }
@@ -89,6 +116,11 @@ checks:
     vraag: Wie gebruikt de oplossing?
     toetser: toetser_architect
     meerdere: true
+    hulp:
+      - kop: IJK-principe
+        tekst: >-
+          Hoe breder een oplossing wordt gebruikt, hoe minder het nog een persoonlijk experiment is en hoe meer eisen
+          we stellen aan beheer, beveiliging en continuïteit.
     antwoorden:
       - { id: alleen_ik, label: Alleen ik, kleur: groen }
       - id: collegas
@@ -105,6 +137,9 @@ checks:
     vraag: Wat mag de oplossing doen?
     toetser: toetser_compliance
     meerdere: true
+    hulp:
+      - kop: Reflectievraag
+        tekst: Beslist de tool, of beslis jij op basis van wat de tool aangeeft?
     antwoorden:
       - { id: assisteren, label: Assisteren, kleur: groen }
       - { id: adviseren, label: Adviseren, kleur: groen }
@@ -118,7 +153,7 @@ checks:
       - id: beslissen
         label: Beslissen (over mensen)
         kleur: rood
-        # TODO: valideren door toetsers
+        # Alternatief uit testscenario 6 van de opdracht. TODO: valideren door toetsers
         alternatief: Laat AI samenvatten of adviseren, en laat een mens (bijvoorbeeld de recruiter) beslissen.
 
   - id: impact
@@ -126,6 +161,10 @@ checks:
     naam: Impact
     vraag: Wat is de impact als het misgaat?
     toetser: toetser_compliance
+    hulp:
+      - tekst: >-
+          Kijk naar de gevolgen voor jezelf, collega's, klanten en IJK, op beschikbaarheid, integriteit en
+          vertrouwelijkheid. De hoogste score telt.
     antwoorden:
       - { id: nauwelijks, label: Nauwelijks, kleur: groen }
       - id: beperkt
@@ -134,22 +173,63 @@ checks:
         # TODO: valideren door toetsers (placeholder, tekst nog aan te leveren door IJK)
         voorwaarde: "[Placeholder] Voorwaarde bij Impact = Beperkt wordt nog vastgesteld door de toetsers."
       - { id: serieus, label: Serieus, kleur: oranje }
-      - id: groot
-        label: Groot
-        kleur: rood
-        # TODO: valideren door toetsers
-        alternatief: Maak de oplossing kleiner, zodat een fout weinig gevolgen heeft, en laat een mens de uitkomst controleren.
+      # Geen alternatief: bij rood zonder alternatief neemt Team Digitale Ontwikkeling contact op.
+      - { id: groot, label: Groot, kleur: rood }
+    # TODO: afstemmen op de BIV-definities uit het IJK-risicomanagementproces
+    deelvragen:
+      - id: beschikbaarheid
+        naam: Beschikbaarheid
+        vraag: Wat als het niet werkt?
+        voorbeelden:
+          nauwelijks: Ik doe het zelf even opnieuw.
+          beperkt: Een paar collega's kunnen tijdelijk niet verder.
+          serieus: Een afdeling of klantproces ligt stil.
+          groot: Een kritisch IJK-proces of de dienstverlening aan klanten valt langdurig uit.
+      - id: integriteit
+        naam: Integriteit
+        vraag: Wat als de uitkomst fout is?
+        voorbeelden:
+          nauwelijks: Een fout in mijn eigen concept, die ik zelf zie.
+          beperkt: Een fout in een intern overzicht, snel te herstellen.
+          serieus: Verkeerde gegevens in AFAS of verkeerde informatie naar klanten.
+          groot: Een automatisch besluit met grote gevolgen voor mensen.
+      - id: vertrouwelijkheid
+        naam: Vertrouwelijkheid
+        vraag: Wat als informatie bij de verkeerde komt?
+        voorbeelden:
+          nauwelijks: Alleen openbare informatie.
+          beperkt: Interne informatie bij de verkeerde collega.
+          serieus: Persoons- of klantgegevens buiten de bedoelde groep.
+          groot: Bijzondere persoonsgegevens of veel klantgegevens op straat (datalek).
 
   - id: afhankelijkheid
     nummer: 6
     naam: Afhankelijkheid
-    vraag: Hoe afhankelijk wordt IJK van de oplossing?
+    vraag: Hoe ga je de oplossing gebruiken?
     toetser: toetser_architect
+    hulp:
+      - tekst: Hoe vaster de oplossing onderdeel wordt van het werk, hoe meer je moet regelen.
     antwoorden:
-      - { id: experiment, label: Experiment, kleur: groen }
-      - { id: persoonlijk, label: Persoonlijke oplossing, kleur: groen }
-      - { id: team, label: Teamoplossing, kleur: oranje }
-      - { id: bedrijf, label: Bedrijfsoplossing, kleur: oranje }
+      - id: experiment
+        label: Eenmalig of om uit te proberen (experiment)
+        kort: Experiment
+        kleur: groen
+        extra_regelen: Niets extra's.
+      - id: persoonlijk
+        label: Regelmatig, voor mijn eigen werk (persoonlijke oplossing)
+        kort: Persoonlijke oplossing
+        kleur: groen
+        extra_regelen: "+ documentatie, security"
+      - id: team
+        label: Vast onderdeel van het werk van mijn team (teamoplossing)
+        kort: Teamoplossing
+        kleur: oranje
+        extra_regelen: "+ eigenaarschap, beheer, logging"
+      - id: bedrijf
+        label: Vast onderdeel van een IJK-proces (bedrijfsoplossing)
+        kort: Bedrijfsoplossing
+        kleur: oranje
+        extra_regelen: "+ monitoring, architectuur, continuïteit, lifecycle management"
 
 # Extra vragen die alleen bij een bepaald antwoord worden gesteld.
 extra_vragen:
@@ -158,37 +238,48 @@ extra_vragen:
     toon_bij: [persoonsgegevens]
     vraag: Gaat het om bijzondere persoonsgegevens, zoals gezondheid?
     uitleg: Bijzondere persoonsgegevens zijn extra gevoelig, zoals gegevens over gezondheid, religie of afkomst.
+  # Nodig voor het AI Act-signaal ("AI adviseert of beslist over mensen"). TODO: valideren door toetsers
+  - id: advies_over_mensen
+    check: autonomie
+    toon_bij: [adviseren]
+    vraag: Gaat het advies over mensen, bijvoorbeeld medewerkers, sollicitanten of klanten?
+    uitleg: Bijvoorbeeld een voorstel welke kandidaat het best past, of welke medewerker extra begeleiding nodig heeft.
 
-# Rode vlaggen: ja = altijd deze kleur.
+# Rode vlaggen: ja = altijd deze kleur. In de interface heten ze "Aanvullende vragen".
 rode_vlag_kleur: rood
 rode_vlaggen:
   - id: niet_goedgekeurde_tool
     nummer: 1
     vraag: Gebruik je een tool die IJK niet heeft goedgekeurd, bijvoorbeeld een gratis AI-tool op een persoonlijk account?
     kort: een tool die IJK niet heeft goedgekeurd
-    # TODO: valideren door toetsers
-    alternatief: Kies een goedgekeurde tool uit de IJK Toolbox en werk met je IJK-account.
+    alternatief: Gebruik een goedgekeurde IJK-tool.
   - id: persoonlijke_inlog_of_secrets
     nummer: 2
-    vraag: Koppel je met je eigen persoonlijke inlog, of staan er wachtwoorden of API-keys in de code?
-    kort: een persoonlijke inlog of wachtwoorden/API-keys in de code
+    vraag: Koppel je met je eigen persoonlijke inlog met systemen buiten Microsoft 365, of staan er wachtwoorden of API-keys in de code?
     # TODO: valideren door toetsers
-    alternatief: Vraag een koppeling aan met IJK-credentials en bewaar wachtwoorden en API-keys in een kluis, nooit in de code.
+    uitleg: Copilot workflows draaien standaard op je eigen account binnen Microsoft 365. Dat telt hier niet mee.
+    kort: een persoonlijke inlog of wachtwoorden/API-keys in de code
+    alternatief: Gebruik IJK-credentials.
   - id: ai_beslist_over_mensen
     nummer: 3
     vraag: Beslist AI zelfstandig over mensen, met grote gevolgen?
     kort: AI die zelfstandig over mensen beslist
-    # TODO: valideren door toetsers
-    alternatief: Laat AI samenvatten of adviseren, en laat een mens (bijvoorbeeld de recruiter) beslissen.
+    # Geen alternatief in de presentatie: dan neemt Team Digitale Ontwikkeling contact op.
   - id: open_zonder_toetsing
     nummer: 4
     vraag: Zet je een oplossing met echte gegevens zonder toetsing open voor klanten of op internet?
     kort: een oplossing met echte gegevens die zonder toetsing openstaat
-    # TODO: valideren door toetsers
-    alternatief: Werk eerst met testdata en laat de oplossing toetsen voordat je hem openzet.
+    alternatief: Eerst toetsen, dan pas delen.
+  - id: proces_zonder_eigenaar
+    nummer: 5
+    vraag: Gaat een proces binnen IJK draaien op een persoonlijke oplossing zonder eigenaar of beheer?
+    kort: een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer
+    alternatief: Wijs een eigenaar aan en regel het beheer.
 
 # DPIA-signaal (DPIA = gegevensbeschermingseffectbeoordeling, verplicht bij hoog privacyrisico).
-# Signaal als ALLE voorwaarden in "vereist" gelden EN minstens één uit "minstens_een_van".
+# Signaal als ALLE voorwaarden in "vereist" gelden EN minstens één uit "minstens_een_van",
+# of als één van de voorwaarden in "altijd_bij" geldt.
+# Bij een check met deelvragen telt de hoogste deelscore, tenzij een deelvraag is genoemd.
 dpia:
   vereist:
     - { check: data, antwoorden: [persoonsgegevens] }
@@ -197,7 +288,19 @@ dpia:
     - { check: autonomie, antwoorden: [beslissen, handelen] }
     - { check: gebruikers, antwoorden: [organisatie, extern] }
     - { check: impact, antwoorden: [serieus, groot] }
+  # Vertrouwelijkheid weegt het zwaarst: Serieus of Groot geeft altijd een DPIA-signaal (ook zonder aangevinkte persoonsgegevens).
+  altijd_bij:
+    - { check: impact, deelvraag: vertrouwelijkheid, antwoorden: [serieus, groot] }
   # Bij een DPIA-signaal gaat een aanvraag altijd (ook) naar deze toetser.
+  toetser: toetser_compliance
+
+# AI Act-signaal: de compliance officer classificeert de toepassing volgens de AI Act.
+# Apart spoor naast de DPIA, ook zonder persoonsgegevens. TODO: valideren door toetsers
+ai_act:
+  minstens_een_van:
+    - { check: autonomie, antwoorden: [handelen, beslissen] }
+    - { extra_vraag: advies_over_mensen }
+    - { rode_vlag: ai_beslist_over_mensen }
   toetser: toetser_compliance
 
 # "Waarom deze kleur?": per kleur staat de tekst bij de kleur (veld motivatie).

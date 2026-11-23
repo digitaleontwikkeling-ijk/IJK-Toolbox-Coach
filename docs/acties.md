@@ -7,9 +7,10 @@
 | Direct aan de slag | Accountaanvraag | `ACTIE_ACCOUNT_URL` | account aangevraagd |
 | Aan de slag met voorwaarden | Accountaanvraag + voorwaarden | `ACTIE_ACCOUNT_URL` | account aangevraagd |
 | Eerst toetsen | Aanvraag naar toetser(s) + Teams-melding | `ACTIE_TOETSING_URL`, `ACTIE_MELDING_URL` | in toetsing |
-| Niet op deze manier | Geen aanvraag, alleen vastgelegd | – | advies gegeven |
+| Niet op deze manier, met alternatief | Geen aanvraag, alleen vastgelegd; alternatief op de adviescard | – | advies gegeven |
+| Niet op deze manier, zonder alternatief | Melding aan Team Digitale Ontwikkeling, dat contact opneemt | `ACTIE_CONTACT_URL` | contact volgt |
 
-De webhooks wijzen naar flows die IJK zelf beheert (Copilot workflows, Power Automate of n8n).
+De webhooks wijzen naar automatiseringen die IJK zelf beheert (bijvoorbeeld in HubBI of Microsoft 365).
 Elke aanroep is een `POST` met JSON en de headers:
 
 - `X-IJK-Webhook-Secret: <ACTIE_GEHEIM>` (naam instelbaar met `ACTIE_GEHEIM_HEADER`); de flow moet dit controleren;
@@ -31,7 +32,12 @@ Voorbeeld (accountaanvraag):
 }
 ```
 
-`toetsing` bevat daarnaast `toetsers`, `motivatie` en `dpiaSignaal`; `teams_melding` bevat `ontvangers` en `tekst`.
+`toetsing` bevat daarnaast `toetsers`, `motivatie` en `dpiaSignaal`; `teams_melding` bevat `ontvangers` en `tekst`;
+`contact` bevat `motivatie`, `toetsers`, `tekst` en een link naar het advies in het beheerscherm.
+
+**Contact volgt** (rood zonder alternatief): de melding gaat direct uit zodra het advies is berekend, maximaal één keer
+per advies. Mislukt de melding, dan blijft de status *advies gegeven* en ziet de medewerker de knop
+"Team Digitale Ontwikkeling informeren" om het opnieuw te proberen.
 De beschrijving en de antwoorden gaan **niet** mee (dataminimalisatie): de toetser leest ze in de app via de link.
 De UPN van de aanvrager gaat alleen mee met `ACTIE_STUUR_UPN=true`.
 
@@ -47,6 +53,7 @@ Lokaal: `ACTIE_MODUS=mock` logt alleen. Of start `npm run mock:webhooks` (poort 
 ## Toetsing
 
 - Toetsers zien alleen **ingediende** aanvragen die naar hun rol zijn gestuurd (`/toetsing`).
+- Bij **Niet op deze manier** kijken beide toetsers mee: ze zien die adviezen onder **Ter informatie**, zonder besluit.
 - Een toetser ziet alle antwoorden, de uitkomst, het DPIA-signaal, de regelversie en eerdere besluiten.
 - Besluit per rol: *goedgekeurd*, *goedgekeurd met voorwaarden* (voorwaarden verplicht) of *afgewezen* (motivatie verplicht).
 - Eindstatus (`src/domain/besluiten.ts`): pas als alle toetsers hebben besloten; één afwijzing → afgewezen;

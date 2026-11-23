@@ -1,11 +1,16 @@
-# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: hubbi
 zelf_doen:
-  - Bestaande automatiseringen gebruiken
-  - Bouwen in een testomgeving
+  - Bij voorkeur HubBI gebruiken voor data van klantmedewerkers waarvoor IJK verwerker is
+  - Gegevens in AFAS laten wijzigen door een automatisering
+  - Gegevens uit AFAS ophalen voor eigen overzichten
 eerst_toetsen:
-  - Live wijzigingen in AFAS
-  - Persoons- of salarisgegevens
+  - Persoons- of salarisgegevens worden verwerkt
+  - "Een nieuwe API (systeem van een derde partij) wordt gekoppeld aan HubBI"
+  - Een bedrijfsproces gaat afhangen van de automatisering
 altijd:
-  - Eerst testen
-  - API-tokens veilig beheren
+  - Eerst testen in een testomgeving
+  - Alleen noodzakelijke rechten in AFAS en HubBI
+  - API-tokens veilig beheren en nooit delen
+  - "Wijzigingen in AFAS herleidbaar houden (logging)"
+  - "Een eigenaar (per hub) aanwijzen en dit documenteren"

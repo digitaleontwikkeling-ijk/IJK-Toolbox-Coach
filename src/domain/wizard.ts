@@ -44,9 +44,10 @@ export const wizardDataSchema = z.object({
   /** Tools die de medewerker niet wil (bij "andere tool vragen"). */
   uitgeslotenTools: z.array(id).max(10).default([]),
   /** check-id → antwoord-id, of een lijst bij een check met meerdere antwoorden. */
-  checks: z.record(id, z.union([id, z.array(id).max(10)])).default({}),
+  checks: z.record(id, z.union([id, z.array(id).max(10), z.record(id, id)])).default({}),
   /** Voorstellen van de coach per check, om te tonen wat de coach dacht. */
-  coachVoorstellen: z.record(id, checkVoorstelSchema).default({}),
+  /** Sleutel: check-id, of check-id.deelvraag-id bij Impact. */
+  coachVoorstellen: z.record(z.string().regex(/^[a-z0-9_]+(\.[a-z0-9_]+)?$/).max(130), checkVoorstelSchema).default({}),
   checksVoorgesteld: z.boolean().default(false),
   extraVragen: z.record(id, z.boolean()).default({}),
   rodeVlaggen: z.record(id, z.boolean()).default({}),

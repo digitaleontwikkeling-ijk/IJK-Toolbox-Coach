@@ -13,7 +13,7 @@ import { CoachService } from "../coach/service";
 import type { Content } from "../content/laad-content";
 import { TESTGEBRUIKERS } from "../auth/testgebruikers";
 import { TOETSER_ROLLEN, type Rol } from "../auth/rollen";
-import { evalueer, extraVraagVanToepassing, OngeldigeInvoerFout, type BeslisInvoer } from "../domain/beslisregels";
+import { evalueer, extraVraagVanToepassing, OngeldigeInvoerFout, type BeslisInvoer, type CheckAntwoord } from "../domain/beslisregels";
 import { besluitInvoerSchema, eindstatus, type Besluit } from "../domain/besluiten";
 import type { Status } from "../domain/content-schema";
 import { legeWizard, wizardDataSchema, type WizardData } from "../domain/wizard";
@@ -36,11 +36,12 @@ interface DemoAdvies {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: NonNullable<WizardData["tooladvies"]>;
-  antwoorden: { checks: Record<string, string | string[]>; extraVragen: Record<string, boolean> };
+  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];
   dpiaSignaal: boolean;
+  aiActSignaal: boolean;
   motivatie: string;
   voorwaarden: string[];
   alternatieven: string[];
@@ -114,6 +115,24 @@ function zonderPseudo<T extends { pseudoniemId: string }>(a: T): Omit<T, "pseudo
 function besluitenVan(s: DemoStaat, id: string) {
   return s.besluiten.filter((b) => b.adviesId === id).map(({ toetserPseudoniemId: _, ...b }) => b);
 }
+
+/** Rood zonder alternatief: Team Digitale Ontwikkeling neemt contact op (demo: alleen gelogd). */
+function contactNodig(a: DemoAdvies): boolean {
+  const k = content.regelset.kleuren.find((x) => x.id === a.uitkomst);
+  return !!k?.contact_als_geen_alternatief && k.vervolgactie === "alleen_vastleggen" && a.alternatieven.length === 0;
+}
+
+function meldContact(s: DemoStaat, a: DemoAdvies) {
+  if (a.status !== "advies_gegeven" || !contactNodig(a)) return;
+  a.status = "contact_volgt";
+  s.log.push({ tijd: nu(), tekst: `${a.referentie}: contact met Team Digitale Ontwikkeling (demo: alleen gelogd, geen webhook)` });
+}
+
+/** Uitkomsten die toetsers ter informatie zien. */
+const terInformatie = (uitkomst: string) => {
+  const k = content.regelset.kleuren.find((x) => x.id === uitkomst);
+  return !!k && k.toetsers === "alle" && k.vervolgactie === "alleen_vastleggen";
+};
 
 // ---------- De "server" ----------
 
@@ -203,7 +222,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
             antwoorden: {},
             uitkomst: {
               regelversie: a.regelversie, kleur: kleur.id, uitkomst: kleur.uitkomst, vervolgactie: kleur.vervolgactie,
-              redenen: [], motivatie: a.motivatie, toetsers: a.toetsers, dpiaSignaal: a.dpiaSignaal,
+              redenen: [], motivatie: a.motivatie, toetsers: a.toetsers, dpiaSignaal: a.dpiaSignaal, aiActSignaal: a.aiActSignaal, contactNodig: false,
               voorwaarden: a.voorwaarden, alternatieven: a.alternatieven,
             },
           },
@@ -242,13 +261,14 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       tooladvies: data.tooladvies,
       antwoorden: { checks: invoer.checks, extraVragen: invoer.extraVragen ?? {} },
       rodeVlaggen: invoer.rodeVlaggen,
-      uitkomst: u.kleur, toetsers: u.toetsers, dpiaSignaal: u.dpiaSignaal, motivatie: u.motivatie,
+      uitkomst: u.kleur, toetsers: u.toetsers, dpiaSignaal: u.dpiaSignaal, aiActSignaal: u.aiActSignaal, motivatie: u.motivatie,
       voorwaarden: u.voorwaarden, alternatieven: u.alternatieven, regelversie: u.regelversie,
       toolsversie: content.tools.versie, status: "advies_gegeven" as Status, bijgewerktOp: nu(), verlooptOp: verloopt.toISOString(),
     };
     const bestaand = s.adviezen.find((a) => a.id === c.adviesId);
     if (bestaand && bestaand.status === "advies_gegeven") {
       Object.assign(bestaand, velden);
+      meldContact(s, bestaand);
       return r({ advies: zonderPseudo(bestaand) });
     }
     const jaar = new Date().getFullYear();
@@ -263,6 +283,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
     };
     s.adviezen.push(a);
     c.adviesId = a.id;
+    meldContact(s, a);
     return r({ advies: zonderPseudo(a) });
   }
 
@@ -275,7 +296,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       if (a.status !== "advies_gegeven") throw fout(409, "Voor dit advies is de vervolgactie al uitgevoerd.");
       const actie = content.regelset.kleuren.find((k) => k.id === a.uitkomst)!.vervolgactie;
       const status: Status | null =
-        actie === "toetsing" ? "in_toetsing" : actie === "alleen_vastleggen" ? null : "account_aangevraagd";
+        contactNodig(a) ? "contact_volgt" : actie === "toetsing" ? "in_toetsing" : actie === "alleen_vastleggen" ? null : "account_aangevraagd";
       if (!status) throw fout(409, "Bij deze uitkomst hoort geen aanvraag.");
       a.status = status;
       s.log.push({ tijd: nu(), tekst: `${a.referentie}: ${actie} (demo: alleen gelogd, geen webhook)` });
@@ -304,7 +325,8 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
   if (deel[0] === "toetsing") {
     const g = vereis("toetser_compliance", "toetser_architect");
     const rollen = g.rollen.filter((x) => (TOETSER_ROLLEN as readonly string[]).includes(x)) as string[];
-    const zichtbaar = (a: DemoAdvies) => a.status !== "advies_gegeven" && a.toetsers.some((t) => rollen.includes(t));
+    const zichtbaar = (a: DemoAdvies) =>
+      (a.status !== "advies_gegeven" || terInformatie(a.uitkomst)) && a.toetsers.some((t) => rollen.includes(t));
     if (!deel[1]) {
       const lijst = s.adviezen.filter(zichtbaar).sort((a, b) => b.aangemaaktOp.localeCompare(a.aangemaaktOp));
       return r({ adviezen: lijst.map((a) => ({ ...a, besluiten: besluitenVan(s, a.id) })) });

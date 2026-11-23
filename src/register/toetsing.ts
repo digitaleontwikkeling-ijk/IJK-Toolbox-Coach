@@ -19,6 +19,20 @@ import {
 } from "../db/toetsing";
 import type { AdviesRij } from "../db/adviezen";
 import { ApiFout, nietGevonden } from "../lib/api";
+import { content } from "../content/laad-content";
+
+/** Uitkomsten die toetsers ter informatie zien (beide toetsers kijken mee, er is geen aanvraag). */
+export function terInformatieKleuren(): string[] {
+  return content()
+    .regelset.kleuren.filter((k) => k.toetsers === "alle" && k.vervolgactie === "alleen_vastleggen")
+    .map((k) => k.id);
+}
+
+/** Mag een toetser dit advies zien? Ingediend, of ter informatie. */
+function zichtbaarVoorToetser(advies: AdviesRij, rollen: string[]): boolean {
+  const ingediendOfInfo = advies.status !== "advies_gegeven" || terInformatieKleuren().includes(advies.uitkomst);
+  return ingediendOfInfo && advies.toetsers.some((t) => rollen.includes(t));
+}
 
 export function toetserRollen(g: Gebruiker): string[] {
   return g.rollen.filter((r) => (TOETSER_ROLLEN as readonly Rol[]).includes(r));
@@ -42,7 +56,7 @@ async function metBesluiten(adviezen: AdviesRij[]): Promise<AdviesMetBesluiten[]
 export async function lijstVoorToetser(g: Gebruiker): Promise<AdviesMetBesluiten[]> {
   const rollen = toetserRollen(g);
   await audit(db(), { pseudoniemId: g.pseudoniemId, rol: rollen.join(","), actie: "inzage_lijst" });
-  return metBesluiten(await adviezenVoorToetsers(rollen));
+  return metBesluiten(await adviezenVoorToetsers(rollen, terInformatieKleuren()));
 }
 
 /**
@@ -52,7 +66,7 @@ export async function lijstVoorToetser(g: Gebruiker): Promise<AdviesMetBesluiten
 export async function detailVoorToetser(g: Gebruiker, id: string): Promise<AdviesMetBesluiten & { openRollen: string[]; eigenAanvraag: boolean }> {
   const rollen = toetserRollen(g);
   const advies = await haalAdvies(id);
-  if (!advies || advies.status === "advies_gegeven" || !advies.toetsers.some((t) => rollen.includes(t))) throw nietGevonden();
+  if (!advies || !zichtbaarVoorToetser(advies, rollen)) throw nietGevonden();
   await audit(db(), { pseudoniemId: g.pseudoniemId, rol: rollen.join(","), actie: "inzage_advies", adviesId: id });
   const detail = (await metBesluiten([advies]))[0]!;
   const eigenAanvraag = advies.pseudoniemId === g.pseudoniemId;

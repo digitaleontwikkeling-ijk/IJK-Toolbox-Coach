@@ -94,6 +94,35 @@ describe("coach: validatie en terugval", () => {
     const beschrijving = "HR-gegevens wekelijks automatisch in AFAS verwerken voor de afdeling";
     expect(await s.tooladvies({ beschrijving, verduidelijking: [], uitsluiten: [] }, ctx)).toMatchObject({ tool: "hubbi" });
     const checks = await s.checksVoorinvullen({ beschrijving, verduidelijking: [], tool: "hubbi" }, ctx);
-    expect(checks).toHaveLength(6);
+    expect(checks).toHaveLength(8); // 5 checks + Impact met 3 deelvragen
+  });
+});
+
+describe("coach: voorstellen per deelvraag (Impact)", () => {
+  it("K12. Impact vraagt een voorstel per deelvraag; zonder of met onbekende deelvraag wordt overgeslagen", async () => {
+    const s = new CoachService(
+      nep({
+        checksVoorinvullen: {
+          checks: [
+            { check: "impact", deelvraag: "integriteit", voorstel: "serieus", zekerheid: "middel" },
+            { check: "impact", voorstel: "serieus", zekerheid: "hoog" },
+            { check: "impact", deelvraag: "schaalbaarheid", voorstel: "groot", zekerheid: "hoog" },
+            { check: "data", deelvraag: "integriteit", voorstel: "intern", zekerheid: "hoog" },
+          ],
+        },
+      }),
+      content,
+    );
+    expect(await s.checksVoorinvullen({ ...vv, tool: "hubbi" }, ctx)).toEqual([
+      { check: "impact", deelvraag: "integriteit", voorstel: "serieus", zekerheid: "middel" },
+    ]);
+  });
+
+  it("K13. de mock-coach stelt nooit n8n voor", async () => {
+    const s = new CoachService(new MockCoachClient(content), content);
+    for (const beschrijving of ["Een taak automatiseren", "Systemen koppelen", "Een workflow bouwen"]) {
+      const r = await s.tooladvies({ beschrijving, verduidelijking: [], uitsluiten: [] }, ctx);
+      expect(r?.tool).not.toBe("n8n");
+    }
   });
 });

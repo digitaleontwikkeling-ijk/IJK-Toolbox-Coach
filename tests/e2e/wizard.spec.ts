@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3, vinkAan } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, vinkAan } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 
@@ -41,7 +41,7 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeFocused();
   await expect(card).toContainText("Uitkomst: oranje");
   await expect(card).toContainText("Claude Code");
-  await expect(card).toContainText("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact).");
+  await expect(card).toContainText("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact – Vertrouwelijkheid).");
   await expect(card).toContainText("AI governance & compliance officer");
   await expect(card).toContainText("architect Digitale Ontwikkeling");
   await expect(card).toContainText("Mogelijk is een DPIA nodig");
@@ -84,8 +84,8 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Alleen ik");
   await kies(page, "autonomie", "Assisteren");
-  await kies(page, "impact", "Nauwelijks");
-  await kies(page, "afhankelijkheid", "Experiment");
+  await kiesImpact(page);
+  await kies(page, "afhankelijkheid", "Eenmalig of om uit te proberen (experiment)");
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
 
   await expect(page.getByRole("heading", { name: "Direct aan de slag", level: 2 })).toBeVisible();
@@ -113,7 +113,7 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
   await naarStap3(page, "Ik wil klantgegevens in een gratis AI-tool plakken om mails te schrijven.");
   await page.getByRole("button", { name: /past, verder/ }).click();
   await kies(page, "niet_goedgekeurde_tool", "Ja");
-  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing"]) await kies(page, v, "Nee");
+  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
   // Coach is onzeker over sommige checks: die moet de medewerker bevestigen of zijn al voorgesteld.
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");
@@ -146,8 +146,8 @@ test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste k
   await expect(page.locator("#veld-gebruikers").getByLabel("Collega's")).toBeChecked();
   await expect(page.locator("#veld-gebruikers").getByLabel("Extern/klanten")).toBeChecked();
   await kies(page, "autonomie", "Assisteren");
-  await kies(page, "impact", "Beperkt");
-  await kies(page, "afhankelijkheid", "Persoonlijke oplossing");
+  await kiesImpact(page, { beschikbaarheid: "Beperkt" });
+  await kies(page, "afhankelijkheid", "Regelmatig, voor mijn eigen werk (persoonlijke oplossing)");
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");

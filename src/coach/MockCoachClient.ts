@@ -15,14 +15,14 @@ import type {
 
 const heeft = (tekst: string, patroon: RegExp) => patroon.test(tekst.toLowerCase());
 
-/** Volgorde waarin de mock tools herkent: [tool, behoefte, trefwoorden]. */
+/** Volgorde waarin de mock tools herkent: [tool, behoefte, trefwoorden]. IJK gebruikt geen n8n. */
 const TOOLREGELS: [string, string, RegExp][] = [
-  ["hubbi", "automatiseren", /\bafas\b/],
+  ["hubbi", "verbinden", /\bafas\b|koppel|verbind/],
   ["ai_flows", "ai_in_werkproces", /\bai\b|beoordeel|kandidat|classific/],
   ["azure_openai", "ai_model_eigen_oplossing", /taalmodel|openai|\bmodel\b/],
   ["claude_code", "bouwen", /dashboard|prototype|\bapp\b|tool bouwen|bouwen/],
+  ["copilot_workflows", "m365_automatiseren", /outlook|planner|sharepoint|herinner|workflow|automati/],
   ["m365_copilot", "sneller_afhandelen", /notulen|mail|vergader|document|samenvat/],
-  ["copilot_workflows", "automatiseren", /automati|workflow|koppel/],
 ];
 
 export class MockCoachClient implements CoachClient {
@@ -56,7 +56,7 @@ export class MockCoachClient implements CoachClient {
 
   async checksVoorinvullen({ beschrijving, verduidelijking }: ChecksInvoer) {
     const t = [beschrijving, ...verduidelijking.map((v) => v.antwoord)].join(" ").toLowerCase();
-    const checks: { check: string; voorstel: string; zekerheid: string; vervolgvraag?: string }[] = [];
+    const checks: { check: string; deelvraag?: string; voorstel: string; zekerheid: string; vervolgvraag?: string }[] = [];
     const zet = (check: string, voorstel: string, zekerheid = "middel", vervolgvraag?: string) =>
       checks.push({ check, voorstel, zekerheid, ...(vervolgvraag ? { vervolgvraag } : {}) });
 
@@ -93,16 +93,27 @@ export class MockCoachClient implements CoachClient {
     else if (/overzicht|dashboard|rapport/.test(t)) zet("autonomie", "lezen", "middel");
     else zet("autonomie", "assisteren", "middel");
 
-    // Impact
-    if (/kiest|beslist|selecteert/.test(t)) zet("impact", "groot", "middel");
-    else if (/verzuim|\bhr\b|hr-|salaris/.test(t)) zet("impact", "serieus", "middel");
-    else if (/team|collega|overzicht/.test(t)) zet("impact", "beperkt", "middel");
-    else zet("impact", "nauwelijks", "laag", "Wat gebeurt er als de oplossing een fout maakt?");
+    // Impact: per deelvraag (beschikbaarheid, integriteit, vertrouwelijkheid)
+    const deel = (deelvraag: string, voorstel: string, zekerheid = "middel", vervolgvraag?: string) =>
+      checks.push({ check: "impact", deelvraag, voorstel, zekerheid, ...(vervolgvraag ? { vervolgvraag } : {}) });
+    if (/afdeling|team|collega/.test(t)) deel("beschikbaarheid", "beperkt");
+    else deel("beschikbaarheid", "nauwelijks", "laag", "Wat gebeurt er als de oplossing een tijdje niet werkt?");
+    if (/kiest|beslist|selecteert/.test(t)) deel("integriteit", "groot");
+    else if (/verwerk|schrijf|bijwerken/.test(t)) deel("integriteit", "serieus");
+    else if (/overzicht|dashboard|rapport/.test(t)) deel("integriteit", "beperkt");
+    else deel("integriteit", "nauwelijks");
+    if (/verzuim|gezond/.test(t)) {
+      deel("vertrouwelijkheid", "serieus", "laag", "Gaat het om gezondheidsgegevens die op straat kunnen komen? Kies dan Groot.");
+    }
+    else if (/\bhr\b|hr-|cv|kandidat|salaris|persoonsgegevens|klantgegevens/.test(t)) deel("vertrouwelijkheid", "serieus");
+    else if (/testdata|openbaar/.test(t)) deel("vertrouwelijkheid", "nauwelijks");
+    else deel("vertrouwelijkheid", "beperkt");
 
     // Afhankelijkheid
     if (/prototype|experiment|uitproberen|testdata/.test(t)) zet("afhankelijkheid", "experiment", "hoog");
+    else if (/herinner|mezelf|voor mij/.test(t)) zet("afhankelijkheid", "persoonlijk", "middel");
     else if (/wekelijks|elke week|dagelijks/.test(t) && /afdeling|hr/.test(t)) zet("afhankelijkheid", "team", "middel");
-    else zet("afhankelijkheid", "persoonlijk", "laag", "Gaat je team op de oplossing rekenen, of is hij alleen voor jou?");
+    else zet("afhankelijkheid", "persoonlijk", "laag", "Hoe ga je de oplossing gebruiken: om uit te proberen, voor je eigen werk, of wordt hij vast onderdeel van het werk van je team?");
 
     return { checks };
   }

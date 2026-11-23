@@ -26,6 +26,8 @@ import {
 
 export interface CheckVoorstel {
   check: string;
+  /** Alleen bij een check met deelvragen (Impact: beschikbaarheid, integriteit, vertrouwelijkheid). */
+  deelvraag?: string;
   voorstel: string;
   zekerheid: "hoog" | "middel" | "laag";
   vervolgvraag?: string;
@@ -92,7 +94,8 @@ export class CoachService {
     const geldig = new Map<string, CheckVoorstel>();
     for (const item of lijst.checks) {
       const r = schema.safeParse(item);
-      if (r.success && !geldig.has(r.data.check)) geldig.set(r.data.check, r.data);
+      const sleutel = r.success ? `${r.data.check}.${r.data.deelvraag ?? ""}` : "";
+      if (r.success && !geldig.has(sleutel)) geldig.set(sleutel, r.data);
       else if (!r.success) console.warn('Coach-taak "checks": ongeldig voorstel overgeslagen.');
     }
     return [...geldig.values()];

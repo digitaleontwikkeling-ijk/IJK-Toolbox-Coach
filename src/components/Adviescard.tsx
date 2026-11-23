@@ -35,7 +35,10 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const actie = t.vervolgacties[kleur.vervolgactie];
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
   const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id]);
-  const actieKanNog = advies.status === "advies_gegeven" && actie?.knop;
+  // Rood zonder alternatief: Team DO neemt contact op. Mislukte de melding, dan kan het opnieuw.
+  const contactNodig = kleur.contact_als_geen_alternatief && kleur.vervolgactie === "alleen_vastleggen" && advies.alternatieven.length === 0;
+  const contactOpnieuw = contactNodig && advies.status === "advies_gegeven";
+  const actieKanNog = advies.status === "advies_gegeven" && (actie?.knop || contactOpnieuw);
   // Klaar = geen vervolgactie meer open: al uitgevoerd, of bij deze uitkomst hoort er geen.
   const klaar = !actieKanNog;
 
@@ -80,8 +83,15 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
 
         {toetserNamen.length > 0 && (
           <section>
-            <h3>Wie toetst?</h3>
+            <h3>{kleur.vervolgactie === "toetsing" ? "Wie toetst?" : "Wie kijkt mee?"}</h3>
             <ul>{toetserNamen.map((n) => <li key={n}>{n}</li>)}</ul>
+          </section>
+        )}
+
+        {advies.aiActSignaal && (
+          <section className="info" style={{ margin: 0 }}>
+            <h3>{t.ai_act.titel}</h3>
+            <p style={{ margin: 0 }}>{t.ai_act.uitleg}</p>
           </section>
         )}
 
@@ -98,22 +108,30 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             <caption className="sr-only">Antwoorden per check en op de aanvullende vragen</caption>
             <tbody>
               {r.checks.map((c) => {
-                const ids = alsLijst(advies.antwoorden.checks[c.id]);
-                const gekozen = c.antwoorden.filter((x) => ids.includes(x.id));
+                const ruw = advies.antwoorden.checks[c.id];
+                const badge = (id: string | undefined, voor?: string) => {
+                  const a = c.antwoorden.find((x) => x.id === id);
+                  if (!a) return <div key={voor ?? "leeg"}>{voor ? `${voor}: ` : ""}—</div>;
+                  const ak = kleurVan(content, a.kleur)!;
+                  return (
+                    <div key={voor ?? a.id}>
+                      {voor && <>{voor}: </>}
+                      {a.label}{" "}
+                      <span className="badge-kleur" style={{ background: ak.hex, color: ak.tekstkleur }}>{ak.id}</span>
+                    </div>
+                  );
+                };
+                const perDeel = ruw && typeof ruw === "object" && !Array.isArray(ruw) ? ruw : {};
+                const ids = alsLijst(ruw);
                 return (
                   <tr key={c.id}>
                     <th scope="row">{c.nummer}. {c.naam}</th>
                     <td>
-                      {gekozen.length === 0 && "—"}
-                      {gekozen.map((a) => {
-                        const ak = kleurVan(content, a.kleur)!;
-                        return (
-                          <div key={a.id}>
-                            {a.label}{" "}
-                            <span className="badge-kleur" style={{ background: ak.hex, color: ak.tekstkleur }}>{ak.id}</span>
-                          </div>
-                        );
-                      })}
+                      {c.deelvragen.length > 0
+                        ? c.deelvragen.map((d) => badge(perDeel[d.id], d.naam))
+                        : ids.length === 0
+                          ? "—"
+                          : c.antwoorden.filter((x) => ids.includes(x.id)).map((a) => badge(a.id))}
                     </td>
                   </tr>
                 );
@@ -159,7 +177,10 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           {/* aria-live: na het indienen hoort een schermlezer meteen wat er is gebeurd. */}
           <div aria-live="polite">
             {advies.status === "advies_gegeven" ? (
-              <p>{actie?.uitleg}</p>
+              <>
+                <p>{actie?.uitleg}</p>
+                {contactOpnieuw && <p className="foutmelding">{t.contact_opnieuw.melding}</p>}
+              </>
             ) : (
               <>
                 <p className="info" style={{ margin: "0 0 0.75rem" }}>
@@ -175,7 +196,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           <div className="knoppen">
             {actieKanNog && onActie && (
               <button type="button" className="knop" onClick={onActie} disabled={actieBezig}>
-                {actie.knop.replace("{tool}", tool)}
+                {contactOpnieuw ? t.contact_opnieuw.knop : actie!.knop.replace("{tool}", tool)}
               </button>
             )}
             {klaar && onAfronden && (

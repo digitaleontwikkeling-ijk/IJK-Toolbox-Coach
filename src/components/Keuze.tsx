@@ -9,7 +9,10 @@ interface Basis {
   naam: string;
   legend: ReactNode;
   vraag?: string;
-  opties: { id: string; label: string }[];
+  /** Hulptekst onder de vraag (bijvoorbeeld definities of een reflectievraag). */
+  toelichting?: ReactNode;
+  /** Opties; met `hulp` staat er een voorbeeld of uitleg bij de knop. */
+  opties: { id: string; label: string; hulp?: string }[];
   extra?: ReactNode;
   fout?: boolean;
 }
@@ -19,7 +22,8 @@ type Props =
   | (Basis & { meerdere: true; waarde: string[]; onKies: (ids: string[]) => void });
 
 export function Keuze(props: Props) {
-  const { naam, legend, vraag, opties, extra, fout } = props;
+  const { naam, legend, vraag, toelichting, opties, extra, fout } = props;
+  const metHulp = opties.some((o) => o.hulp);
   const gekozen = (id: string) => (props.meerdere ? props.waarde.includes(id) : props.waarde === id);
   const wissel = (id: string) => {
     if (props.meerdere) {
@@ -38,7 +42,8 @@ export function Keuze(props: Props) {
         {vraag && <span className="keuze__vraag">{vraag}</span>}
         {props.meerdere && <span className="keuze__hint">Je kunt meerdere antwoorden kiezen.</span>}
       </legend>
-      <div className="keuze__opties">
+      {toelichting && <div className="keuze__toelichting">{toelichting}</div>}
+      <div className={`keuze__opties${metHulp ? " keuze__opties--lijst" : ""}`}>
         {opties.map((o) => {
           const id = `${naam}-${o.id}`;
           return (
@@ -51,7 +56,16 @@ export function Keuze(props: Props) {
                 checked={gekozen(o.id)}
                 onChange={() => wissel(o.id)}
               />
-              <label htmlFor={id}>{o.label}</label>
+              <label htmlFor={id}>
+                {o.hulp ? (
+                  <span>
+                    <span className="keuze__label">{o.label}</span>
+                    <span className="keuze__optiehulp">{o.hulp}</span>
+                  </span>
+                ) : (
+                  o.label
+                )}
+              </label>
             </div>
           );
         })}
@@ -67,5 +81,6 @@ export const JA_NEE = [
 ];
 export const naarJaNee = (b: boolean | undefined) => (b === undefined ? undefined : b ? "ja" : "nee");
 
-/** De gekozen antwoorden van een check altijd als lijst. */
-export const alsLijst = (w: string | string[] | undefined): string[] => (Array.isArray(w) ? w : w ? [w] : []);
+/** De gekozen antwoorden van een check altijd als lijst (bij deelvragen: alle deelantwoorden). */
+export const alsLijst = (w: string | string[] | Record<string, string> | undefined): string[] =>
+  Array.isArray(w) ? w : typeof w === "string" ? (w ? [w] : []) : w ? Object.values(w) : [];

@@ -3,7 +3,8 @@
  *   Direct aan de slag          → accountaanvraag
  *   Aan de slag met voorwaarden → accountaanvraag, inclusief voorwaarden
  *   Eerst toetsen               → aanvraag naar de toetser(s) + melding in Teams
- *   Niet op deze manier         → geen aanvraag (alleen vastgelegd)
+ *   Niet op deze manier         → geen aanvraag (alleen vastgelegd); is er geen alternatief,
+ *                                 dan een melding aan Team Digitale Ontwikkeling en status "contact volgt"
  *
  * Volgorde, zodat dubbel klikken of een mislukte webhook geen rommel geeft:
  * 1. de status wordt eerst "geclaimd" (alleen als die nog "advies gegeven" is);
@@ -25,6 +26,12 @@ const STATUS_NA_ACTIE: Record<string, Status | null> = {
   toetsing: "in_toetsing",
   alleen_vastleggen: null,
 };
+
+/** Is er bij dit advies contact met Team Digitale Ontwikkeling nodig (rood zonder alternatief)? */
+export function contactNodig(advies: AdviesRij, content: Content): boolean {
+  const kleur = content.regelset.kleuren.find((k) => k.id === advies.uitkomst);
+  return !!kleur?.contact_als_geen_alternatief && kleur.vervolgactie === "alleen_vastleggen" && advies.alternatieven.length === 0;
+}
 
 async function logActie(adviesId: string, type: ActieType, r: ActieResultaat) {
   await db().query(
@@ -55,6 +62,20 @@ export function maakPayloads(advies: AdviesRij, o: Omit<VervolgactieOpties, "adv
     uitkomst: { kleur: kleur.id, naam: kleur.uitkomst },
   };
 
+  if (contactNodig(advies, content)) {
+    const toetsers = advies.toetsers.map((rol) => ({ rol, naam: content.regelset.toetsers.find((t) => t.id === rol)?.naam ?? rol }));
+    return [
+      {
+        ...basis,
+        type: "contact",
+        link: `${appUrl}/beheer/advies/${advies.id}`,
+        motivatie: advies.motivatie,
+        toetsers,
+        tekst: `Advies ${advies.referentie} is "${kleur.uitkomst}" zonder alternatief. Neem contact op met de medewerker.`,
+      },
+    ];
+  }
+
   if (kleur.vervolgactie === "toetsing") {
     const toetsers = advies.toetsers.map((rol) => ({ rol, naam: content.regelset.toetsers.find((t) => t.id === rol)?.naam ?? rol }));
     const link = `${appUrl}/toetsing/${advies.id}`;
@@ -76,7 +97,11 @@ export async function voerVervolgactieUit(o: VervolgactieOpties): Promise<{ stat
   const advies = await haalEigenAdvies(o.adviesId, o.gebruiker.pseudoniemId);
   if (!advies) throw nietGevonden();
   const kleur = o.content.regelset.kleuren.find((k) => k.id === advies.uitkomst);
-  const nieuweStatus = kleur ? STATUS_NA_ACTIE[kleur.vervolgactie] : null;
+  const nieuweStatus: Status | null = contactNodig(advies, o.content)
+    ? "contact_volgt"
+    : kleur
+      ? (STATUS_NA_ACTIE[kleur.vervolgactie] ?? null)
+      : null;
   if (!nieuweStatus) throw new ApiFout(409, "Bij deze uitkomst hoort geen aanvraag.");
 
   // 1. Claimen: lukt maar één keer, ook bij dubbel klikken.
@@ -108,4 +133,22 @@ export async function voerVervolgactieUit(o: VervolgactieOpties): Promise<{ stat
   // Het concept (met de chat) is niet meer nodig: in het register staat alleen wat nodig is.
   await verwijderConceptenVanAdvies(advies.id);
   return { status: nieuweStatus, meldingVerstuurd };
+}
+
+/**
+ * Rood zonder alternatief: direct een melding aan Team Digitale Ontwikkeling, maximaal één keer
+ * per advies (keuze IJK). Mislukt de melding, dan blijft de status "advies gegeven" en kan de
+ * medewerker het opnieuw proberen via de vervolgactie. Geeft de (eventueel nieuwe) status terug.
+ */
+export async function meldContactIndienNodig(
+  advies: AdviesRij,
+  o: Omit<VervolgactieOpties, "adviesId">,
+): Promise<Status> {
+  if (advies.status !== "advies_gegeven" || !contactNodig(advies, o.content)) return advies.status;
+  try {
+    return (await voerVervolgactieUit({ ...o, adviesId: advies.id })).status;
+  } catch (e) {
+    console.warn(`[actie] Contactmelding voor ${advies.referentie} mislukt: ${(e as Error).message}`);
+    return "advies_gegeven";
+  }
 }

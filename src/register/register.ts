@@ -81,6 +81,7 @@ export async function registreerAdvies(opties: {
       uitkomst: uitkomst.kleur,
       toetsers: uitkomst.toetsers,
       dpiaSignaal: uitkomst.dpiaSignaal,
+      aiActSignaal: uitkomst.aiActSignaal,
       motivatie: uitkomst.motivatie,
       voorwaarden: uitkomst.voorwaarden,
       alternatieven: uitkomst.alternatieven,

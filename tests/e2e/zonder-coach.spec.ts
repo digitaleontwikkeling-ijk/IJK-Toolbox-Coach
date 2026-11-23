@@ -1,6 +1,6 @@
 /** De app moet volledig bruikbaar blijven zonder AI (COACH_MODUS=uit). */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login } from "./hulp";
 
 test("zonder coach: alles handmatig invullen geeft een advies", async ({ page }) => {
   await login(page, "Testbeheerder");
@@ -17,8 +17,8 @@ test("zonder coach: alles handmatig invullen geeft een advies", async ({ page })
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Collega's");
   await kies(page, "autonomie", "Assisteren");
-  await kies(page, "impact", "Beperkt");
-  await kies(page, "afhankelijkheid", "Persoonlijke oplossing");
+  await kiesImpact(page, { beschikbaarheid: "Beperkt" });
+  await kies(page, "afhankelijkheid", "Regelmatig, voor mijn eigen werk (persoonlijke oplossing)");
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
 

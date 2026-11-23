@@ -18,8 +18,8 @@ function fouten(fn: () => unknown): string[] {
 describe("invoercontrole", () => {
   it("R1. ontbrekend antwoord op een check geeft een fout, geen stille aanname", () => {
     const i = invoer();
-    delete i.checks.impact;
-    expect(fouten(() => evalueer(i, regelset))).toEqual(['check "impact" is niet beantwoord']);
+    delete i.checks.gebruikers;
+    expect(fouten(() => evalueer(i, regelset))).toEqual(['check "gebruikers" is niet beantwoord']);
   });
 
   it("R2. leeg antwoord telt als niet beantwoord", () => {
@@ -61,7 +61,7 @@ describe("invoercontrole", () => {
 
   it("R9. meerdere fouten worden allemaal tegelijk gemeld", () => {
     const i = invoer({ checks: { data: "onzin" } });
-    delete i.checks.impact;
+    delete i.checks.gebruikers;
     delete i.rodeVlaggen.niet_goedgekeurde_tool;
     expect(fouten(() => evalueer(i, regelset))).toHaveLength(3);
   });
@@ -71,7 +71,8 @@ describe("hoogste kleur en motivatie", () => {
   it("R10. één rode vlag maakt een verder volledig groen advies rood", () => {
     const u = evalueer(invoer({ rodeVlaggen: { open_zonder_toetsing: true } }), regelset);
     expect(u.kleur).toBe("rood");
-    expect(u.toetsers).toEqual([]);
+    // Bij rood kijken beide toetsers mee (opdracht §4.4).
+    expect(u.toetsers).toEqual(["toetser_compliance", "toetser_architect"]);
     expect(u.voorwaarden).toEqual([]);
   });
 
@@ -89,7 +90,7 @@ describe("hoogste kleur en motivatie", () => {
       "impact",
     ]);
     expect(u.motivatie).toBe(
-      "Een tool die IJK niet heeft goedgekeurd, een persoonlijke inlog of wachtwoorden/API-keys in de code en Groot (Impact).",
+      "Een tool die IJK niet heeft goedgekeurd, een persoonlijke inlog of wachtwoorden/API-keys in de code en Groot (Impact – Integriteit).",
     );
   });
 

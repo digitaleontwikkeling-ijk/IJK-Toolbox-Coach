@@ -15,7 +15,7 @@ fases:
 stappen:
   - nummer: 1
     titel: Wat wil je bereiken?
-    instructie: Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt, nog zonder aan een tool te denken.
+    instructie: Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt, zonder al aan een tool te denken.
   - nummer: 2
     titel: Welke tool past?
     instructie: Op basis van je beschrijving adviseert de coach een tool uit de IJK Toolbox.
@@ -53,6 +53,7 @@ na_actie:
   goedgekeurd: Je aanvraag is goedgekeurd. Je kunt aan de slag.
   goedgekeurd_met_voorwaarden: Je aanvraag is goedgekeurd met voorwaarden. Houd je aan de voorwaarden van de toetsers hierboven.
   afgewezen: Je aanvraag is afgewezen. Lees de motivatie van de toetsers hierboven. Heb je vragen, stel ze dan aan de coach of neem contact op met de toetser.
+  contact_volgt: Op deze manier kan het niet, en er is geen kant-en-klaar alternatief. Team Digitale Ontwikkeling neemt contact met je op om samen te kijken wat wel kan. Ga in de tussentijd niet zelf een andere weg zoeken.
 
 # De rode vlaggen uit het kader, zoals de medewerker ze ziet. Neutraal geformuleerd:
 # een "ja" is geen fout, de coach helpt dan verder.
@@ -79,6 +80,7 @@ statussen:
   goedgekeurd: Goedgekeurd
   goedgekeurd_met_voorwaarden: Goedgekeurd met voorwaarden
   afgewezen: Afgewezen
+  contact_volgt: Contact volgt
 
 besluiten:
   goedgekeurd: Goedgekeurd
@@ -90,10 +92,27 @@ toetsing:
   intro: Aanvragen die bij jouw rol als toetser horen. Bekijk de antwoorden en leg je besluit vast. Je inzage wordt vastgelegd in de audit-log.
   toelichting_voorwaarden: Welke voorwaarden gelden?
   toelichting_afwijzing: Waarom wijs je de aanvraag af?
+  ter_informatie: Ter informatie (Niet op deze manier)
+  ter_informatie_uitleg: Bij deze uitkomst is er geen aanvraag en hoef je geen besluit te nemen. Je ziet hem zodat je weet wat er speelt.
 
 beheer:
   titel: Beheer
   intro: Alle adviezen en de inhoud van de coach. De inhoud (tools, spelregels, beslisregels) wijzig je via Git in de map content/; elke wijziging krijgt een nieuw versienummer. Je inzage wordt vastgelegd in de audit-log.
+
+# Signaal dat de compliance officer de toepassing moet classificeren volgens de AI Act.
+ai_act:
+  titel: AI Act-classificatie nodig
+  uitleg: >-
+    De AI Act is de Europese wet voor AI. Omdat de oplossing zelfstandig handelt of adviseert of beslist over
+    mensen, bepaalt de AI governance & compliance officer in welke risicoklasse je toepassing valt.
+
+# Bij check 6: lijst met wat je extra moet regelen per antwoord.
+extra_regelen_titel: Wat moet je extra regelen?
+
+# Rode uitkomst zonder alternatief: Team DO kon (nog) niet worden ingelicht.
+contact_opnieuw:
+  melding: Team Digitale Ontwikkeling is nog niet op de hoogte gebracht. Probeer het opnieuw.
+  knop: Team Digitale Ontwikkeling informeren
 
 dpia:
   titel: Mogelijk is een DPIA nodig

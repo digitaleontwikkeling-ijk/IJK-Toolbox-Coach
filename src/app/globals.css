@@ -273,3 +273,16 @@ fieldset.keuze legend + * { clear: both; }
 .uitleg__stap h3 { margin: 0 0 0.25rem; }
 .uitleg__stap p { margin: 0.25rem 0 0; }
 .uitleg__wie { display: inline-block; background: var(--wolk); border-radius: 999px; padding: 0.1rem 0.7rem; font-size: 0.85rem; font-weight: 600; }
+
+/* ---------- Keuzes met hulptekst (Impact) en toelichting bij checks ---------- */
+.keuze__toelichting { font-size: 0.9rem; color: var(--tekst-zacht); margin: 0.25rem 0 0.5rem; }
+.keuze__toelichting p { margin: 0 0 0.35rem; }
+.keuze__opties--lijst { flex-direction: column; align-items: stretch; }
+.keuze__opties--lijst .keuze__optie label { border-radius: var(--radius); width: 100%; align-items: flex-start; }
+.keuze__label { display: block; font-weight: 600; }
+.keuze__optiehulp { display: block; font-size: 0.9rem; font-weight: 400; }
+.deelvragen { display: grid; gap: 0.75rem; margin-top: 0.5rem; }
+.deelvragen fieldset.keuze { margin: 0; background: var(--wit); }
+.extra-regelen { margin-top: 0.75rem; font-size: 0.9rem; }
+.extra-regelen h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.extra-regelen ul { margin: 0; padding-left: 1.1rem; }

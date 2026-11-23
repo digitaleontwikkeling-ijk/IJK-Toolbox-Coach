@@ -40,7 +40,17 @@ function spelregelsTekst(c: Content, tool?: string): string {
 
 function schalenTekst(c: Content): string {
   return c.regelset.checks
-    .map((ch) => `- ${ch.id} (${ch.naam}: ${ch.vraag}) → toegestane waarden: ${ch.antwoorden.map((a) => `${a.id} (${a.label})`).join(", ")}`)
+    .map((ch) => {
+      const waarden = ch.antwoorden.map((a) => `${a.id} (${a.label})`).join(", ");
+      const hulp = ch.hulp.map((h) => `${h.kop ? `${h.kop}: ` : ""}${h.tekst}`).join(" ");
+      const kop = `- ${ch.id} (${ch.naam}: ${ch.vraag}) → toegestane waarden: ${waarden}${hulp ? `\n  Uitleg: ${hulp}` : ""}`;
+      if (ch.deelvragen.length === 0) return kop;
+      // Bij deelvragen: per deelvraag een eigen voorstel, met voorbeelden per niveau.
+      const deel = ch.deelvragen
+        .map((d) => `  - deelvraag ${d.id} (${d.naam}: ${d.vraag}): ${Object.entries(d.voorbeelden).map(([a, v]) => `${a} = ${v}`).join("; ")}`)
+        .join("\n");
+      return `${kop}\n  Geef voor deze check een voorstel PER DEELVRAAG (veld "deelvraag"):\n${deel}`;
+    })
     .join("\n");
 }
 
@@ -71,7 +81,7 @@ Twijfel je, kies dan de voorzichtigere (hogere-risico) waarde en zet zekerheid o
 Checks en toegestane waarden:
 ${schalenTekst(c)}
 
-Formaat: {"checks": [{"check": "<check-id>", "voorstel": "<waarde-id>", "zekerheid": "hoog|middel|laag", "vervolgvraag": "<optioneel>"}]}`;
+Formaat: {"checks": [{"check": "<check-id>", "deelvraag": "<alleen bij een check met deelvragen>", "voorstel": "<waarde-id>", "zekerheid": "hoog|middel|laag", "vervolgvraag": "<optioneel>"}]}`;
     case "uitleg":
       return `${BASIS}
 

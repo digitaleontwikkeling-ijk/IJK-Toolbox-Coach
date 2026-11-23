@@ -1,13 +1,13 @@
 /**
  * Vervolgacties: aanroepen van de flows die IJK zelf beheert (bijvoorbeeld in
- * Copilot workflows, Power Automate of n8n). Voor de app zijn het gewone
+ * HubBI of Microsoft 365). Voor de app zijn het gewone
  * webhooks: een URL plus een gedeeld geheim in een header.
  *
  * Dataminimalisatie: de payload bevat geen beschrijving en geen antwoorden,
  * alleen wat de flow nodig heeft plus een link naar de app. De UPN gaat alleen
  * mee als ACTIE_STUUR_UPN=true.
  */
-export type ActieType = "accountaanvraag" | "toetsing" | "teams_melding";
+export type ActieType = "accountaanvraag" | "toetsing" | "teams_melding" | "contact";
 
 export interface ActiePayload {
   type: ActieType;

@@ -5,6 +5,7 @@
  */
 import type { PoolClient } from "pg";
 import type { Status } from "../domain/content-schema";
+import type { CheckAntwoord } from "../domain/beslisregels";
 import type { Tooladvies, WizardData } from "../domain/wizard";
 import { db } from "./pool";
 
@@ -92,11 +93,13 @@ export interface AdviesRij {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: Tooladvies;
-  antwoorden: { checks: Record<string, string | string[]>; extraVragen: Record<string, boolean> };
+  /** Per check het antwoord; bij Impact per deelvraag (beschikbaarheid, integriteit, vertrouwelijkheid). */
+  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];
   dpiaSignaal: boolean;
+  aiActSignaal: boolean;
   motivatie: string;
   voorwaarden: string[];
   alternatieven: string[];
@@ -109,7 +112,7 @@ export interface AdviesRij {
 
 export const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId", aangemaakt_op AS "aangemaaktOp",
   bijgewerkt_op AS "bijgewerktOp", beschrijving, verduidelijking, tooladvies, antwoorden,
-  rode_vlaggen AS "rodeVlaggen", uitkomst, toetsers, dpia_signaal AS "dpiaSignaal", motivatie,
+  rode_vlaggen AS "rodeVlaggen", uitkomst, toetsers, dpia_signaal AS "dpiaSignaal", ai_act_signaal AS "aiActSignaal", motivatie,
   voorwaarden, alternatieven, regelversie, toolsversie, status, vorig_advies_id AS "vorigAdviesId",
   verloopt_op AS "verlooptOp"`;
 
@@ -131,6 +134,7 @@ function adviesParameters(a: NieuwAdvies) {
     a.pseudoniemId, a.beschrijving, JSON.stringify(a.verduidelijking), a.tooladvies, a.antwoorden,
     a.rodeVlaggen, a.uitkomst, a.toetsers, a.dpiaSignaal, a.motivatie, JSON.stringify(a.voorwaarden),
     JSON.stringify(a.alternatieven), a.regelversie, a.toolsversie, a.status, a.vorigAdviesId, a.verlooptOp,
+    a.aiActSignaal,
   ];
 }
 
@@ -138,8 +142,8 @@ export async function voegAdviesToe(q: Querier, referentie: string, a: NieuwAdvi
   const r = await q.query(
     `INSERT INTO advies (pseudoniem_id, beschrijving, verduidelijking, tooladvies, antwoorden, rode_vlaggen,
        uitkomst, toetsers, dpia_signaal, motivatie, voorwaarden, alternatieven, regelversie, toolsversie,
-       status, vorig_advies_id, verloopt_op, referentie)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+       status, vorig_advies_id, verloopt_op, ai_act_signaal, referentie)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
      RETURNING ${adviesVelden}`,
     [...adviesParameters(a), referentie],
   );
@@ -152,8 +156,8 @@ export async function werkAdviesBij(q: Querier, id: string, a: NieuwAdvies): Pro
     `UPDATE advies SET pseudoniem_id=$1, beschrijving=$2, verduidelijking=$3, tooladvies=$4, antwoorden=$5,
        rode_vlaggen=$6, uitkomst=$7, toetsers=$8, dpia_signaal=$9, motivatie=$10, voorwaarden=$11,
        alternatieven=$12, regelversie=$13, toolsversie=$14, status=$15, vorig_advies_id=$16, verloopt_op=$17,
-       bijgewerkt_op=now()
-     WHERE id=$18 RETURNING ${adviesVelden}`,
+       ai_act_signaal=$18, bijgewerkt_op=now()
+     WHERE id=$19 RETURNING ${adviesVelden}`,
     [...adviesParameters(a), id],
   );
   return r.rows[0];

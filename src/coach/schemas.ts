@@ -29,18 +29,28 @@ export function tooladviesSchema(content: Content, uitsluiten: string[] = []) {
 
 export const ZEKERHEDEN = ["hoog", "middel", "laag"] as const;
 
-/** Eén voorstel per check. De waarde moet uit de schaal van die check komen. */
+/**
+ * Eén voorstel per check, of bij een check met deelvragen (Impact) één voorstel per deelvraag.
+ * De waarde moet uit de schaal van die check komen.
+ */
 export function checkVoorstelSchema(content: Content) {
-  const schalen = new Map(content.regelset.checks.map((c) => [c.id, c.antwoorden.map((a) => a.id)]));
+  const checks = new Map(content.regelset.checks.map((c) => [c.id, c]));
   return z
     .object({
       check: z.string(),
+      deelvraag: z.string().optional(),
       voorstel: z.string(),
       zekerheid: z.enum(ZEKERHEDEN),
       vervolgvraag: tekst(300).optional(),
     })
     .strip()
-    .refine((v) => schalen.get(v.check)?.includes(v.voorstel) ?? false, "waarde staat niet in de schaal");
+    .refine((v) => checks.get(v.check)?.antwoorden.some((a) => a.id === v.voorstel) ?? false, "waarde staat niet in de schaal")
+    .refine((v) => {
+      const c = checks.get(v.check);
+      if (!c) return false;
+      // Deelvraag verplicht bij een check met deelvragen, en anders niet toegestaan.
+      return c.deelvragen.length > 0 ? c.deelvragen.some((d) => d.id === v.deelvraag) : v.deelvraag === undefined;
+    }, "deelvraag ontbreekt of bestaat niet");
 }
 
 export const checksAntwoordSchema = z.object({ checks: z.array(z.unknown()).max(20) });

@@ -22,10 +22,15 @@ export async function kies(page: Page, veld: string, label: string) {
   const blok = page.locator(`#veld-${veld} > fieldset`).first();
   await blok.waitFor();
   const opties = blok.locator(":scope > .keuze__opties input");
+  let gevonden = false;
   for (let i = 0; i < (await opties.count()); i++) {
     const invoer = opties.nth(i);
     const id = await invoer.getAttribute("id");
-    const isDit = (await page.locator(`label[for="${id}"]`).innerText()) === label;
+    // Bij opties met een voorbeeldtekst staat het label apart (.keuze__label).
+    const lab = page.locator(`label[for="${id}"]`);
+    const tekst = (await lab.locator(".keuze__label").count()) ? await lab.locator(".keuze__label").innerText() : await lab.innerText();
+    const isDit = tekst === label;
+    if (isDit) gevonden = true;
     const isVakje = (await invoer.getAttribute("type")) === "checkbox";
     // Selectievakjes: precies dit antwoord aan, de rest uit. Keuzerondjes: alleen dit antwoord aanklikken.
     if (isVakje ? (await invoer.isChecked()) !== isDit : isDit) {
@@ -33,6 +38,7 @@ export async function kies(page: Page, veld: string, label: string) {
       await expect(invoer).toBeChecked({ checked: isDit });
     }
   }
+  if (!gevonden) throw new Error(`Antwoord "${label}" bestaat niet bij "${veld}".`);
 }
 
 /** Vinkt een extra antwoord aan bij een check met meerdere antwoorden. */
@@ -42,8 +48,23 @@ export async function vinkAan(page: Page, veld: string, label: string) {
   if (!(await page.locator(`#${id}`).isChecked())) await l.click();
 }
 
+/** Impact: per deelvraag (beschikbaarheid, integriteit, vertrouwelijkheid) een niveau. Niet genoemd = Nauwelijks. */
+export async function kiesImpact(page: Page, niveaus: Partial<Record<"beschikbaarheid" | "integriteit" | "vertrouwelijkheid", string>> = {}) {
+  for (const d of ["beschikbaarheid", "integriteit", "vertrouwelijkheid"] as const) {
+    await kies(page, `impact-${d}`, niveaus[d] ?? "Nauwelijks");
+  }
+}
+
+export const RODE_VLAGGEN = [
+  "niet_goedgekeurde_tool",
+  "persoonlijke_inlog_of_secrets",
+  "ai_beslist_over_mensen",
+  "open_zonder_toetsing",
+  "proces_zonder_eigenaar",
+];
+
 export async function geenRodeVlaggen(page: Page) {
-  for (const v of ["niet_goedgekeurde_tool", "persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing"]) {
+  for (const v of RODE_VLAGGEN) {
     await kies(page, v, "Nee");
   }
 }

@@ -84,6 +84,12 @@ export function kleurVan(c: ContentDto, id: string) {
   return c.regelset.kleuren.find((k) => k.id === id);
 }
 
+/** Uitkomsten die toetsers alleen ter informatie zien (beide toetsers kijken mee, geen aanvraag). */
+export function isTerInformatie(c: ContentDto, uitkomst: string): boolean {
+  const k = kleurVan(c, uitkomst);
+  return !!k && k.toetsers === "alle" && k.vervolgactie === "alleen_vastleggen";
+}
+
 export function datum(iso: string): string {
   return new Date(iso).toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
 }

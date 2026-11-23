@@ -24,11 +24,11 @@ let mock: Awaited<ReturnType<typeof startWebhookMock>>;
 // Adviezen per uitkomst (VOLLEDIG = scenario 4: oranje, beide toetsers, DPIA)
 const GROEN = {
   ...VOLLEDIG,
-  checks: { data: "openbaar", systemen: "geen", gebruikers: "alleen_ik", autonomie: "assisteren", impact: "nauwelijks", afhankelijkheid: "experiment" },
+  checks: { data: "openbaar", systemen: "geen", gebruikers: "alleen_ik", autonomie: "assisteren", impact: { beschikbaarheid: "nauwelijks", integriteit: "nauwelijks", vertrouwelijkheid: "nauwelijks" }, afhankelijkheid: "experiment" },
   extraVragen: {},
 };
 const ALLEEN_ARCHITECT = { ...GROEN, checks: { ...GROEN.checks, systemen: "koppelen" } };
-const ALLEEN_COMPLIANCE = { ...GROEN, checks: { ...GROEN.checks, impact: "serieus" } };
+const ALLEEN_COMPLIANCE = { ...GROEN, checks: { ...GROEN.checks, impact: { ...GROEN.checks.impact, integriteit: "serieus" } } };
 
 const actie = (id: string, gebruiker = ANNA) => roep(actieRoute.POST as Handler, { gebruiker, params: { id }, method: "POST" });
 const besluit = (id: string, gebruiker: typeof ANNA, b: object) =>
@@ -42,6 +42,7 @@ beforeAll(async () => {
     ACTIE_ACCOUNT_URL: `${mock.url}/account`,
     ACTIE_TOETSING_URL: `${mock.url}/toetsing`,
     ACTIE_MELDING_URL: `${mock.url}/melding`,
+    ACTIE_CONTACT_URL: `${mock.url}/contact`,
     ACTIE_GEHEIM: GEHEIM,
     APP_URL: "https://coach.test",
   });
@@ -53,7 +54,7 @@ beforeEach(async () => {
   delete process.env.ACTIE_STUUR_UPN;
 });
 afterAll(async () => {
-  for (const k of ["ACTIE_MODUS", "ACTIE_ACCOUNT_URL", "ACTIE_TOETSING_URL", "ACTIE_MELDING_URL", "ACTIE_GEHEIM", "APP_URL", "ACTIE_STUUR_UPN"]) {
+  for (const k of ["ACTIE_MODUS", "ACTIE_ACCOUNT_URL", "ACTIE_TOETSING_URL", "ACTIE_MELDING_URL", "ACTIE_CONTACT_URL", "ACTIE_GEHEIM", "APP_URL", "ACTIE_STUUR_UPN"]) {
     delete process.env[k];
   }
   await mock.stop();
@@ -114,7 +115,7 @@ describe("vervolgacties via webhooks", () => {
   it("F4. mislukte webhook: status terug naar 'advies gegeven', foutmelding, en later opnieuw proberen lukt", async () => {
     const a = await nieuwAdvies(ANNA, GROEN);
     const instellingen = {
-      urls: { accountaanvraag: `${mock.url}/fout`, toetsing: "", teams_melding: "" },
+      urls: { accountaanvraag: `${mock.url}/fout`, toetsing: "", teams_melding: "", contact: "" },
       geheim: GEHEIM,
       geheimHeader: "X-IJK-Webhook-Secret",
       timeoutMs: 2000,
@@ -130,7 +131,7 @@ describe("vervolgacties via webhooks", () => {
   it("F5. mislukte Teams-melding houdt de aanvraag tegen? Nee: status blijft 'in toetsing', melding wordt gelogd", async () => {
     const a = await nieuwAdvies();
     const instellingen = {
-      urls: { accountaanvraag: "", toetsing: `${mock.url}/toetsing`, teams_melding: `${mock.url}/melding/fout` },
+      urls: { accountaanvraag: "", toetsing: `${mock.url}/toetsing`, teams_melding: `${mock.url}/melding/fout`, contact: "" },
       geheim: GEHEIM,
       geheimHeader: "X-IJK-Webhook-Secret",
       timeoutMs: 2000,
@@ -183,7 +184,7 @@ describe("toetsing", () => {
       rodeVlaggen: VOLLEDIG.rodeVlaggen,
       uitkomst: "oranje",
       dpiaSignaal: true,
-      regelversie: "0.3",
+      regelversie: "0.4",
       besluiten: [],
     });
     await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE });
@@ -251,5 +252,68 @@ describe("beheer", () => {
       { rol: "beheerder", actie: "inzage_lijst" },
       { rol: "beheerder", actie: "inzage_advies" },
     ]);
+  });
+});
+
+describe("regelset 0.4: contact volgt, ter informatie en AI Act", () => {
+  // Rood zonder alternatief: Vertrouwelijkheid = Groot (scenario 9).
+  const ROOD_ZONDER_ALT = { ...GROEN, checks: { ...GROEN.checks, impact: { ...GROEN.checks.impact, vertrouwelijkheid: "groot" } } };
+  // Rood met alternatief: rode vlag 1.
+  const ROOD_MET_ALT = { ...GROEN, rodeVlaggen: { ...GROEN.rodeVlaggen, niet_goedgekeurde_tool: true } };
+
+  it("F17. rood zonder alternatief: direct een melding aan Team DO en status 'contact volgt'", async () => {
+    const a = (await nieuwAdvies(ANNA, ROOD_ZONDER_ALT)) as unknown as { id: string; status: string; referentie: string };
+    expect(a.status).toBe("contact_volgt");
+    expect(mock.ontvangen.map((o) => o.pad)).toEqual(["/contact"]);
+    expect(mock.ontvangen[0]!.body).toMatchObject({
+      type: "contact",
+      referentie: a.referentie,
+      link: `https://coach.test/beheer/advies/${a.id}`,
+      uitkomst: { kleur: "rood" },
+    });
+    // Geen tweede melding voor hetzelfde advies.
+    expect((await actie(a.id)).status).toBe(409);
+    expect(mock.ontvangen).toHaveLength(1);
+  });
+
+  it("F18. rood mét alternatief: geen melding, status blijft 'advies gegeven'", async () => {
+    const a = (await nieuwAdvies(ANNA, ROOD_MET_ALT)) as unknown as { status: string };
+    expect(a.status).toBe("advies_gegeven");
+    expect(mock.ontvangen).toEqual([]);
+  });
+
+  it("F19. mislukte contactmelding: status blijft 'advies gegeven', opnieuw proberen lukt", async () => {
+    process.env.ACTIE_CONTACT_URL = `${mock.url}/contact/fout`;
+    vi.resetModules();
+    const { POST: adviesPost } = await import("@/app/api/advies/route");
+    const id = await (await import("./hulp")).nieuwConcept(ANNA, ROOD_ZONDER_ALT);
+    const r = await roep(adviesPost as Handler, { body: { conceptId: id } });
+    expect(r.json.advies.status).toBe("advies_gegeven");
+    process.env.ACTIE_CONTACT_URL = `${mock.url}/contact`;
+    vi.resetModules();
+    const { POST: actiePost } = await import("@/app/api/advies/[id]/actie/route");
+    expect((await roep(actiePost as Handler, { params: { id: r.json.advies.id }, method: "POST" })).json.status).toBe("contact_volgt");
+  });
+
+  it("F20. toetsers zien rode adviezen ter informatie, maar kunnen er niet over besluiten", async () => {
+    const zonder = await nieuwAdvies(ANNA, ROOD_ZONDER_ALT);
+    const met = await nieuwAdvies(BRAM, ROOD_MET_ALT);
+    for (const toetser of [COMPLIANCE, ARCHITECT]) {
+      const ids = (await roep(toetsingRoute.GET as Handler, { gebruiker: toetser })).json.adviezen.map((x: { id: string }) => x.id);
+      expect(ids.sort()).toEqual([zonder.id, met.id].sort());
+    }
+    expect((await roep(toetsingIdRoute.GET as Handler, { gebruiker: ARCHITECT, params: { id: met.id } })).json.advies.openRollen).toEqual([]);
+    expect([404, 409]).toContain((await besluit(met.id, ARCHITECT, { besluit: "goedgekeurd" })).status);
+    expect([404, 409]).toContain((await besluit(zonder.id, COMPLIANCE, { besluit: "goedgekeurd" })).status);
+  });
+
+  it("F21. het AI Act-signaal en de deelscores van Impact staan in het adviesregister", async () => {
+    const data = { ...GROEN, checks: { ...GROEN.checks, autonomie: "handelen", impact: { beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" } } };
+    const a = await nieuwAdvies(ANNA, data);
+    const rij = (await db().query("SELECT ai_act_signaal, dpia_signaal, antwoorden FROM advies WHERE id = $1", [a.id])).rows[0];
+    expect(rij.ai_act_signaal).toBe(true);
+    expect(rij.dpia_signaal).toBe(false);
+    expect(rij.antwoorden.checks.impact).toEqual({ beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" });
+    expect(a.toetsers).toEqual(["toetser_compliance"]);
   });
 });

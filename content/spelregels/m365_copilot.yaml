@@ -1,12 +1,20 @@
-# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: m365_copilot
 zelf_doen:
-  - Teksten schrijven
-  - Samenvattingen maken
-  - Vergaderingen voorbereiden en samenvatten
+  - Teksten opstellen, herschrijven of samenvatten
+  - E-mails en Teams-gesprekken samenvatten
+  - Conceptantwoorden laten maken
+  - Vergaderingen samenvatten en actiepunten opstellen
+  - Informatie zoeken in je eigen IJK-omgeving
 eerst_toetsen:
-  - Besluiten over personen
-  - Eigen Copilot-agents bouwen
+  - De uitkomst wordt gebruikt voor besluiten over personen
+  - Je bouwt of deelt een Copilot-agent met anderen
+  - Copilot wordt gekoppeld aan externe bronnen
+  - Output gaat zonder controle naar klanten
+  - Bijzondere persoonsgegevens worden verwerkt
 altijd:
-  - Controleer de uitkomst
-  - Werk met je IJK-account
+  - Controleer de uitkomst voordat je hem gebruikt
+  - Je blijft zelf verantwoordelijk voor het resultaat
+  - Werk alleen met je IJK-account
+  - "Houd bestandsrechten op orde (Copilot ziet wat jij mag zien)"
+  - Meld onjuiste of ongewenste uitkomsten

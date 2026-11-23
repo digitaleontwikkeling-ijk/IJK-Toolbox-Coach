@@ -1,12 +1,19 @@
-# Beginversie. De definitieve teksten levert IJK aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: azure_openai
 zelf_doen:
-  - Experimenteren
+  - Experimenteren met testdata in de IJK-Azure-omgeving
+  - Prompts en modelinstellingen testen
+  - AI-functionaliteit toevoegen aan prototypes
   - Persoons- of vertrouwelijke gegevens verwerken via een goedgekeurde IJK-deployment in de EU
+  - "Het model gebruiken via goedgekeurde koppelingen (bijvoorbeeld binnen AI Flows)"
 eerst_toetsen:
-  - Bijzondere persoonsgegevens
-  - Een nieuwe deployment of regio
-  - Beslissingen over mensen
+  - Er worden bijzondere persoonsgegevens verwerkt, zoals gezondheid
+  - Je hebt een nieuwe deployment of een andere regio nodig
+  - De toepassing neemt beslissingen over mensen
+  - Ook anderen gaan de oplossing gebruiken
+  - De uitkomst gaat naar klanten of bedrijfssystemen
+  - Je wilt een model trainen of finetunen
 altijd:
-  - Alleen EU Data Zone- of regionale deployments
-  - API-keys in een kluis
+  - Alleen EU Data Zone- of regionale deployments van IJK gebruiken, nooit Global
+  - "Bij gebruik van het model vanuit AI Flows of via Claude Code ontwikkelde software: bewaar API-keys in je kluis (Keeper)"
+  - Een eigenaar per deployment aanwijzen

@@ -34,6 +34,9 @@ export function BeheerContent() {
               <th scope="row">
                 {ch.nummer}. {ch.naam}<br /><span className="hulptekst">{ch.vraag}</span>
                 {ch.meerdere && <><br /><span className="hulptekst">Meerdere antwoorden mogelijk (hoogste kleur telt)</span></>}
+                {ch.deelvragen.length > 0 && (
+                  <><br /><span className="hulptekst">Deelvragen: {ch.deelvragen.map((d) => d.naam).join(", ")} (hoogste score telt)</span></>
+                )}
               </th>
               <td>
                 {ch.antwoorden.map((a) => {

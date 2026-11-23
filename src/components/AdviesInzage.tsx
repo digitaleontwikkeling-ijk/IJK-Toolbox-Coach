@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Adviescard } from "./Adviescard";
 import { Keuze } from "./Keuze";
-import { api, ApiFoutClient, toetserNaam, useContent, type AdviesDto, type ContentDto } from "./client";
+import { api, ApiFoutClient, isTerInformatie, toetserNaam, useContent, type AdviesDto, type ContentDto } from "./client";
 
 export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "beheer" }) {
   const content = useContent();
@@ -95,7 +95,9 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
     <aside className="paneel" aria-labelledby="besluit-titel">
       <h2 id="besluit-titel">Besluit</h2>
       {gelukt && <p className="info" role="status">{gelukt}</p>}
-      {advies.eigenAanvraag ? (
+      {isTerInformatie(content, advies.uitkomst) ? (
+        <p>{t.toetsing.ter_informatie_uitleg}</p>
+      ) : advies.eigenAanvraag ? (
         <p>Dit is je eigen aanvraag. Een andere toetser beoordeelt hem.</p>
       ) : open.length === 0 ? (
         !gelukt && <p>Je hoeft voor deze aanvraag geen besluit (meer) te nemen.</p>

@@ -1,7 +1,8 @@
 /** Advies berekenen en vastleggen in het adviesregister. */
 import { z } from "zod";
 import { body, route, vereisUuid } from "@/lib/api";
-import { content } from "@/lib/app";
+import { actieClient, content } from "@/lib/app";
+import { meldContactIndienNodig } from "@/acties/vervolgactie";
 import { config } from "@/lib/config";
 import { registreerAdvies } from "@/register/register";
 import { zonderPseudoniem } from "@/lib/weergave";
@@ -14,6 +15,14 @@ export const POST = route(["medewerker"], async ({ req, gebruiker }) => {
     content: content(),
     bewaartermijnMaanden: config.bewaartermijnMaanden,
   });
-  return { advies: zonderPseudoniem(advies) };
+  // Rood zonder alternatief: direct contact met Team Digitale Ontwikkeling (max. één keer per advies).
+  const status = await meldContactIndienNodig(advies, {
+    gebruiker,
+    content: content(),
+    client: actieClient(),
+    appUrl: config.appUrl,
+    stuurUpn: config.actieStuurUpn,
+  });
+  return { advies: zonderPseudoniem({ ...advies, status }) };
 });
 

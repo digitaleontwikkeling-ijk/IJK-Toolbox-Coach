@@ -49,7 +49,8 @@ describe("protocol", () => {
     const beschrijving = "Wekelijks overzicht van openstaande facturen uit AFAS voor mijn team";
     expect(await coach.verduidelijk({ beschrijving }, ctx)).toEqual({ vragen: expect.any(Array) });
     expect(await coach.tooladvies({ beschrijving, ...vv, uitsluiten: [] }, ctx)).toMatchObject({ tool: "hubbi" });
-    expect(await coach.checksVoorinvullen({ beschrijving, ...vv, tool: "hubbi" }, ctx)).toHaveLength(6);
+    // 5 checks + Impact met 3 deelvragen (B, I, V)
+    expect(await coach.checksVoorinvullen({ beschrijving, ...vv, tool: "hubbi" }, ctx)).toHaveLength(8);
     const uitkomst = evalueer(invoer({ checks: { systemen: "lezen", gebruikers: "collegas" } }), regelset);
     expect(await coach.uitleg({ beschrijving, tool: "hubbi", uitkomst, antwoorden: {} }, ctx)).toContain("Aan de slag met voorwaarden");
     expect(await coach.chat({ vraag: "Wat mag ik met HubBI?", stap: 2, beschrijving, geschiedenis: [] }, ctx)).toContain("HubBI");

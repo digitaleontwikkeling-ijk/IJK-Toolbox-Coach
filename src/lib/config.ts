@@ -100,6 +100,7 @@ export const config = {
         accountaanvraag: verplicht("ACTIE_ACCOUNT_URL"),
         toetsing: verplicht("ACTIE_TOETSING_URL"),
         teams_melding: verplicht("ACTIE_MELDING_URL"),
+        contact: verplicht("ACTIE_CONTACT_URL"),
       },
       geheim: verplicht("ACTIE_GEHEIM"),
       geheimHeader: process.env.ACTIE_GEHEIM_HEADER ?? "X-IJK-Webhook-Secret",

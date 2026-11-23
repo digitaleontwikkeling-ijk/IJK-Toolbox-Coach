@@ -1,9 +1,19 @@
-# Placeholder. Copilot workflows vervangt (waarschijnlijk) n8n.
-# De spelregels levert IJK nog aan. TODO: valideren door toetsers
+# Letterlijk uit de presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
 tool: copilot_workflows
 zelf_doen:
-  - "[Placeholder] Nog aan te leveren door IJK."
+  - Eigen terugkerende taken automatiseren in Outlook, Teams, SharePoint en Planner
+  - Herinneringen, samenvattingen en meldingen voor jezelf of je team
+  - Eenvoudige goedkeuringen binnen je team
+  - Experimenteren met testdata
 eerst_toetsen:
-  - "[Placeholder] Nog aan te leveren door IJK."
+  - De workflow mailt automatisch naar klanten of externen
+  - De workflow wijzigt gedeelde SharePoint-lijsten of -bestanden
+  - Een team of proces gaat afhangen van de workflow
+  - Je wilt koppelen met systemen buiten Microsoft 365
 altijd:
-  - "[Placeholder] Nog aan te leveren door IJK."
+  - Je geeft geen dienstverleningsprocessen vorm met Copilot workflows
+  - "De workflow draait op jouw account: hij kan alles wat jij mag"
+  - Test eerst en controleer wat de AI-stappen doen
+  - Wijs een eigenaar aan en documenteer wat de workflow doet
+  - Gaat je team erop vertrouwen? Regel de overdracht
+  - Menselijke controle waar fouten relevante gevolgen hebben

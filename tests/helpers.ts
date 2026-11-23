@@ -1,6 +1,6 @@
 import path from "node:path";
 import { laadContent } from "@/content/laad-content";
-import type { BeslisInvoer } from "@/domain/beslisregels";
+import type { BeslisInvoer, CheckAntwoord } from "@/domain/beslisregels";
 import type { Regelset } from "@/domain/content-schema";
 
 export const content = laadContent(path.resolve(__dirname, "../content"));
@@ -14,15 +14,30 @@ export function kopieRegelset(): Regelset {
 /**
  * Maakt een complete invoer. Checks die niet zijn opgegeven krijgen het eerste
  * (laagste) antwoord uit de schaal; rode vlaggen staan standaard op "nee".
- * Dit volgt de afspraak voor scenario's waarin niet alle checks zijn genoemd.
+ *
+ * Impact heeft deelvragen (B, I, V). Geef een object per deelvraag, of één waarde:
+ * dan is dat de hoogste deelscore en staat die op Integriteit; de andere deelvragen
+ * krijgen het laagste niveau (zie opdracht §7: "kies de andere gelijk of lager").
  */
 export function invoer(opties: {
-  checks?: Record<string, string | string[]>;
+  checks?: Record<string, CheckAntwoord>;
   extraVragen?: Record<string, boolean>;
   rodeVlaggen?: Record<string, boolean>;
 } = {}, r: Regelset = regelset): BeslisInvoer {
-  const checks: Record<string, string | string[]> = {};
-  for (const c of r.checks) checks[c.id] = opties.checks?.[c.id] ?? c.antwoorden[0]!.id;
+  const checks: Record<string, CheckAntwoord> = {};
+  for (const c of r.checks) {
+    const gegeven = opties.checks?.[c.id];
+    const laagste = c.antwoorden[0]!.id;
+    if (c.deelvragen.length > 0) {
+      const perDeel: Record<string, string> = {};
+      for (const d of c.deelvragen) perDeel[d.id] = laagste;
+      if (typeof gegeven === "string") perDeel.integriteit = gegeven;
+      else if (gegeven && !Array.isArray(gegeven)) Object.assign(perDeel, gegeven);
+      checks[c.id] = gegeven === undefined || typeof gegeven === "string" || !Array.isArray(gegeven) ? perDeel : gegeven;
+    } else {
+      checks[c.id] = gegeven ?? laagste;
+    }
+  }
   const rodeVlaggen: Record<string, boolean> = {};
   for (const v of r.rode_vlaggen) rodeVlaggen[v.id] = opties.rodeVlaggen?.[v.id] ?? false;
   return { checks, extraVragen: opties.extraVragen ?? {}, rodeVlaggen };

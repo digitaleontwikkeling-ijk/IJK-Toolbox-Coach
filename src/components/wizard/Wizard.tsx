@@ -24,7 +24,13 @@ interface ConceptDto {
   data: WizardData;
 }
 
-type CheckVoorstel = { check: string; voorstel: string; zekerheid: "hoog" | "middel" | "laag"; vervolgvraag?: string };
+type CheckVoorstel = {
+  check: string;
+  deelvraag?: string;
+  voorstel: string;
+  zekerheid: "hoog" | "middel" | "laag";
+  vervolgvraag?: string;
+};
 
 export function Wizard() {
   const content = useContent();
@@ -166,14 +172,28 @@ export function Wizard() {
       const checks = { ...x.checks };
       const coachVoorstellen = { ...x.coachVoorstellen };
       for (const v of voorstellen ?? []) {
-        coachVoorstellen[v.check] = { voorstel: v.voorstel, zekerheid: v.zekerheid, vervolgvraag: v.vervolgvraag };
+        const check = r.checks.find((c) => c.id === v.check);
+        const voorstel = { voorstel: v.voorstel, zekerheid: v.zekerheid, vervolgvraag: v.vervolgvraag };
         // Nooit een keuze van de medewerker overschrijven.
-        const meerdere = r.checks.find((c) => c.id === v.check)?.meerdere;
-        checks[v.check] ??= meerdere ? [v.voorstel] : v.voorstel;
+        if (v.deelvraag) {
+          coachVoorstellen[`${v.check}.${v.deelvraag}`] = voorstel;
+          const huidig = checks[v.check];
+          const perDeel = huidig && typeof huidig === "object" && !Array.isArray(huidig) ? { ...huidig } : {};
+          perDeel[v.deelvraag] ??= v.voorstel;
+          checks[v.check] = perDeel;
+        } else {
+          coachVoorstellen[v.check] = voorstel;
+          checks[v.check] ??= check?.meerdere ? [v.voorstel] : v.voorstel;
+        }
       }
+      const naamVan = (v: CheckVoorstel) => {
+        const check = r.checks.find((c) => c.id === v.check);
+        const deel = check?.deelvragen.find((d) => d.id === v.deelvraag);
+        return deel ? `${check?.naam} – ${deel.naam}` : check?.naam;
+      };
       const vragen = (voorstellen ?? [])
         .filter((v) => v.vervolgvraag && v.zekerheid !== "hoog")
-        .map((v) => `Over ${r.checks.find((c) => c.id === v.check)?.naam}: ${v.vervolgvraag}`);
+        .map((v) => `Over ${naamVan(v)}: ${v.vervolgvraag}`);
       const chat = vragen.length
         ? [...x.chat, { rol: "coach" as const, tekst: `Ik heb de checks alvast ingevuld. Bij een paar twijfel ik:\n${vragen.join("\n")}` }]
         : x.chat;

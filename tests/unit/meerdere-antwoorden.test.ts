@@ -47,7 +47,7 @@ describe("meerdere antwoorden per check", () => {
   });
 
   it("M6. rood binnen een meerkeuze-check geeft rood, met alternatief", () => {
-    const u = evalueer(invoer({ checks: { autonomie: ["adviseren", "beslissen"] } }), regelset);
+    const u = evalueer(invoer({ checks: { autonomie: ["adviseren", "beslissen"] }, extraVragen: { advies_over_mensen: true } }), regelset);
     expect(u.kleur).toBe("rood");
     expect(u.alternatieven.join(" ")).toMatch(/recruiter/);
   });
@@ -62,7 +62,7 @@ describe("meerdere antwoorden per check", () => {
   });
 
   it("M8. meerdere antwoorden bij een check die er maar één toestaat wordt geweigerd", () => {
-    expect(() => evalueer(invoer({ checks: { impact: ["beperkt", "serieus"] as unknown as string } }), regelset)).toThrow(
+    expect(() => evalueer(invoer({ checks: { afhankelijkheid: ["experiment", "team"] } }), regelset)).toThrow(
       /heeft maar één antwoord/,
     );
   });
