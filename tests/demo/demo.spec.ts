@@ -21,7 +21,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page.getByText("Alles blijft in je eigen browser")).toBeVisible();
 
   await login(page, "Testmedewerker Anna");
-  await expect(page).toHaveURL(new RegExp(`${B}/wizard/$`));
+  await expect(page).toHaveURL(new RegExp(`${B}/wizard/(\\?concept=.*)?$`));
   await page.getByLabel("Jouw probleem of idee").fill("HR-gegevens van mijn afdeling wekelijks automatisch in AFAS verwerken.");
   await page.getByRole("button", { name: "Volgende →" }).click();
   if (await page.getByRole("heading", { name: /De coach heeft nog/ }).isVisible().catch(() => false)) {

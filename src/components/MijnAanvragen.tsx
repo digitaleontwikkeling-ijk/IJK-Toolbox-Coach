@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { adviesPad, volledigPad } from "@/lib/paden";
+import { adviesPad, volledigPad, wizardPad } from "@/lib/paden";
 import { api, datum, kleurVan, toolNaam, useContent, type AdviesDto } from "./client";
 
 export function MijnAanvragen() {
@@ -24,8 +24,8 @@ export function MijnAanvragen() {
 
   async function ietsVeranderd(id: string) {
     try {
-      await api(`/api/advies/${id}/opnieuw`, { method: "POST" });
-      window.location.href = volledigPad("/wizard");
+      const r = await api<{ concept: { id: string } }>(`/api/advies/${id}/opnieuw`, { method: "POST" });
+      window.location.href = volledigPad(wizardPad(r.concept.id));
     } catch {
       setFout("Het opnieuw starten is niet gelukt. Probeer het later opnieuw.");
     }

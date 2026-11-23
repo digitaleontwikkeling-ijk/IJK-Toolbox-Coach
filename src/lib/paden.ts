@@ -25,6 +25,10 @@ export function startPad(rollen: readonly string[]): string {
 export const afgerondPad = (referentie: string) =>
   `${IS_DEMO ? "/mijn-aanvragen/" : "/mijn-aanvragen"}?afgerond=${encodeURIComponent(referentie)}`;
 
+/** De wizard; met een concept-id ga je verder met dat idee (ook na herladen). */
+export const wizardPad = (conceptId?: string) =>
+  `${IS_DEMO ? "/wizard/" : "/wizard"}${conceptId ? `?concept=${encodeURIComponent(conceptId)}` : ""}`;
+
 /** Uitlegpagina, voor gewone <a>-links (inclusief basispad en, in de demo, slash). */
 export const hoeWerktHetHref = () => volledigPad(IS_DEMO ? "/hoe-werkt-het/" : "/hoe-werkt-het");
 

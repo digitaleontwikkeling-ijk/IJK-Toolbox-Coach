@@ -98,7 +98,7 @@ test("na het inloggen begint iedereen op de pagina die bij de rol hoort; eigen w
     ["Testbeheerder", "/beheer", "Beheer"],
   ] as const) {
     await login(page, naam, { nieuwIdee: false });
-    await expect(page).toHaveURL(new RegExp(`${pad}$`));
+    await expect(page).toHaveURL(new RegExp(`${pad}(\\?|$)`));
     const menu = page.getByRole("navigation", { name: "Hoofdmenu" }).getByRole("link");
     await expect(menu.first()).toHaveText(eerste);
     // Toetsers en beheerders kunnen ook zelf een idee indienen.

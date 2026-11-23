@@ -72,7 +72,7 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await login(page, "Testmedewerker Anna");
   await page.goto("/mijn-aanvragen");
   await page.getByRole("button", { name: /Er is iets veranderd/ }).first().click();
-  await page.waitForURL("**/wizard");
+  await page.waitForURL(/\/wizard\?concept=/);
   await expect(page.getByText("Je past een eerder advies aan")).toBeVisible();
   await expect(page.getByLabel("Jouw probleem of idee")).toHaveValue(/verzuimdashboard/);
 

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { startPad, volledigPad } from "@/lib/paden";
+import { startPad, volledigPad, wizardPad } from "@/lib/paden";
 import { api } from "./client";
 
 interface Props {
@@ -26,9 +26,9 @@ export function Kop({ appNaam, gebruiker }: Props) {
   return (
     <header className="kop">
       <div className="kop__binnen">
-        <Link href={gebruiker ? startPad(gebruiker.rollen) : "/login"} className="kop__naam">
+        <a href={volledigPad(gebruiker ? startPad(gebruiker.rollen) : "/login")} className="kop__naam">
           <span>{ijk}</span> {rest.join(" ")}
-        </Link>
+        </a>
         {gebruiker && (
           <nav aria-label="Hoofdmenu">
             {/* Eigen werk van toetsers en beheerders vooraan; de wizard is er ook voor hen. */}
@@ -38,7 +38,9 @@ export function Kop({ appNaam, gebruiker }: Props) {
             {gebruiker.rollen.includes("beheerder") && (
               <Link href="/beheer" aria-current={huidig("/beheer")}>Beheer</Link>
             )}
-            <Link href="/wizard" aria-current={huidig("/wizard")}>Nieuw idee</Link>
+            {/* Gewone link (geen client-navigatie): de wizard moet altijd opnieuw starten met een leeg idee,
+                ook als je er al in staat. */}
+            <a href={volledigPad(wizardPad())} aria-current={huidig("/wizard")}>Nieuw idee</a>
             <Link href="/mijn-aanvragen" aria-current={huidig("/mijn-aanvragen")}>Mijn aanvragen</Link>
           </nav>
         )}

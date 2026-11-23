@@ -208,3 +208,30 @@ describe("bewaartermijn", () => {
     expect((await ruimOp()).adviezen).toBe(1);
   });
 });
+
+describe("concepten: nieuw idee en hervatten", () => {
+  it("I23. een nieuw idee ruimt lege en afgeronde concepten op, maar laat onafgemaakte ideeën staan", async () => {
+    const onafgemaakt = await nieuwConcept(ANNA, { beschrijving: "Half idee" });
+    const leeg = (await roep(conceptRoute.POST as Handler, { method: "POST" })).json.concept.id;
+    const metAdvies = await nieuwConcept();
+    await roep(adviesRoute.POST as Handler, { body: { conceptId: metAdvies } });
+    const nieuw = (await roep(conceptRoute.POST as Handler, { method: "POST" })).json.concept.id;
+    const ids = (await db().query("SELECT id FROM concept")).rows.map((r) => r.id).sort();
+    expect(ids).toEqual([onafgemaakt, nieuw].sort());
+    expect(ids).not.toContain(leeg);
+    expect(ids).not.toContain(metAdvies);
+  });
+
+  it("I24. GET /api/concept geeft alleen het laatste onafgemaakte idee (met beschrijving, zonder advies)", async () => {
+    expect((await roep(conceptRoute.GET as Handler)).json.concept).toBeNull();
+    const id = await nieuwConcept(ANNA, { beschrijving: "Half idee" });
+    await roep(conceptRoute.POST as Handler, { method: "POST" }); // leeg nieuw idee
+    expect((await roep(conceptRoute.GET as Handler)).json.concept.id).toBe(id);
+  });
+
+  it("I25. één concept ophalen kan alleen voor je eigen concept", async () => {
+    const id = await nieuwConcept(ANNA, { beschrijving: "Van Anna" });
+    expect((await roep(conceptIdRoute.GET as Handler, { params: { id } })).json.concept.data.beschrijving).toBe("Van Anna");
+    expect((await roep(conceptIdRoute.GET as Handler, { gebruiker: BRAM, params: { id } })).status).toBe(404);
+  });
+});

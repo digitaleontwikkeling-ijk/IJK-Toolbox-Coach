@@ -12,7 +12,7 @@ import { Adviescard } from "../Adviescard";
 import { Chatvenster, CHAT_INVOER_ID } from "../Chatvenster";
 import { Stappenbalk } from "../Stappenbalk";
 import { api, ApiFoutClient, toolNaam, useContent, type AdviesDto } from "../client";
-import { afgerondPad, volledigPad } from "@/lib/paden";
+import { afgerondPad, volledigPad, wizardPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
 import { ontbrekendeVelden, Stap3 } from "./Stap3";
@@ -50,11 +50,24 @@ export function Wizard() {
   const eersteRender = useRef(true);
 
   // ---------- Laden ----------
+  // Met ?concept=<id> ga je verder met dat idee (ook na herladen). Zonder: altijd een nieuw idee,
+  // met de vraag of je verder wilt met een onafgemaakt idee als dat er is.
+  const [vorige, setVorige] = useState<ConceptDto | null>(null);
+
   useEffect(() => {
     (async () => {
       try {
-        let { concept } = await api<{ concept: ConceptDto | null }>("/api/concept");
-        if (!concept) concept = (await api<{ concept: ConceptDto }>("/api/concept", { method: "POST" })).concept;
+        const gevraagd = new URLSearchParams(window.location.search).get("concept");
+        let concept: ConceptDto | null = null;
+        if (gevraagd) {
+          concept = (await api<{ concept: ConceptDto }>(`/api/concept/${encodeURIComponent(gevraagd)}`).catch(() => null))?.concept ?? null;
+        }
+        if (!concept) {
+          const onafgemaakt = (await api<{ concept: ConceptDto | null }>("/api/concept")).concept;
+          concept = (await api<{ concept: ConceptDto }>("/api/concept", { method: "POST" })).concept;
+          if (onafgemaakt && onafgemaakt.id !== concept.id) setVorige(onafgemaakt);
+        }
+        window.history.replaceState(null, "", volledigPad(wizardPad(concept.id)));
         setConceptId(concept.id);
         dataRef.current = concept.data;
         setData(concept.data);
@@ -255,6 +268,8 @@ export function Wizard() {
     if (!afgerond && !window.confirm("Weet je zeker dat je opnieuw wilt beginnen? Je antwoorden en het gesprek worden gewist. Een gegeven advies blijft in het register.")) return;
     if (conceptId && !afgerond) await api(`/api/concept/${conceptId}`, { method: "DELETE" }).catch(() => undefined);
     const { concept } = await api<{ concept: ConceptDto }>("/api/concept", { method: "POST" });
+    window.history.replaceState(null, "", volledigPad(wizardPad(concept.id)));
+    setVorige(null);
     setConceptId(concept.id);
     dataRef.current = concept.data;
     setData(concept.data);
@@ -298,6 +313,17 @@ export function Wizard() {
   return (
     <>
       <Stappenbalk teksten={t} huidig={data.stap} bereikt={afgerond ? 4 : bereikt} onKies={afgerond ? () => undefined : gaNaar} />
+      {vorige && data.stap === 1 && !data.beschrijving.trim() && (
+        <div className="info" role="status">
+          <p style={{ margin: "0 0 0.5rem" }}>
+            {t.onafgemaakt.melding.replace(
+              "{beschrijving}",
+              vorige.data.beschrijving.length > 80 ? `${vorige.data.beschrijving.slice(0, 80)}…` : vorige.data.beschrijving,
+            )}
+          </p>
+          <a className="knop knop--secundair" href={volledigPad(wizardPad(vorige.id))}>{t.onafgemaakt.knop}</a>
+        </div>
+      )}
       {data.vorigAdviesId && data.stap < 4 && (
         <p className="info">Je past een eerder advies aan. Je vorige antwoorden zijn alvast ingevuld.</p>
       )}

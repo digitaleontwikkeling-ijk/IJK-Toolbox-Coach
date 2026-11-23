@@ -34,13 +34,31 @@ export async function haalConcept(id: string, pseudoniemId: string, q: Querier =
   return r.rows[0] ?? null;
 }
 
-/** Het meest recente concept van deze medewerker (om verder te gaan waar je was). */
-export async function laatsteConcept(pseudoniemId: string): Promise<ConceptRij | null> {
+/**
+ * Het meest recente ónafgemaakte idee: wel een beschrijving, nog geen advies.
+ * De wizard biedt aan om daarmee verder te gaan.
+ */
+export async function laatsteOnafgemaaktConcept(pseudoniemId: string): Promise<ConceptRij | null> {
   const r = await db().query(
-    `SELECT ${conceptVelden} FROM concept WHERE pseudoniem_id = $1 ORDER BY bijgewerkt_op DESC LIMIT 1`,
+    `SELECT ${conceptVelden} FROM concept
+     WHERE pseudoniem_id = $1 AND advies_id IS NULL AND btrim(coalesce(data->>'beschrijving', '')) <> ''
+     ORDER BY bijgewerkt_op DESC LIMIT 1`,
     [pseudoniemId],
   );
   return r.rows[0] ?? null;
+}
+
+/**
+ * Ruimt concepten op die niet meer nodig zijn als iemand een nieuw idee begint:
+ * lege concepten, en concepten waarvan het advies al in het register staat (het gesprek
+ * is dan niet meer nodig). Onafgemaakte ideeën met een beschrijving blijven staan.
+ */
+export async function ruimConceptenOp(pseudoniemId: string): Promise<void> {
+  await db().query(
+    `DELETE FROM concept WHERE pseudoniem_id = $1
+       AND (advies_id IS NOT NULL OR btrim(coalesce(data->>'beschrijving', '')) = '')`,
+    [pseudoniemId],
+  );
 }
 
 export async function bewaarConcept(id: string, pseudoniemId: string, data: WizardData): Promise<boolean> {

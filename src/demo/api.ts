@@ -146,16 +146,26 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
   // Concept (de wizard)
   if (deel[0] === "concept") {
     const g = vereis("medewerker");
+    const heeftBeschrijving = (x: { data: WizardData }) => x.data.beschrijving.trim() !== "";
     if (!deel[1] && methode === "GET") {
-      const c = s.concepten.filter((x) => x.pseudoniemId === g.pseudoniemId).sort((a, b) => b.bijgewerktOp.localeCompare(a.bijgewerktOp))[0];
+      // Laatste onafgemaakte idee: wel een beschrijving, nog geen advies.
+      const c = s.concepten
+        .filter((x) => x.pseudoniemId === g.pseudoniemId && !x.adviesId && heeftBeschrijving(x))
+        .sort((a, b) => b.bijgewerktOp.localeCompare(a.bijgewerktOp))[0];
       return r({ concept: c ? { id: c.id, adviesId: c.adviesId, data: c.data } : null });
     }
     if (!deel[1] && methode === "POST") {
+      // Nieuw idee: lege en afgeronde concepten opruimen.
+      s.concepten = s.concepten.filter((x) => x.pseudoniemId !== g.pseudoniemId || (!x.adviesId && heeftBeschrijving(x)));
       const c = { id: uuid(), pseudoniemId: g.pseudoniemId, data: legeWizard(), adviesId: null, bijgewerktOp: nu() };
       s.concepten.push(c);
       return r({ concept: { id: c.id, adviesId: null, data: c.data } });
     }
     const c = s.concepten.find((x) => x.id === deel[1] && x.pseudoniemId === g.pseudoniemId);
+    if (methode === "GET") {
+      if (!c) throw fout(404, "Niet gevonden.");
+      return r({ concept: { id: c.id, adviesId: c.adviesId, data: c.data } });
+    }
     if (methode === "DELETE") {
       s.concepten = s.concepten.filter((x) => x !== c);
       return r({ ok: true });

@@ -1,6 +1,14 @@
-import { bewaarConcept, verwijderConcept } from "@/db/adviezen";
-import { wizardDataSchema } from "@/domain/wizard";
+import { bewaarConcept, haalConcept, verwijderConcept } from "@/db/adviezen";
+import { legeWizard, wizardDataSchema } from "@/domain/wizard";
 import { body, nietGevonden, route, vereisUuid } from "@/lib/api";
+
+/** Eén eigen concept (de wizard onthoudt via ?concept= aan welk idee je werkt). */
+export const GET = route<{ id: string }>(["medewerker"], async ({ gebruiker, params }) => {
+  const c = await haalConcept(vereisUuid(params.id), gebruiker.pseudoniemId);
+  if (!c) throw nietGevonden();
+  const data = wizardDataSchema.safeParse(c.data);
+  return { concept: { id: c.id, adviesId: c.adviesId, data: data.success ? data.data : legeWizard() } };
+});
 
 /** Wizardgegevens opslaan (bij elke stap). */
 export const PUT = route<{ id: string }>(["medewerker"], async ({ req, gebruiker, params }) => {

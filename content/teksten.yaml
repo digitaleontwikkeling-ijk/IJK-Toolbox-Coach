@@ -62,6 +62,11 @@ aanvullende_vragen:
   vraag_label: "Vraag {nummer}"
   geen: Nee op alle vragen
 
+# Melding bij een nieuw idee als er nog een onafgemaakt idee is. {beschrijving} = begin van dat idee.
+onafgemaakt:
+  melding: "Je hebt nog een onafgemaakt idee: \"{beschrijving}\""
+  knop: Verder met dat idee
+
 # Knop en bevestiging om de wizard af te ronden als er niets meer te doen is.
 afronden:
   knop: Afronden

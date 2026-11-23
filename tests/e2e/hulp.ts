@@ -8,10 +8,8 @@ export async function login(page: Page, naam: string, opties: { nieuwIdee?: bool
   await page.goto("/login");
   await page.getByRole("button", { name: new RegExp(naam) }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/login"));
-  if (opties.nieuwIdee !== false) {
-    await page.request.post("/api/concept");
-    await page.goto("/wizard");
-  }
+  // /wizard begint altijd met een nieuw, leeg idee.
+  if (opties.nieuwIdee !== false) await page.goto("/wizard");
 }
 
 /**
