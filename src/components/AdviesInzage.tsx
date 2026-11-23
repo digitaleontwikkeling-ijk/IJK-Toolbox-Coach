@@ -1,5 +1,6 @@
 "use client";
 /** Eén advies bekijken als toetser (met besluitformulier) of als beheerder (alleen inzage). */
+import { Aanvrager } from "./Aanvrager";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Adviescard } from "./Adviescard";
@@ -33,6 +34,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
           <div style={{ display: "grid", gap: "1rem" }}>
             <div className="paneel paneel--vlak">
               <h2>Beschrijving van de medewerker</h2>
+              <p><Aanvrager advies={advies} /></p>
               <p style={{ whiteSpace: "pre-wrap" }}>{advies.beschrijving}</p>
               {advies.verduidelijking.length > 0 && (
                 <dl style={{ margin: 0 }}>
@@ -45,7 +47,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
                 </dl>
               )}
               <p className="hulptekst" style={{ margin: 0 }}>
-                Aanvrager (pseudoniem): {advies.pseudoniemId?.slice(0, 12)}… · Regelversie {advies.regelversie} · Toolsversie{" "}
+                Pseudoniem: {advies.pseudoniemId?.slice(0, 12)}… · Regelversie {advies.regelversie} · Toolsversie{" "}
                 {advies.toolsversie}
               </p>
             </div>

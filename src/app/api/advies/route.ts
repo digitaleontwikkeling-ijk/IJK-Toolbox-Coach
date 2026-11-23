@@ -14,6 +14,7 @@ export const POST = route(["medewerker"], async ({ req, gebruiker }) => {
     pseudoniemId: gebruiker.pseudoniemId,
     content: content(),
     bewaartermijnMaanden: config.bewaartermijnMaanden,
+    aanvrager: config.aanvragerOpslaan ? { naam: gebruiker.naam, email: gebruiker.upn ?? null } : null,
   });
   // Rood zonder alternatief: direct contact met Team Digitale Ontwikkeling (max. één keer per advies).
   const status = await meldContactIndienNodig(advies, {

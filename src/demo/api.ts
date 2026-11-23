@@ -31,6 +31,8 @@ interface DemoAdvies {
   id: string;
   referentie: string;
   pseudoniemId: string;
+  /** Wie de aanvraag indiende (alleen voor toetsers en beheerders). */
+  aanvrager?: { naam: string; email: string | null } | null;
   aangemaaktOp: string;
   bijgewerktOp: string;
   verlooptOp: string;
@@ -108,8 +110,9 @@ function vereis(...rollen: Rol[]) {
   return g;
 }
 
-function zonderPseudo<T extends { pseudoniemId: string }>(a: T): Omit<T, "pseudoniemId"> {
-  const { pseudoniemId: _, ...rest } = a;
+/** Voor de medewerker zelf: zonder pseudoniem en zonder opgeslagen naam/e-mail. */
+function zonderPseudo<T extends { pseudoniemId: string; aanvrager?: unknown }>(a: T): Omit<T, "pseudoniemId" | "aanvrager"> {
+  const { pseudoniemId: _, aanvrager: __, ...rest } = a;
   return rest;
 }
 
@@ -254,6 +257,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
     const verloopt = new Date();
     verloopt.setMonth(verloopt.getMonth() + 12);
     const velden = {
+      aanvrager: { naam: g.naam, email: g.upn ?? null },
       beschrijving: data.beschrijving.trim(),
       verduidelijking: data.verduidelijking.filter((v) => v.antwoord.trim()),
       tooladvies: data.tooladvies,

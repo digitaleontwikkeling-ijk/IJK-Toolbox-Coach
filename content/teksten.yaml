@@ -96,8 +96,8 @@ fase2_uitleg:
     toetsing: Je aanvraag gaat naar de juiste toetser(s). Zij beoordelen je idee en leggen een besluit vast.
     alleen_vastleggen: Op deze manier kan het niet. Je krijgt een alternatief, of Team Digitale Ontwikkeling neemt contact met je op.
   register: >-
-    Je advies krijgt een referentienummer en komt in het adviesregister. Bij Mijn aanvragen volg je de status en zie je het
-    besluit van de toetsers. Verandert er later iets aan je idee? Dan doorloop je de wizard opnieuw.
+    Je advies krijgt een referentienummer en komt in het adviesregister, met je naam en e-mailadres, zodat de toetsers
+    weten wie ze kunnen benaderen. Bij Mijn aanvragen volg je de status en zie je het besluit van de toetsers. Verandert er later iets aan je idee? Dan doorloop je de wizard opnieuw.
   knop: Begin met de checks
   opnieuw_lezen: Lees de uitleg over deze fase opnieuw
 

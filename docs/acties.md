@@ -68,5 +68,7 @@ Lokaal: `ACTIE_MODUS=mock` logt alleen. Of start `npm run mock:webhooks` (poort 
 ## Beheer en audit-log
 
 - Beheerders zien alle adviezen en de inhoud (`/beheer`). Wijzigen van de inhoud gaat via Git (`content/`).
+- Toetsers en beheerders zien bij elke aanvraag de naam en het e-mailadres van de aanvrager
+  (`AANVRAGER_OPSLAAN`, standaard aan). Die gaan niet mee in de webhooks (daar alleen de UPN met `ACTIE_STUUR_UPN=true`).
 - Elke inzage en elk besluit door een toetser of beheerder komt in `audit_log` (pseudoniem, rol, actie, advies, tijd).
   `npm run opruimen` verwijdert auditregels na de bewaartermijn.

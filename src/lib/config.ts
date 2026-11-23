@@ -107,6 +107,13 @@ export const config = {
       timeoutMs: getal("ACTIE_TIMEOUT_MS", 10_000),
     };
   },
+  /**
+   * Naam en e-mailadres van de aanvrager opslaan bij het advies, zodat toetsers en beheerders zien wie de
+   * aanvraag indiende (standaard aan). Gaat nooit naar de coach.
+   */
+  get aanvragerOpslaan() {
+    return process.env.AANVRAGER_OPSLAAN !== "false";
+  },
   /** Stuur de UPN van de aanvrager mee met acties (standaard uit: alleen pseudoniem). */
   get actieStuurUpn() {
     return process.env.ACTIE_STUUR_UPN === "true";

@@ -1,7 +1,7 @@
 /**
  * Fictieve testgebruikers voor de nep-login (proof of concept).
- * Het "oid" bootst het Entra-object-ID na. Namen worden alleen in de sessiecookie
- * getoond en nooit opgeslagen of naar de coach gestuurd.
+ * Het "oid" bootst het Entra-object-ID na. Naam en e-mail worden bij een advies opgeslagen
+ * (zichtbaar voor toetsers en beheerders), maar nooit naar de coach gestuurd.
  */
 import type { Rol } from "./rollen";
 

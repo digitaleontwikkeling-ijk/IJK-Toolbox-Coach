@@ -57,6 +57,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
     await login(page, naam);
     // Toetsers beginnen op hun eigen pagina.
     await expect(page).toHaveURL(new RegExp(`${B}/toetsing/$`));
+    await expect(page.locator(".aanvraag", { hasText: ref })).toContainText("Ingediend door: Testmedewerker");
     await page.getByRole("link", { name: ref }).click();
     await page.getByText(besluit, { exact: true }).click();
     if (toelichting) await page.getByLabel(/Welke voorwaarden gelden/).fill(toelichting);

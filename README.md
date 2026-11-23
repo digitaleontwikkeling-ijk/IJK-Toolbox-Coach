@@ -120,7 +120,10 @@ Hermes API-server (profiel toolbox-coach)     Webhooks naar flows van IJK
 
 ## Beveiliging en privacy (kort)
 
-- Geen namen of e-mailadressen in de database of naar de coach: alleen een pseudoniem (HMAC van het Entra-object-ID).
+- Naar de coach gaat nooit een naam of e-mailadres, alleen een pseudoniem (HMAC van het Entra-object-ID).
+- Bij een advies worden naam en e-mailadres van de aanvrager opgeslagen, zodat toetsers en beheerders zien wie de
+  aanvraag indiende (`AANVRAGER_OPSLAAN`, standaard aan). De medewerker ziet ze zelf niet terug in de API-antwoorden;
+  ze verdwijnen met het advies na de bewaartermijn.
 - Contactgegevens worden uit tekst gehaald voordat die naar de coach gaat.
 - Chatgeschiedenis staat alleen in het onafgemaakte concept en komt niet in het adviesregister.
 - Autorisatie per rol op elke API-route; audit-log van inzage en besluiten door toetsers en beheerders.

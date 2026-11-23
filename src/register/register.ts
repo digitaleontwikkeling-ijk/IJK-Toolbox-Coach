@@ -9,6 +9,7 @@ import {
   voegAdviesToe,
   volgendeReferentie,
   werkAdviesBij,
+  type Aanvrager,
   type AdviesRij,
   type NieuwAdvies,
 } from "../db/adviezen";
@@ -38,6 +39,8 @@ export async function registreerAdvies(opties: {
   pseudoniemId: string;
   content: Content;
   bewaartermijnMaanden: number;
+  /** Naam en e-mail van de aanvrager (voor toetsers en beheerders), of null als die niet worden opgeslagen. */
+  aanvrager?: Aanvrager | null;
   nu?: Date;
 }): Promise<AdviesRij> {
   const { conceptId, pseudoniemId, content } = opties;
@@ -62,6 +65,7 @@ export async function registreerAdvies(opties: {
 
     const nieuw: NieuwAdvies = {
       pseudoniemId,
+      aanvrager: opties.aanvrager ?? null,
       beschrijving: data.beschrijving.trim(),
       verduidelijking: data.verduidelijking.filter((v) => v.antwoord.trim()),
       tooladvies: data.tooladvies!,

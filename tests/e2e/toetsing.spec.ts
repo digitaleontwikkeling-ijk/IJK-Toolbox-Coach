@@ -42,9 +42,11 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await login(page, "Testtoetser Compliance", { nieuwIdee: false });
   await page.getByRole("link", { name: "Toetsing" }).click();
   await expect(page.getByRole("heading", { name: /Te beoordelen/ })).toBeVisible();
+  await expect(page.locator(".aanvraag", { hasText: referentie })).toContainText("Ingediend door: Testmedewerker Anna · anna@voorbeeld.invalid");
   await geenOvertredingen(page);
   await page.getByRole("link", { name: referentie }).click();
   await expect(page.getByRole("heading", { name: `Aanvraag ${referentie}` })).toBeVisible();
+  await expect(page.getByRole("link", { name: "anna@voorbeeld.invalid" })).toHaveAttribute("href", "mailto:anna@voorbeeld.invalid");
   await expect(page.getByText("Een verzuimdashboard bouwen")).toBeVisible();
   await expect(page.locator(".adviescard")).toContainText("Mogelijk is een DPIA nodig");
   await geenOvertredingen(page);
@@ -85,7 +87,10 @@ test("beheerder ziet alle adviezen en de inhoud, zonder besluitformulier", async
   await expect(page.getByRole("heading", { name: /Alle adviezen/ })).toBeVisible();
   await expect(page.getByText("Regelset versie")).toBeVisible();
   await geenOvertredingen(page);
+  await expect(page.locator(".aanvraag", { hasText: referentie })).toContainText("Ingediend door: Testmedewerker Anna");
   await page.getByRole("link", { name: referentie }).click();
+  await expect(page.getByRole("heading", { name: `Aanvraag ${referentie}` })).toBeVisible();
+  await expect(page.locator(".paneel").first()).toContainText("Ingediend door: Testmedewerker Anna");
   await expect(page.locator(".adviescard")).toContainText("Besluiten van de toetsers");
   await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
 });

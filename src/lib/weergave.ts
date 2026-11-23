@@ -1,5 +1,8 @@
-/** Haalt het pseudoniem weg voordat een advies naar de browser gaat: de interface heeft het niet nodig. */
-export function zonderPseudoniem<T extends { pseudoniemId: string }>(a: T): Omit<T, "pseudoniemId"> {
-  const { pseudoniemId: _, ...rest } = a;
+/**
+ * Voor de medewerker zelf: haalt het pseudoniem en de opgeslagen naam/e-mail weg voordat een advies naar de
+ * browser gaat. De interface heeft ze niet nodig.
+ */
+export function zonderPseudoniem<T extends { pseudoniemId: string; aanvrager?: unknown }>(a: T): Omit<T, "pseudoniemId" | "aanvrager"> {
+  const { pseudoniemId: _, aanvrager: __, ...rest } = a;
   return rest;
 }

@@ -84,10 +84,17 @@ export async function verwijderConceptenVanAdvies(adviesId: string): Promise<voi
 
 // ---------- Adviesregister ----------
 
+export interface Aanvrager {
+  naam: string;
+  email: string | null;
+}
+
 export interface AdviesRij {
   id: string;
   referentie: string;
   pseudoniemId: string;
+  /** Wie de aanvraag indiende. Alleen voor toetsers en beheerders; nooit naar de coach. Null = niet opgeslagen. */
+  aanvrager: Aanvrager | null;
   aangemaaktOp: Date;
   bijgewerktOp: Date;
   beschrijving: string;
@@ -110,7 +117,10 @@ export interface AdviesRij {
   verlooptOp: Date;
 }
 
-export const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId", aangemaakt_op AS "aangemaaktOp",
+export const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId",
+  CASE WHEN aanvrager_naam IS NULL THEN NULL
+       ELSE json_build_object('naam', aanvrager_naam, 'email', aanvrager_email) END AS aanvrager,
+  aangemaakt_op AS "aangemaaktOp",
   bijgewerkt_op AS "bijgewerktOp", beschrijving, verduidelijking, tooladvies, antwoorden,
   rode_vlaggen AS "rodeVlaggen", uitkomst, toetsers, dpia_signaal AS "dpiaSignaal", ai_act_signaal AS "aiActSignaal", motivatie,
   voorwaarden, alternatieven, regelversie, toolsversie, status, vorig_advies_id AS "vorigAdviesId",
@@ -134,7 +144,7 @@ function adviesParameters(a: NieuwAdvies) {
     a.pseudoniemId, a.beschrijving, JSON.stringify(a.verduidelijking), a.tooladvies, a.antwoorden,
     a.rodeVlaggen, a.uitkomst, a.toetsers, a.dpiaSignaal, a.motivatie, JSON.stringify(a.voorwaarden),
     JSON.stringify(a.alternatieven), a.regelversie, a.toolsversie, a.status, a.vorigAdviesId, a.verlooptOp,
-    a.aiActSignaal,
+    a.aiActSignaal, a.aanvrager?.naam ?? null, a.aanvrager?.email ?? null,
   ];
 }
 
@@ -142,8 +152,8 @@ export async function voegAdviesToe(q: Querier, referentie: string, a: NieuwAdvi
   const r = await q.query(
     `INSERT INTO advies (pseudoniem_id, beschrijving, verduidelijking, tooladvies, antwoorden, rode_vlaggen,
        uitkomst, toetsers, dpia_signaal, motivatie, voorwaarden, alternatieven, regelversie, toolsversie,
-       status, vorig_advies_id, verloopt_op, ai_act_signaal, referentie)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)
+       status, vorig_advies_id, verloopt_op, ai_act_signaal, aanvrager_naam, aanvrager_email, referentie)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21)
      RETURNING ${adviesVelden}`,
     [...adviesParameters(a), referentie],
   );
@@ -156,8 +166,8 @@ export async function werkAdviesBij(q: Querier, id: string, a: NieuwAdvies): Pro
     `UPDATE advies SET pseudoniem_id=$1, beschrijving=$2, verduidelijking=$3, tooladvies=$4, antwoorden=$5,
        rode_vlaggen=$6, uitkomst=$7, toetsers=$8, dpia_signaal=$9, motivatie=$10, voorwaarden=$11,
        alternatieven=$12, regelversie=$13, toolsversie=$14, status=$15, vorig_advies_id=$16, verloopt_op=$17,
-       ai_act_signaal=$18, bijgewerkt_op=now()
-     WHERE id=$19 RETURNING ${adviesVelden}`,
+       ai_act_signaal=$18, aanvrager_naam=$19, aanvrager_email=$20, bijgewerkt_op=now()
+     WHERE id=$21 RETURNING ${adviesVelden}`,
     [...adviesParameters(a), id],
   );
   return r.rows[0];

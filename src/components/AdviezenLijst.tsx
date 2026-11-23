@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { beheerAdviesPad, toetsingPad } from "@/lib/paden";
+import { Aanvrager } from "./Aanvrager";
 import { ToolIcoon } from "./ToolIcoon";
 import { api, datum, isTerInformatie, kleurVan, toetserNaam, toolWeergave, useContent, type AdviesDto, type ContentDto } from "./client";
 
@@ -66,6 +67,7 @@ function Lijst({ adviezen, content, modus }: { adviezen: AdviesDto[]; content: C
               <ToolIcoon content={content} tool={a.tooladvies.tool} /><strong>{toolWeergave(content, a.tooladvies)}</strong> ·{" "}
               {a.beschrijving.length > 160 ? `${a.beschrijving.slice(0, 160)}…` : a.beschrijving}
             </p>
+            <p className="aanvraag__aanvrager" style={{ margin: 0 }}><Aanvrager advies={a} /></p>
             {a.toetsers.length > 0 && (
               <p className="hulptekst" style={{ margin: 0 }}>
                 Toetsers: {a.toetsers.map((t) => {

@@ -23,7 +23,9 @@ export interface BesluitDto {
   datum: string;
 }
 
-export type AdviesDto = Omit<AdviesRij, "pseudoniemId" | "aangemaaktOp" | "bijgewerktOp" | "verlooptOp"> & {
+export type AdviesDto = Omit<AdviesRij, "pseudoniemId" | "aanvrager" | "aangemaaktOp" | "bijgewerktOp" | "verlooptOp"> & {
+  /** Alleen voor toetsers en beheerders: wie de aanvraag indiende (null = niet opgeslagen). */
+  aanvrager?: AdviesRij["aanvrager"];
   aangemaaktOp: string;
   bijgewerktOp: string;
   verlooptOp: string;

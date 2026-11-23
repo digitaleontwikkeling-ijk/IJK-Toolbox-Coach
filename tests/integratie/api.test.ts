@@ -116,7 +116,11 @@ describe("adviesregister", () => {
     expect(a.pseudoniemId).toBeUndefined();
     const rij = (await db().query("SELECT * FROM advies")).rows[0];
     expect(JSON.stringify(rij)).not.toContain("Dit gesprek");
-    expect(JSON.stringify(rij)).not.toContain("Anna");
+    // Naam en e-mail staan alleen in de eigen kolommen (voor toetsers en beheerders), niet in de API voor de medewerker.
+    expect(rij.aanvrager_naam).toBe("Anna");
+    expect(rij.aanvrager_email).toBe("anna@voorbeeld.invalid");
+    expect(a.aanvrager).toBeUndefined();
+    expect(JSON.stringify({ ...rij, aanvrager_naam: null, aanvrager_email: null })).not.toContain("Anna");
     expect(rij.pseudoniem_id).toMatch(/^[0-9a-f]{32}$/);
     // Bewaartermijn: standaard 12 maanden
     const maanden = (new Date(rij.verloopt_op).getTime() - Date.now()) / (30.4 * 24 * 3600 * 1000);

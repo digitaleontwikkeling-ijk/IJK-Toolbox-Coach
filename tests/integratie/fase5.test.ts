@@ -351,3 +351,37 @@ describe("regelset 0.7: tool buiten de IJK Toolbox", () => {
     expect(mock.ontvangen[0]!.body.tool).toEqual({ id: "claude_code", naam: "Claude Code", buitenToolbox: false });
   });
 });
+
+describe("aanvrager zichtbaar voor toetsers en beheerders", () => {
+  it("F24. toetser en beheerder zien naam en e-mail; de medewerker krijgt ze niet terug", async () => {
+    const a = await nieuwAdvies();
+    await actie(a.id);
+    const verwacht = { naam: "Anna", email: "anna@voorbeeld.invalid" };
+    const lijst = (await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE })).json.adviezen;
+    expect(lijst[0].aanvrager).toEqual(verwacht);
+    expect((await roep(toetsingIdRoute.GET as Handler, { gebruiker: COMPLIANCE, params: { id: a.id } })).json.advies.aanvrager).toEqual(verwacht);
+    expect((await roep(beheerRoute.GET as Handler, { gebruiker: BEHEERDER })).json.adviezen[0].aanvrager).toEqual(verwacht);
+    expect((await roep(beheerIdRoute.GET as Handler, { gebruiker: BEHEERDER, params: { id: a.id } })).json.advies.aanvrager).toEqual(verwacht);
+    expect((await roep(mijnRoute.GET as Handler, { gebruiker: ANNA })).json.adviezen[0].aanvrager).toBeUndefined();
+    expect((await roep(adviesIdRoute.GET as Handler, { gebruiker: ANNA, params: { id: a.id } })).json.advies.aanvrager).toBeUndefined();
+    // Niet in de webhook (alleen het pseudoniem, tenzij ACTIE_STUUR_UPN aan staat).
+    expect(JSON.stringify(mock.ontvangen)).not.toContain("Anna");
+  });
+
+  it("F25. AANVRAGER_OPSLAAN=false: geen naam of e-mail opgeslagen; toetser ziet 'onbekend'", async () => {
+    process.env.AANVRAGER_OPSLAAN = "false";
+    try {
+      const a = await nieuwAdvies();
+      const rij = (await db().query("SELECT aanvrager_naam, aanvrager_email FROM advies WHERE id = $1", [a.id])).rows[0];
+      expect(rij).toEqual({ aanvrager_naam: null, aanvrager_email: null });
+      expect((await roep(beheerIdRoute.GET as Handler, { gebruiker: BEHEERDER, params: { id: a.id } })).json.advies.aanvrager).toBeNull();
+    } finally {
+      delete process.env.AANVRAGER_OPSLAAN;
+    }
+  });
+
+  it("F26. medewerker zonder e-mail (UPN): alleen de naam", async () => {
+    const a = await nieuwAdvies(BRAM);
+    expect((await roep(beheerIdRoute.GET as Handler, { gebruiker: BEHEERDER, params: { id: a.id } })).json.advies.aanvrager).toEqual({ naam: "Bram", email: null });
+  });
+});

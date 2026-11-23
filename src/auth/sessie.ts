@@ -16,9 +16,9 @@ const GELDIGHEID_SECONDEN = 8 * 60 * 60;
 export interface Gebruiker {
   /** Pseudoniem gebruikers-ID: dit wordt opgeslagen en naar de coach gestuurd. */
   pseudoniemId: string;
-  /** Alleen voor weergave in de interface; wordt nergens opgeslagen. */
+  /** Voor weergave; opgeslagen bij een advies (voor toetsers en beheerders) als AANVRAGER_OPSLAAN aan staat. Nooit naar de coach. */
   naam: string;
-  /** Alleen meegestuurd met acties als ACTIE_STUUR_UPN=true; wordt nergens opgeslagen. */
+  /** E-mailadres (UPN). Opgeslagen bij een advies als AANVRAGER_OPSLAAN aan staat; met acties alleen als ACTIE_STUUR_UPN=true. */
   upn?: string;
   rollen: Rol[];
 }
