@@ -137,4 +137,5 @@ Hermes API-server (profiel toolbox-coach)     Webhooks naar flows van IJK
   - de uitzondering bij aanvullende vraag 1 (Copilot workflows) en welke checks meerdere antwoorden toestaan;
   - de route voor een tool buiten de IJK Toolbox (minstens "Eerst toetsen", altijd beide toetsers).
 - Eerste test met echte Hermes, echte Entra-tenant en echte Teams (zie de documenten hierboven).
-- Lettertypes Riona Sans en Ratio en het IJK-logo (op te vragen bij marketing).
+- Lettertypes Riona Sans en Ratio (op te vragen bij marketing). Het IJK-logo staat in `src/assets/ijk-logo.png`
+  (kop), `src/app/icon.png` (favicon) en `teams/` (Teams-iconen); een SVG-versie van marketing is nog scherper.

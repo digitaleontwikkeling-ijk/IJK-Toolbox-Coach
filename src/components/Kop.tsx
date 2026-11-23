@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { startPad, volledigPad, wizardPad } from "@/lib/paden";
 import { api } from "./client";
+import logo from "@/assets/ijk-logo.png";
 
 interface Props {
   appNaam: string;
@@ -27,7 +28,9 @@ export function Kop({ appNaam, gebruiker }: Props) {
     <header className="kop">
       <div className="kop__binnen">
         <a href={volledigPad(gebruiker ? startPad(gebruiker.rollen) : "/login")} className="kop__naam">
-          <span>{ijk}</span> {rest.join(" ")}
+          {/* eslint-disable-next-line @next/next/no-img-element -- statisch logo; werkt ook in de statische demo */}
+          <img src={logo.src} width={logo.width} height={logo.height} alt={ijk} className="kop__logo" />
+          <span className="kop__titel">{rest.join(" ")}</span>
         </a>
         {gebruiker && (
           <nav aria-label="Hoofdmenu">

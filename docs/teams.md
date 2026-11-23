@@ -65,8 +65,9 @@ manifest alleen één persoonlijk tabblad bevat. Valideer het pakket daarna in h
 Installeren: **Teams admin center** → *Manage apps* → *Upload new app*. Optioneel via een
 *app setup policy* vastpinnen voor de testgroep.
 
-Het icoon is een neutrale hexagon met "TC" in de huisstijlkleuren. Het officiële IJK-logo is op te vragen
-bij marketing; vervang dan `teams/color.png` (192×192) en `teams/outline.png` (32×32, wit, transparant).
+De iconen zijn het IJK-logo: `teams/color.png` (192×192, groen logo op wit) en `teams/outline.png`
+(32×32, wit op transparant, zoals Teams vraagt). Gemaakt uit een PNG van het logo; met een SVG van marketing
+worden ze scherper.
 
 ## 4. Insluiten
 

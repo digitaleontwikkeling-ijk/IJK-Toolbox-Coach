@@ -125,7 +125,7 @@ Zoals in de opdracht (fases 2–7), met na elke fase een samenvatting en wacht o
 
 Contrast (WCAG AA): op groen, geel en oranje staat tekst in Lucht (contrast > 6:1); op rood witte tekst (≈ 5:1). Witte tekst op Blad haalt AA niet (≈ 2,9:1) en gebruiken we dus niet.
 
-Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op te vragen bij marketing. Tot die er zijn: systeemlettertype als terugval. Logo alleen in Blad of wit. Iconen in hexagonvorm (Wolk-vlak, Lucht-lijn) passen we toe in fase 3.
+Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op te vragen bij marketing. Tot die er zijn: systeemlettertype als terugval. Logo alleen in Blad of wit; het aangeleverde logobestand gebruikt groen #05B496 en staat zo in de kop (`src/assets/ijk-logo.png`). Iconen in hexagonvorm (Wolk-vlak, Lucht-lijn) passen we toe in fase 3.
 
 ## 10. Besluiten na fase 2
 
