@@ -16,6 +16,7 @@ import { afgerondPad, volledigPad, wizardPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
 import { ontbrekendeVelden, Stap3 } from "./Stap3";
+import { Fase2Uitleg } from "./Fase2Uitleg";
 import type { Wijzig } from "./types";
 
 interface ConceptDto {
@@ -329,6 +330,8 @@ export function Wizard() {
   const stap = t.stappen.find((s) => s.nummer === data.stap)!;
   const bereikt = advies ? 4 : data.tooladvies?.geaccepteerd ? 3 : data.verduidelijkingGevraagd && data.beschrijving.trim() ? 2 : 1;
   const props = { content, data, wijzig, coachBezig };
+  // Vóór de checks: eerst uitleg over fase 2 (één keer per idee).
+  const toonFase2Uitleg = data.stap === 3 && !data.fase2UitlegGezien;
 
   return (
     <>
@@ -353,9 +356,23 @@ export function Wizard() {
             <>
               <h1 ref={kopRef} tabIndex={-1}>
                 <span className="sr-only">Stap {stap.nummer} van 4: </span>
-                {stap.titel}
+                {toonFase2Uitleg ? t.fase2_uitleg.titel : stap.titel}
               </h1>
-              <p className="instructie">{stap.instructie}</p>
+              {!toonFase2Uitleg && <p className="instructie">{stap.instructie}</p>}
+              {data.stap === 3 && !toonFase2Uitleg && (
+                <p>
+                  <button
+                    type="button"
+                    className="knop knop--tekst"
+                    onClick={() => {
+                      wijzig((d) => ({ ...d, fase2UitlegGezien: false }));
+                      setTimeout(() => kopRef.current?.focus(), 30);
+                    }}
+                  >
+                    {t.fase2_uitleg.opnieuw_lezen}
+                  </button>
+                </p>
+              )}
             </>
           )}
 
@@ -381,7 +398,10 @@ export function Wizard() {
               onAnderAdvies={() => vraagTooladvies([...data.uitgeslotenTools, data.tooladvies!.tool])}
             />
           )}
-          {data.stap === 3 && <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />}
+          {data.stap === 3 && toonFase2Uitleg && <Fase2Uitleg content={content} />}
+          {data.stap === 3 && !toonFase2Uitleg && (
+            <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />
+          )}
           {data.stap === 4 && advies && (
             <Adviescard
               ref={adviesKopRef}
@@ -414,7 +434,19 @@ export function Wizard() {
                 {data.tooladvies ? `${toolNaam(content, data.tooladvies.tool)} past, verder →` : "Volgende →"}
               </button>
             )}
-            {data.stap === 3 && (
+            {data.stap === 3 && toonFase2Uitleg && (
+              <button
+                type="button"
+                className="knop"
+                onClick={() => {
+                  wijzig((d) => ({ ...d, fase2UitlegGezien: true }));
+                  setTimeout(() => kopRef.current?.focus(), 30);
+                }}
+              >
+                {t.fase2_uitleg.knop} →
+              </button>
+            )}
+            {data.stap === 3 && !toonFase2Uitleg && (
               <button type="button" className="knop" onClick={bekijkAdvies} disabled={!!coachBezig}>
                 Bekijk het advies →
               </button>

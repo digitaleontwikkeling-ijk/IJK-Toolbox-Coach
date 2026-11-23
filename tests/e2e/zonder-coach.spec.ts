@@ -1,6 +1,6 @@
 /** De app moet volledig bruikbaar blijven zonder AI (COACH_MODUS=uit). */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, kiesImpact, login } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarChecks } from "./hulp";
 
 test("zonder coach: alles handmatig invullen geeft een advies", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
@@ -9,7 +9,7 @@ test("zonder coach: alles handmatig invullen geeft een advies", async ({ page })
 
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();
   await page.getByText("Microsoft 365 Copilot", { exact: true }).click();
-  await page.getByRole("button", { name: "Microsoft 365 Copilot past, verder →" }).click();
+  await naarChecks(page, "Microsoft 365 Copilot past, verder →");
 
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();
   await expect(page.getByText("Voorgesteld door de coach")).toHaveCount(0);

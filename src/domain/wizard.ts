@@ -49,6 +49,8 @@ export const wizardDataSchema = z.object({
   /** Sleutel: check-id, of check-id.deelvraag-id bij Impact. */
   coachVoorstellen: z.record(z.string().regex(/^[a-z0-9_]+(\.[a-z0-9_]+)?$/).max(130), checkVoorstelSchema).default({}),
   checksVoorgesteld: z.boolean().default(false),
+  /** Heeft de medewerker de uitleg vóór fase 2 gezien? (één keer per idee) */
+  fase2UitlegGezien: z.boolean().default(false),
   extraVragen: z.record(id, z.boolean()).default({}),
   rodeVlaggen: z.record(id, z.boolean()).default({}),
   chat: z.array(chatBerichtSchema).max(200).default([]),

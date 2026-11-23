@@ -306,7 +306,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
     if (deel[2] === "opnieuw") {
       const data = wizardDataSchema.parse({
         stap: 1, beschrijving: a.beschrijving, verduidelijking: a.verduidelijking, verduidelijkingGevraagd: true,
-        tooladvies: { ...a.tooladvies, geaccepteerd: false }, checks: a.antwoorden.checks, checksVoorgesteld: true,
+        tooladvies: { ...a.tooladvies, geaccepteerd: false }, checks: a.antwoorden.checks, checksVoorgesteld: true, fase2UitlegGezien: true,
         extraVragen: a.antwoorden.extraVragen, rodeVlaggen: a.rodeVlaggen, vorigAdviesId: a.id,
       });
       const c = { id: uuid(), pseudoniemId: g.pseudoniemId, data, adviesId: null, bijgewerktOp: nu() };

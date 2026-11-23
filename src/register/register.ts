@@ -117,6 +117,7 @@ export function wizardUitAdvies(advies: AdviesRij): WizardData {
     tooladvies: { ...advies.tooladvies, geaccepteerd: false },
     checks: advies.antwoorden.checks,
     checksVoorgesteld: true,
+    fase2UitlegGezien: true,
     extraVragen: advies.antwoorden.extraVragen,
     rodeVlaggen: advies.rodeVlaggen,
     vorigAdviesId: advies.id,

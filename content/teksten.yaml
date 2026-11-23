@@ -63,6 +63,44 @@ aanvullende_vragen:
   vraag_label: "Vraag {nummer}"
   geen: Nee op alle vragen
 
+# Uitleg vóór fase 2 (na het tooladvies, vóór de checks). TODO: valideren (concepttekst)
+fase2_uitleg:
+  titel: "Fase 2 · Mag ik dit doen?"
+  intro: >-
+    Je weet nu welke tool past. In deze fase kijken we of en hoe je ermee aan de slag kunt.
+    Niet de tool bepaalt wat mag, maar wat je ermee doet.
+  hoe_titel: Hoe werkt het?
+  hoe:
+    - De coach (een AI agent) vult de checks alvast in op basis van je beschrijving.
+    - Jij controleert de antwoorden en past ze aan waar nodig. Twijfelt de coach, dan stelt hij een vraag in de chat.
+    - Daarna berekent de tool je advies met de vaste spelregels van IJK. De AI agent bepaalt de uitkomst niet.
+  vragen_titel: Welke vragen krijg je, en waarom?
+  vragen_intro: "Zes checks, elk over een ander soort risico:"
+  # Per check-id: waarom we dit vragen.
+  waarom_per_check:
+    data: Hoe gevoeliger de gegevens, hoe groter de gevolgen als ze bij de verkeerde terechtkomen.
+    systemen: Hoe meer de oplossing in IJK-systemen leest of wijzigt, hoe belangrijker veilige koppelingen en de juiste rechten zijn.
+    gebruikers: Hoe breder een oplossing wordt gebruikt, hoe meer eisen we stellen aan beheer, beveiliging en continuïteit.
+    autonomie: Hoe zelfstandiger de oplossing werkt, hoe belangrijker menselijke controle is.
+    impact: Wat er gebeurt als het misgaat, als het niet werkt, als de uitkomst fout is of als informatie bij de verkeerde komt.
+    afhankelijkheid: Of de oplossing een experiment is of een vast onderdeel van het werk. Dat bepaalt wat je extra moet regelen.
+  aanvullend: >-
+    Daarna volgen een paar aanvullende vragen over hoe je de oplossing maakt en gebruikt. Daarmee vangen we situaties af
+    die altijd een risico geven, zoals inloggen met een persoonlijk account.
+  daarna_titel: Wat gebeurt er daarna?
+  daarna_intro: "Je krijgt een advies in één van vier kleuren:"
+  # Per vervolgactie: wat er na de wizard gebeurt.
+  per_vervolgactie:
+    accountaanvraag: Je vraagt direct een account aan voor de tool.
+    accountaanvraag_met_voorwaarden: Je vraagt een account aan. De voorwaarden gaan mee met je aanvraag.
+    toetsing: Je aanvraag gaat naar de juiste toetser(s). Zij beoordelen je idee en leggen een besluit vast.
+    alleen_vastleggen: Op deze manier kan het niet. Je krijgt een alternatief, of Team Digitale Ontwikkeling neemt contact met je op.
+  register: >-
+    Je advies krijgt een referentienummer en komt in het adviesregister. Bij Mijn aanvragen volg je de status en zie je het
+    besluit van de toetsers. Verandert er later iets aan je idee? Dan doorloop je de wizard opnieuw.
+  knop: Begin met de checks
+  opnieuw_lezen: Lees de uitleg over deze fase opnieuw
+
 # Melding bij een nieuw idee als er nog een onafgemaakt idee is. {beschrijving} = begin van dat idee.
 onafgemaakt:
   melding: "Je hebt nog een onafgemaakt idee: \"{beschrijving}\""

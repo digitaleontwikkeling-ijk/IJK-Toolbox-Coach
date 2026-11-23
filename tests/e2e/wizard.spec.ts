@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, vinkAan } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, vinkAan, naarChecks } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 
@@ -12,7 +12,7 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(page.getByRole("heading", { name: "Wat mag je zelf doen?" })).toBeVisible();
   await page.getByRole("button", { name: "Zelf een tool kiezen" }).click();
   await page.getByText("Claude Code", { exact: true }).click();
-  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+  await naarChecks(page, "Claude Code past, verder →");
 
   // Stap 3: de coach heeft voorgesteld; voorgestelde waarde is geselecteerd.
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
@@ -31,7 +31,7 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   // Terug en weer vooruit: niets kwijt.
   await page.getByRole("button", { name: "← Terug" }).click();
   await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();
-  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+  await naarChecks(page, "Claude Code past, verder →");
   await expect(page.getByLabel("Ja", { exact: true }).first()).toBeChecked();
 
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
@@ -77,7 +77,7 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await expect(page.getByLabel("Jouw probleem of idee")).toHaveValue(/verzuimdashboard/);
 
   await page.getByRole("button", { name: "Volgende →" }).click();
-  await page.getByRole("button", { name: "Claude Code past, verder →" }).click();
+  await naarChecks(page, "Claude Code past, verder →");
   // Vorige antwoorden staan er nog; de wijziging: alleen voor mezelf, met testdata.
   await expect(page.getByLabel("Afdeling", { exact: true })).toBeChecked();
   await kies(page, "data", "Openbaar");
@@ -111,7 +111,7 @@ test("een medewerker ziet alleen zijn eigen aanvragen", async ({ page }) => {
 test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", async ({ page }) => {
   await login(page, "Testmedewerker Bram");
   await naarStap3(page, "Ik wil klantgegevens in een gratis AI-tool plakken om mails te schrijven.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await kies(page, "niet_goedgekeurde_tool", "Ja");
   for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
   // Coach is onzeker over sommige checks: die moet de medewerker bevestigen of zijn al voorgesteld.
@@ -136,7 +136,7 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
 test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste kleur telt", async ({ page }) => {
   await login(page, "Testmedewerker Bram");
   await naarStap3(page, "Een overzicht van openstaande facturen voor mijn team.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await expect(page.locator("#veld-gebruikers")).toContainText("Je kunt meerdere antwoorden kiezen.");
   await expect(page.locator("#veld-impact")).not.toContainText("Je kunt meerdere antwoorden kiezen.");
   await kies(page, "data", "Intern");

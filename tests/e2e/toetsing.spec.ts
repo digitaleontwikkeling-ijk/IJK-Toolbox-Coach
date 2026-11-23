@@ -1,7 +1,7 @@
 /** Van aanvraag tot besluit: medewerker → beide toetsers → medewerker ziet de uitkomst. */
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3 } from "./hulp";
+import { geenRodeVlaggen, kies, login, naarStap3, naarChecks } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 let referentie = "";
@@ -19,7 +19,7 @@ async function geenOvertredingen(page: Page) {
 test("medewerker dient een aanvraag in voor toetsing", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "Een verzuimdashboard bouwen voor de afdeling met gegevens uit AFAS.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await kies(page, "bijzondere_persoonsgegevens", "Ja");
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();

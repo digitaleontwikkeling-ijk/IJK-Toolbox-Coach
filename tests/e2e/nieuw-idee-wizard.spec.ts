@@ -1,6 +1,6 @@
 /** "Nieuw idee" begint altijd leeg; een onafgemaakt idee kun je bewust hervatten. */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login } from "./hulp";
+import { geenRodeVlaggen, kies, login, naarChecks } from "./hulp";
 
 test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet terug", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
@@ -28,7 +28,7 @@ test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet te
   if (await page.getByRole("heading", { name: /De coach heeft nog/ }).isVisible().catch(() => false)) {
     await page.getByRole("button", { name: "Volgende →" }).click();
   }
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await kies(page, "data", "Openbaar");
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();

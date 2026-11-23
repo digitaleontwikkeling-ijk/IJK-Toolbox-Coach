@@ -297,3 +297,11 @@ fieldset.keuze legend + * { clear: both; }
 .keuze__info:hover, .keuze__info[aria-expanded="true"] { background: var(--lucht); border-color: var(--lucht); color: var(--wit); }
 .keuze__uitleg { margin-top: 0.6rem; padding: 0.6rem 0.8rem; background: var(--wolk); border-left: 4px solid var(--water); border-radius: var(--radius); font-size: 0.95rem; }
 .keuze__uitleg[hidden] { display: none; }
+
+/* ---------- Uitleg vóór fase 2 ---------- */
+.fase-uitleg h3 { margin-top: 1.25rem; }
+.fase-uitleg ol, .fase-uitleg ul { padding-left: 1.25rem; }
+.fase-uitleg li { margin-bottom: 0.4rem; }
+.fase-uitleg__waarom { display: block; color: var(--tekst-zacht); }
+.fase-uitleg__uitkomsten { list-style: none; padding-left: 0 !important; }
+.fase-uitleg__uitkomsten li { margin-bottom: 0.6rem; }

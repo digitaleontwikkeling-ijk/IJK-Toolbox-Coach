@@ -80,3 +80,15 @@ export async function naarStap3(page: Page, beschrijving: string) {
   }
   await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();
 }
+
+/**
+ * Van stap 2 naar de checks: klik op "<tool> past, verder" en daarna, als het uitlegscherm
+ * over fase 2 verschijnt (één keer per idee), op "Begin met de checks".
+ */
+export async function naarChecks(page: Page, knop: string | RegExp = /past, verder/) {
+  await page.getByRole("button", { name: knop }).click();
+  const begin = page.getByRole("button", { name: "Begin met de checks →" });
+  await expect(begin.or(page.getByRole("heading", { name: /Zes checks/ })).first()).toBeVisible();
+  if (await begin.isVisible()) await begin.click();
+  await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
+}

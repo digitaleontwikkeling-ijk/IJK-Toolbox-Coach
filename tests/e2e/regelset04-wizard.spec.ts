@@ -1,6 +1,6 @@
 /** Regelset 0.4: Impact (BIV), hulpteksten, AI Act-signaal, contact volgt en "ter informatie" voor toetsers. */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3 } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, naarChecks } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 let referentie = "";
@@ -8,7 +8,7 @@ let referentie = "";
 test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten en 'Wat moet je extra regelen?'", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
 
   const impact = page.locator("#veld-impact");
   for (const naam of ["Beschikbaarheid", "Integriteit", "Vertrouwelijkheid"]) {
@@ -28,7 +28,7 @@ test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten e
 test("AI Act-signaal: AI keurt zelfstandig facturen goed (scenario 11)", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "AI keurt facturen zelfstandig goed voor betaling.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await kies(page, "data", "Intern");
   await kies(page, "systemen", "Geen");
   await kies(page, "gebruikers", "Alleen ik");
@@ -47,7 +47,7 @@ test("AI Act-signaal: AI keurt zelfstandig facturen goed (scenario 11)", async (
 test("rood zonder alternatief: status 'Contact volgt' (scenario 9)", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
   await kies(page, "data", "Openbaar");
   await kiesImpact(page, { vertrouwelijkheid: "Groot" });
   await geenRodeVlaggen(page);
@@ -72,7 +72,7 @@ test("toetser ziet het rode advies ter informatie, zonder besluitformulier", asy
 test("'i'-knopje bij een keuze toont de toelichting, kiest het antwoord niet, en sluit met Escape", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
-  await page.getByRole("button", { name: /past, verder/ }).click();
+  await naarChecks(page);
 
   const data = page.locator("#veld-data");
   const info = data.getByRole("button", { name: "Uitleg bij Persoonsgegevens" });
