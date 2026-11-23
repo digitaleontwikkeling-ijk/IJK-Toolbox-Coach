@@ -110,16 +110,16 @@ test("een medewerker ziet alleen zijn eigen aanvragen", async ({ page }) => {
 
 test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", async ({ page }) => {
   await login(page, "Testmedewerker Bram");
-  await naarStap3(page, "Ik wil klantgegevens in een gratis AI-tool plakken om mails te schrijven.");
+  await naarStap3(page, "Ik wil een rooster-app met echte gegevens zonder toetsing op internet zetten (testscenario).");
   await naarChecks(page);
-  await kies(page, "niet_goedgekeurde_tool", "Ja");
-  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
+  await kies(page, "open_zonder_toetsing", "Ja");
+  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
   // Coach is onzeker over sommige checks: die moet de medewerker bevestigen of zijn al voorgesteld.
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");
   await expect(page.getByRole("heading", { name: "Niet op deze manier", level: 2 })).toBeVisible();
-  await expect(card).toContainText("Een tool die IJK niet heeft goedgekeurd.");
-  await expect(card).toContainText("Ja: een tool die IJK niet heeft goedgekeurd");
+  await expect(card).toContainText("een oplossing met echte gegevens die zonder toetsing openstaat");
+  await expect(card).toContainText("Eerst toetsen, dan pas delen.");
   await expect(card).not.toContainText("Rode vlag");
   await expect(card).toContainText("Zo kan het wel");
   await expect(card.getByRole("button", { name: /Account aanvragen|Aanvraag indienen/ })).toHaveCount(0);

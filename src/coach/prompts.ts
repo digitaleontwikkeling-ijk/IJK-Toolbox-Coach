@@ -4,6 +4,7 @@
  * hier niet hardcoded. De coach bepaalt NOOIT de kleur of de uitkomst.
  */
 import type { Content } from "../content/laad-content";
+import { ANDERE_TOOL } from "../domain/content-schema";
 
 export type CoachTaak = "verduidelijk" | "tooladvies" | "checks" | "uitleg" | "chat";
 
@@ -28,6 +29,9 @@ function toolsTekst(c: Content): string {
 }
 
 function spelregelsTekst(c: Content, tool?: string): string {
+  if (tool === ANDERE_TOOL) {
+    return "De medewerker koos een tool die (nog) niet in de IJK Toolbox zit. Daarvoor zijn geen spelregels; het idee gaat altijd ter toetsing naar beide toetsers.";
+  }
   const ids = tool && c.spelregels[tool] ? [tool] : Object.keys(c.spelregels);
   return ids
     .map((id) => {

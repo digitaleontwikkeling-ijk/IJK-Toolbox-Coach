@@ -56,7 +56,7 @@ describe("content en concept", () => {
   it("I5. content bevat de regelset met versie", async () => {
     const r = await roep(contentRoute.GET as Handler);
     expect(r.status).toBe(200);
-    expect(r.json.regelset.versie).toBe("0.6");
+    expect(r.json.regelset.versie).toBe("0.7");
     expect(r.json.gebruiker).toEqual({ naam: "Anna", rollen: ["medewerker"] });
   });
 
@@ -85,12 +85,24 @@ describe("adviesregister", () => {
     const id = await nieuwConcept(ANNA, { ...VOLLEDIG, rodeVlaggen: {} });
     const r = await roep(adviesRoute.POST as Handler, { body: { conceptId: id } });
     expect(r.status).toBe(400);
-    expect(r.json.details).toContain('rode vlag "niet_goedgekeurde_tool" is niet beantwoord');
+    expect(r.json.details).toContain('rode vlag "persoonlijke_inlog_of_secrets" is niet beantwoord');
   });
 
   it("I10. zonder gekozen tool: 400", async () => {
     const id = await nieuwConcept(ANNA, { ...VOLLEDIG, tooladvies: null });
     expect((await roep(adviesRoute.POST as Handler, { body: { conceptId: id } })).status).toBe(400);
+  });
+
+  it("I10b. andere tool (buiten de toolbox): naam verplicht, link alleen http(s)", async () => {
+    const andere = (andereTool: object) => ({ ...VOLLEDIG, tooladvies: { tool: "andere_tool", bron: "medewerker", geaccepteerd: true, andereTool } });
+    for (const t of [{ naam: "", link: "" }, { naam: "Notion", link: "javascript:alert(1)" }]) {
+      const id = await nieuwConcept(ANNA, andere(t));
+      expect((await roep(adviesRoute.POST as Handler, { body: { conceptId: id } })).status).toBe(400);
+    }
+    const id = await nieuwConcept(ANNA, andere({ naam: "Notion", link: "https://www.notion.so" }));
+    const r = await roep(adviesRoute.POST as Handler, { body: { conceptId: id } });
+    expect(r.status).toBe(200);
+    expect(r.json.advies.tooladvies.andereTool).toEqual({ naam: "Notion", link: "https://www.notion.so" });
   });
 
   it("I11. volledig advies wordt vastgelegd met referentie, uitkomst en regelversie, zonder chat of pseudoniem", async () => {
@@ -99,7 +111,7 @@ describe("adviesregister", () => {
     expect(r.status).toBe(200);
     const a = r.json.advies;
     expect(a.referentie).toBe(`TC-${new Date().getFullYear()}-0001`);
-    expect(a).toMatchObject({ uitkomst: "oranje", dpiaSignaal: true, regelversie: "0.6", status: "advies_gegeven" });
+    expect(a).toMatchObject({ uitkomst: "oranje", dpiaSignaal: true, regelversie: "0.7", status: "advies_gegeven" });
     expect(a.toetsers).toEqual(["toetser_compliance", "toetser_architect"]);
     expect(a.pseudoniemId).toBeUndefined();
     const rij = (await db().query("SELECT * FROM advies")).rows[0];
@@ -132,7 +144,7 @@ describe("adviesregister", () => {
   });
 
   it("I14. bij rood is er geen aanvraag mogelijk (409)", async () => {
-    const id = await nieuwConcept(ANNA, { ...VOLLEDIG, rodeVlaggen: { ...VOLLEDIG.rodeVlaggen, niet_goedgekeurde_tool: true } });
+    const id = await nieuwConcept(ANNA, { ...VOLLEDIG, rodeVlaggen: { ...VOLLEDIG.rodeVlaggen, open_zonder_toetsing: true } });
     const a = (await roep(adviesRoute.POST as Handler, { body: { conceptId: id } })).json.advies;
     expect(a.uitkomst).toBe("rood");
     expect((await roep(actieRoute.POST as Handler, { params: { id: a.id }, method: "POST" })).status).toBe(409);

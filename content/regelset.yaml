@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.6"
+versie: "0.7"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -271,30 +271,27 @@ extra_vragen:
 # Rode vlaggen: ja = altijd deze kleur. In de interface heten ze "Aanvullende vragen".
 rode_vlag_kleur: rood
 rode_vlaggen:
-  - id: niet_goedgekeurde_tool
-    nummer: 1
-    vraag: Gebruik je een tool die IJK niet heeft goedgekeurd, bijvoorbeeld een gratis AI-tool op een persoonlijk account?
-    kort: een tool die IJK niet heeft goedgekeurd
-    alternatief: Gebruik een goedgekeurde IJK-tool.
+  # Vraag "Gebruik je een tool die IJK niet heeft goedgekeurd?" is vervallen (regelset 0.7):
+  # een tool buiten de IJK Toolbox kies je nu in stap 2 en gaat altijd ter toetsing (zie tool_buiten_toolbox).
   - id: persoonlijke_inlog_of_secrets
-    nummer: 2
-    vraag: Koppel je met je eigen persoonlijke inlog met systemen buiten Microsoft 365, of staan er wachtwoorden of API-keys in de code?
+    nummer: 1
+    vraag: Log je met je eigen account in op een systeem buiten Microsoft 365 (bijvoorbeeld een HubBI-flow met jouw AFAS-inlog), of zet je wachtwoorden of API-keys in de code?
     # TODO: valideren door toetsers
     uitleg: Copilot workflows draaien standaard op je eigen account binnen Microsoft 365. Dat telt hier niet mee.
     kort: een persoonlijke inlog of wachtwoorden/API-keys in de code
     alternatief: Gebruik IJK-credentials.
   - id: ai_beslist_over_mensen
-    nummer: 3
+    nummer: 2
     vraag: Beslist AI zelfstandig over mensen, met grote gevolgen?
     kort: AI die zelfstandig over mensen beslist
     # Geen alternatief in de presentatie: dan neemt Team Digitale Ontwikkeling contact op.
   - id: open_zonder_toetsing
-    nummer: 4
+    nummer: 3
     vraag: Zet je een oplossing met echte gegevens zonder toetsing open voor klanten of op internet?
     kort: een oplossing met echte gegevens die zonder toetsing openstaat
     alternatief: Eerst toetsen, dan pas delen.
   - id: proces_zonder_eigenaar
-    nummer: 5
+    nummer: 4
     vraag: Gaat een proces binnen IJK draaien op een persoonlijke oplossing zonder eigenaar of beheer?
     kort: een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer
     alternatief: Wijs een eigenaar aan en regel het beheer.
@@ -330,6 +327,16 @@ ai_act:
   minimale_uitkomst: oranje
   # Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde.
   motivatie: AI Act-classificatie nodig (de AI adviseert over mensen, handelt of beslist)
+
+# Tool buiten de IJK Toolbox: de medewerker kiest in stap 2 een tool die (nog) niet in de toolbox zit.
+# De zes checks en de aanvullende vragen gelden gewoon (de uitkomst kan dus ook rood worden),
+# maar de uitkomst is minstens deze kleur en de aanvraag gaat altijd naar deze toetsers (keuze IJK).
+# TODO: valideren door toetsers
+tool_buiten_toolbox:
+  minimale_uitkomst: oranje
+  toetsers: [toetser_compliance, toetser_architect]
+  # Tekst in "Waarom deze kleur?" als de tool de kleur verhoogde.
+  motivatie: de tool zit nog niet in de IJK Toolbox
 
 # "Waarom deze kleur?": per kleur staat de tekst bij de kleur (veld motivatie).
 # {redenen} wordt vervangen door de doorslaggevende checks en rode vlaggen,

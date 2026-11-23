@@ -157,6 +157,20 @@ dpia:
   titel: Mogelijk is een DPIA nodig
   uitleg: Een DPIA (gegevensbeschermingseffectbeoordeling) brengt de privacyrisico's van een toepassing in kaart. Bij jouw antwoorden is die mogelijk verplicht. De AI governance & compliance officer kijkt met je mee.
 
+# Stap 2: een tool die (nog) niet in de IJK Toolbox zit. TODO: valideren door toetsers
+andere_tool:
+  optie: Een andere tool (nog niet in de IJK Toolbox)
+  naam_label: Naam van de tool
+  link_label: Link naar de tool (optioneel)
+  link_hulp: Bijvoorbeeld de website van de leverancier. De link begint met https://.
+  link_fout: Een link begint met https:// (of http://).
+  uitleg: >-
+    Deze tool zit nog niet in de IJK Toolbox, dus er zijn nog geen spelregels voor. Je doorloopt gewoon de checks.
+    Je idee gaat daarna altijd ter toetsing naar de AI governance & compliance officer en de architect Digitale
+    Ontwikkeling. Zij kijken of de tool veilig is, of hij past bij IJK en of er een tool in de toolbox is die
+    hetzelfde kan.
+  kenmerk: nog niet in de IJK Toolbox
+
 coach_niet_beschikbaar: De coach is nu niet beschikbaar. Je kunt gewoon verder door zelf te kiezen.
 
 # Uitlegpagina "Hoe werkt de coach?" (/hoe-werkt-het) en korte verwijzingen ernaar.

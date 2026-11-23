@@ -14,19 +14,11 @@ import {
 } from "../db/adviezen";
 import { transactie } from "../db/pool";
 import { ApiFout, nietGevonden } from "../lib/api";
-import { evalueer, extraVraagVanToepassing, OngeldigeInvoerFout, type BeslisInvoer } from "../domain/beslisregels";
+import { evalueer, OngeldigeInvoerFout } from "../domain/beslisregels";
 import { wizardDataSchema, type WizardData } from "../domain/wizard";
+import { beslisInvoerUit, toolGekozen } from "../domain/invoer";
 
-export function beslisInvoerUit(data: WizardData, content: Content): BeslisInvoer {
-  const invoer: BeslisInvoer = { checks: data.checks, rodeVlaggen: data.rodeVlaggen, extraVragen: {} };
-  // Alleen extra vragen die bij de gekozen antwoorden horen tellen mee.
-  for (const e of content.regelset.extra_vragen) {
-    if (extraVraagVanToepassing(e.id, invoer, content.regelset) && e.id in data.extraVragen) {
-      invoer.extraVragen![e.id] = data.extraVragen[e.id]!;
-    }
-  }
-  return invoer;
-}
+export { beslisInvoerUit, toolGekozen };
 
 export function plusMaanden(datum: Date, maanden: number): Date {
   const d = new Date(datum);
@@ -57,10 +49,7 @@ export async function registreerAdvies(opties: {
     const data = wizardDataSchema.parse(concept.data);
 
     if (!data.beschrijving.trim()) throw new ApiFout(400, "Beschrijf eerst wat je wilt bereiken (stap 1).");
-    const tool = data.tooladvies?.tool;
-    if (!tool || !content.tools.tools.some((t) => t.id === tool)) {
-      throw new ApiFout(400, "Kies eerst een tool (stap 2).");
-    }
+    if (!toolGekozen(data, content)) throw new ApiFout(400, "Kies eerst een tool (stap 2).");
 
     const invoer = beslisInvoerUit(data, content);
     let uitkomst;

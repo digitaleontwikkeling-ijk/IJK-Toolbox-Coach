@@ -13,6 +13,8 @@
  * 3. de Teams-melding mag mislukken zonder dat de aanvraag terugdraait (wel gelogd).
  */
 import type { Content } from "../content/laad-content";
+import { ANDERE_TOOL } from "../domain/content-schema";
+import { geldigeLink } from "../domain/wizard";
 import type { Gebruiker } from "../auth/sessie";
 import { haalEigenAdvies, verwijderConceptenVanAdvies, type AdviesRij } from "../db/adviezen";
 import { db } from "../db/pool";
@@ -52,7 +54,15 @@ export interface VervolgactieOpties {
 export function maakPayloads(advies: AdviesRij, o: Omit<VervolgactieOpties, "adviesId" | "client">): ActiePayload[] {
   const { content, gebruiker, appUrl, stuurUpn } = o;
   const kleur = content.regelset.kleuren.find((k) => k.id === advies.uitkomst)!;
-  const tool = { id: advies.tooladvies.tool, naam: content.tools.tools.find((t) => t.id === advies.tooladvies.tool)?.naam };
+  const andere = advies.tooladvies.tool === ANDERE_TOOL ? advies.tooladvies.andereTool : undefined;
+  const tool = andere
+    ? {
+        id: advies.tooladvies.tool,
+        naam: andere.naam.trim(),
+        buitenToolbox: true,
+        ...(andere.link.trim() && geldigeLink(andere.link) ? { link: andere.link.trim() } : {}),
+      }
+    : { id: advies.tooladvies.tool, naam: content.tools.tools.find((t) => t.id === advies.tooladvies.tool)?.naam, buitenToolbox: false };
   const basis = {
     referentie: advies.referentie,
     adviesId: advies.id,

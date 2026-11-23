@@ -97,12 +97,13 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.aiActSignaal).toBe(true);
   });
 
-  it("7. Klantgegevens in een gratis AI-tool plakken (rode vlag 1) → rood, met alternatief", () => {
-    const u = evalueer(invoer({ rodeVlaggen: { niet_goedgekeurde_tool: true } }), regelset);
-    expect(u.kleur).toBe("rood");
-    expect(u.motivatie).toBe("Een tool die IJK niet heeft goedgekeurd.");
-    expect(u.alternatieven).toEqual(["Gebruik een goedgekeurde IJK-tool."]);
-    expect(u.contactNodig).toBe(false);
+  it("7. Een tool buiten de IJK Toolbox (verder alles groen) → Eerst toetsen, door beide toetsers (regelset 0.7)", () => {
+    const u = evalueer({ ...invoer(), toolBuitenToolbox: true }, regelset);
+    expect(u.kleur).toBe("oranje");
+    expect(u.vervolgactie).toBe("toetsing");
+    expect(u.toetsers).toEqual(BEIDE);
+    expect(u.motivatie).toBe("De tool zit nog niet in de IJK Toolbox.");
+    expect(u.redenen).toEqual([{ soort: "signaal", signaal: "tool_buiten_toolbox", tekst: "de tool zit nog niet in de IJK Toolbox" }]);
   });
 
   it("8. Een HubBI-flow logt in met een persoonlijk account (rode vlag 2) → rood", () => {

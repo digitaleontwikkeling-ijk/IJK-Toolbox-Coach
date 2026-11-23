@@ -34,7 +34,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await page.getByRole("button", { name: "Begin met de checks →" }).click();
   await expect(page.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
   await kies(page, "bijzondere_persoonsgegevens", "Nee");
-  for (const v of ["niet_goedgekeurde_tool", "persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
+  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
   const ref = (await page.locator(".adviescard__voet strong").innerText()).trim();

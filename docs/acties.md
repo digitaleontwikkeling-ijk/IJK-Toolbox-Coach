@@ -24,13 +24,17 @@ Voorbeeld (accountaanvraag):
   "referentie": "TC-2026-0001",
   "adviesId": "…",
   "aanvrager": { "pseudoniemId": "3f2a…" },
-  "regelversie": "0.1",
-  "tool": { "id": "hubbi", "naam": "HubBI" },
+  "regelversie": "0.7",
+  "tool": { "id": "hubbi", "naam": "HubBI", "buitenToolbox": false },
   "uitkomst": { "kleur": "geel", "naam": "Aan de slag met voorwaarden" },
   "voorwaarden": ["Gebruik de goedgekeurde koppeling …"],
   "link": "https://<app>/advies/…"
 }
 ```
+
+Bij een tool buiten de IJK Toolbox is `tool` bijvoorbeeld
+`{ "id": "andere_tool", "naam": "<naam die de medewerker opgaf>", "buitenToolbox": true, "link": "https://…" }`
+(`link` alleen als die is ingevuld). Zo'n aanvraag is altijd minstens `toetsing` en gaat naar beide toetsers.
 
 `toetsing` bevat daarnaast `toetsers`, `motivatie` en `dpiaSignaal`; `teams_melding` bevat `ontvangers` en `tekst`;
 `contact` bevat `motivatie`, `toetsers`, `tekst` en een link naar het advies in het beheerscherm.

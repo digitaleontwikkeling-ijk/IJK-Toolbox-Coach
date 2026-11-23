@@ -9,6 +9,8 @@
  * - Bij een check met meerdere antwoorden telt het antwoord met de hoogste kleur.
  * - Bij een check met deelvragen (Impact: B, I, V) telt de hoogste deelscore.
  * - Bij een AI Act-signaal is de uitkomst minstens de ingestelde kleur (oranje).
+ * - Bij een tool buiten de IJK Toolbox is de uitkomst minstens de ingestelde kleur (oranje),
+ *   en gaat de aanvraag naar de ingestelde toetsers.
  */
 import type { Antwoord, Check, Conditie, Deelvraag, Kleur, Regelset, Vervolgactie } from "./content-schema";
 
@@ -27,6 +29,8 @@ export interface BeslisInvoer {
   extraVragen?: Record<string, boolean>;
   /** rode-vlag-id → ja/nee. Elke rode vlag moet beantwoord zijn. */
   rodeVlaggen: Record<string, boolean>;
+  /** Koos de medewerker een tool die (nog) niet in de IJK Toolbox zit? */
+  toolBuitenToolbox?: boolean;
 }
 
 export type Reden =
@@ -40,8 +44,8 @@ export type Reden =
       antwoordLabel: string;
     }
   | { soort: "rode_vlag"; vlagId: string; kort: string }
-  /** Een signaal (AI Act) dat de uitkomst naar een minimale kleur verhoogde. */
-  | { soort: "signaal"; signaal: "ai_act"; tekst: string };
+  /** Een signaal (AI Act, tool buiten de toolbox) dat de uitkomst naar een minimale kleur verhoogde. */
+  | { soort: "signaal"; signaal: "ai_act" | "tool_buiten_toolbox"; tekst: string };
 
 export interface BeslisUitkomst {
   regelversie: string;
@@ -188,23 +192,35 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     regelset.dpia.altijd_bij.some(geldt);
   const aiActSignaal = regelset.ai_act.minstens_een_van.some(geldt);
 
-  // 3. Hoogste kleur over checks en rode vlaggen. Een AI Act-signaal verhoogt de uitkomst
-  //    tot minstens de ingestelde kleur, zodat de compliance officer altijd meekijkt.
+  // 3. Hoogste kleur over checks en rode vlaggen. Een AI Act-signaal en een tool buiten de toolbox
+  //    verhogen de uitkomst tot minstens de ingestelde kleur, zodat de toetsers altijd meekijken.
   let hoogste = 0;
   for (const s of checkScores) hoogste = Math.max(hoogste, rangVan(s.kleur));
   if (vlaggenJa.length > 0) hoogste = Math.max(hoogste, rangVan(regelset.rode_vlag_kleur));
-  const minimum = aiActSignaal && regelset.ai_act.minimale_uitkomst ? rangVan(regelset.ai_act.minimale_uitkomst) : 0;
-  const verhoogdDoorAiAct = minimum > hoogste;
-  hoogste = Math.max(hoogste, minimum);
+  const buiten = invoer.toolBuitenToolbox === true;
+  const minima: { signaal: "ai_act" | "tool_buiten_toolbox"; rang: number; tekst: string }[] = [];
+  if (buiten) {
+    const tb = regelset.tool_buiten_toolbox;
+    minima.push({ signaal: "tool_buiten_toolbox", rang: rangVan(tb.minimale_uitkomst), tekst: tb.motivatie });
+  }
+  if (aiActSignaal && regelset.ai_act.minimale_uitkomst) {
+    minima.push({
+      signaal: "ai_act",
+      rang: rangVan(regelset.ai_act.minimale_uitkomst),
+      tekst: regelset.ai_act.motivatie ?? "AI Act-classificatie nodig",
+    });
+  }
+  const verhogers = minima.filter((m) => m.rang > hoogste);
+  for (const m of minima) hoogste = Math.max(hoogste, m.rang);
   const kleur: Kleur = regelset.kleuren[hoogste]!;
 
-  // 4. Wat gaf de doorslag? Alle checks en vlaggen met de hoogste kleur (en eventueel het signaal).
+  // 4. Wat gaf de doorslag? Alle checks en vlaggen met de hoogste kleur (en eventueel de signalen).
   const doorslagChecks = checkScores.filter((s) => s.kleur === kleur.id);
   const doorslagVlaggen = regelset.rode_vlag_kleur === kleur.id ? vlaggenJa : [];
   const redenen: Reden[] = [
-    ...(verhoogdDoorAiAct
-      ? [{ soort: "signaal", signaal: "ai_act", tekst: regelset.ai_act.motivatie ?? "AI Act-classificatie nodig" } as Reden]
-      : []),
+    ...verhogers
+      .filter((m) => m.rang === hoogste)
+      .map((m): Reden => ({ soort: "signaal", signaal: m.signaal, tekst: m.tekst })),
     ...doorslagVlaggen.map((v): Reden => ({ soort: "rode_vlag", vlagId: v.id, kort: v.kort })),
     ...doorslagChecks.flatMap((s) =>
       s.bepalend.map(
@@ -228,6 +244,7 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     const nodig = new Set(doorslagChecks.map((s) => s.check.toetser));
     if (dpiaSignaal) nodig.add(regelset.dpia.toetser);
     if (aiActSignaal) nodig.add(regelset.ai_act.toetser);
+    if (buiten) for (const t of regelset.tool_buiten_toolbox.toetsers) nodig.add(t);
     toetsers = regelset.toetsers.map((t) => t.id).filter((t) => nodig.has(t));
   }
 

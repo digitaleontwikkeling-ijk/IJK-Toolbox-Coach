@@ -15,9 +15,26 @@ export const chatBerichtSchema = z.object({
 });
 export type ChatBericht = z.infer<typeof chatBerichtSchema>;
 
+/** Een tool die (nog) niet in de IJK Toolbox zit (tool = ANDERE_TOOL). */
+/** Tijdens het typen mag het concept nog onvolledig zijn; `toolGekozen` controleert bij het advies. */
+export const andereToolSchema = z.object({
+  naam: z.string().max(100).default(""),
+  /** Optioneel. Alleen een http(s)-link telt (zie `geldigeLink`), zodat een link nooit iets anders kan uitvoeren. */
+  link: z.string().max(500).default(""),
+});
+
+/** Een geldige http(s)-link, of leeg. */
+export function geldigeLink(link: string | undefined): boolean {
+  const l = (link ?? "").trim();
+  return l === "" || /^https?:\/\/[^\s<>"]+$/i.test(l);
+}
+export type AndereTool = z.infer<typeof andereToolSchema>;
+
 export const tooladviesSchema = z.object({
   behoefte: id.optional(),
   tool: id,
+  /** Alleen bij tool = ANDERE_TOOL. */
+  andereTool: andereToolSchema.optional(),
   motivatie: z.string().max(1000).default(""),
   /** Kwam het advies van de coach, of koos de medewerker zelf? */
   bron: z.enum(["coach", "medewerker"]),

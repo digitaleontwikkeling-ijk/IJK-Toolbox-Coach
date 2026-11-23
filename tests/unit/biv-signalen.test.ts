@@ -163,8 +163,8 @@ describe("rood: toetsers en contact", () => {
   });
 
   it("R4. is er naast een oorzaak zonder alternatief ook een met alternatief, dan geen contact", () => {
-    const u = evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true, niet_goedgekeurde_tool: true } }), regelset);
-    expect(u.alternatieven).toEqual(["Gebruik een goedgekeurde IJK-tool."]);
+    const u = evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true, open_zonder_toetsing: true } }), regelset);
+    expect(u.alternatieven).toEqual(["Eerst toetsen, dan pas delen."]);
     expect(u.contactNodig).toBe(false);
   });
 

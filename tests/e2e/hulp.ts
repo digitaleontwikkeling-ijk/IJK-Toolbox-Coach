@@ -56,7 +56,6 @@ export async function kiesImpact(page: Page, niveaus: Partial<Record<"beschikbaa
 }
 
 export const RODE_VLAGGEN = [
-  "niet_goedgekeurde_tool",
   "persoonlijke_inlog_of_secrets",
   "ai_beslist_over_mensen",
   "open_zonder_toetsing",

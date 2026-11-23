@@ -8,7 +8,9 @@ import { forwardRef } from "react";
 import { alsLijst } from "./Keuze";
 import { HoeWerktHetLink } from "./HoeWerktHet";
 import { hoeWerktHetHref } from "@/lib/paden";
-import { datum, kleurVan, toetserNaam, toolNaam, type AdviesDto, type ContentDto } from "./client";
+import { ANDERE_TOOL } from "@/domain/content-schema";
+import { geldigeLink } from "@/domain/wizard";
+import { datum, kleurVan, toetserNaam, toolWeergave, type AdviesDto, type ContentDto } from "./client";
 
 interface Props {
   advies: AdviesDto;
@@ -31,7 +33,9 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const kleur = kleurVan(content, advies.uitkomst)!;
   const t = content.teksten;
   const r = content.regelset;
-  const tool = toolNaam(content, advies.tooladvies.tool);
+  const tool = toolWeergave(content, advies.tooladvies);
+  const andere = advies.tooladvies.tool === ANDERE_TOOL ? advies.tooladvies.andereTool : undefined;
+  const link = andere?.link?.trim() && geldigeLink(andere.link) ? andere.link.trim() : null;
   const actie = t.vervolgacties[kleur.vervolgactie];
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
   const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id]);
@@ -56,6 +60,11 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         <section>
           <h3>Tooladvies</h3>
           <p><strong>{tool}</strong>{advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
+          {link && (
+            <p className="hulptekst" style={{ margin: 0, overflowWrap: "anywhere" }}>
+              Link: <a href={link} rel="noopener noreferrer nofollow" target="_blank">{link}</a>
+            </p>
+          )}
         </section>
 
         <section>

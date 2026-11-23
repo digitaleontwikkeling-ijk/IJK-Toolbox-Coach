@@ -3,6 +3,17 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.7 (concept)
+
+- Nieuw: in stap 2 kan de medewerker kiezen voor "Een andere tool (nog niet in de IJK Toolbox)", met de naam en
+  eventueel een link. De zes checks en de aanvullende vragen gelden gewoon (rood blijft mogelijk), maar de uitkomst
+  is minstens "Eerst toetsen" en de aanvraag gaat altijd naar beide toetsers (`tool_buiten_toolbox`, keuze IJK).
+  TODO: valideren door toetsers.
+- Aanvullende vraag "Gebruik je een tool die IJK niet heeft goedgekeurd?" vervallen: die route loopt nu via stap 2.
+  De overige aanvullende vragen zijn hernummerd (1 t/m 4).
+- Aanvullende vraag over persoonlijke inlog concreter: "Log je met je eigen account in op een systeem buiten
+  Microsoft 365 (bijvoorbeeld een HubBI-flow met jouw AFAS-inlog), of zet je wachtwoorden of API-keys in de code?"
+
 ## regelset 0.6 (concept)
 
 - Toelichting per keuzemogelijkheid bij de checks (achter een "i"-knopje). Conceptteksten, deels uit de opdracht

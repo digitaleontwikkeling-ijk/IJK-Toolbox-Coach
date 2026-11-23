@@ -7,11 +7,12 @@
  * - De uitkomst wordt altijd door de server berekend met de vaste beslisregels.
  */
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { WizardData } from "@/domain/wizard";
+import { geldigeLink, type WizardData } from "@/domain/wizard";
 import { Adviescard } from "../Adviescard";
 import { Chatvenster, CHAT_INVOER_ID } from "../Chatvenster";
 import { Stappenbalk } from "../Stappenbalk";
-import { api, ApiFoutClient, toolNaam, useContent, type AdviesDto } from "../client";
+import { api, ApiFoutClient, gekozenToolNaam, useContent, type AdviesDto } from "../client";
+import { ANDERE_TOOL } from "@/domain/content-schema";
 import { afgerondPad, volledigPad, wizardPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
@@ -229,10 +230,24 @@ export function Wizard() {
   }
 
   async function volgendeVanuit2() {
-    if (!dataRef.current!.tooladvies) {
+    const t = dataRef.current!.tooladvies;
+    if (!t) {
       setFout("Kies eerst een tool.");
       return;
     }
+    if (t.tool === ANDERE_TOOL) {
+      if (!t.andereTool?.naam.trim()) {
+        setFout(`Vul de ${content!.teksten.andere_tool.naam_label.toLowerCase()} in.`);
+        document.getElementById("andere-tool-naam")?.focus();
+        return;
+      }
+      if (!geldigeLink(t.andereTool.link)) {
+        setFout(content!.teksten.andere_tool.link_fout);
+        document.getElementById("andere-tool-link")?.focus();
+        return;
+      }
+    }
+    setFout(null);
     wijzig((d) => ({ ...d, tooladvies: { ...d.tooladvies!, geaccepteerd: true } }));
     gaNaar(3);
     if (!dataRef.current!.checksVoorgesteld) await vulChecksVoor();
@@ -431,7 +446,9 @@ export function Wizard() {
             )}
             {data.stap === 2 && (
               <button type="button" className="knop" onClick={volgendeVanuit2} disabled={!!coachBezig || !data.tooladvies}>
-                {data.tooladvies ? `${toolNaam(content, data.tooladvies.tool)} past, verder →` : "Volgende →"}
+                {data.tooladvies && gekozenToolNaam(content, data.tooladvies) && (data.tooladvies.tool !== ANDERE_TOOL || data.tooladvies.andereTool?.naam.trim())
+                  ? `${gekozenToolNaam(content, data.tooladvies)} past, verder →`
+                  : "Volgende →"}
               </button>
             )}
             {data.stap === 3 && toonFase2Uitleg && (

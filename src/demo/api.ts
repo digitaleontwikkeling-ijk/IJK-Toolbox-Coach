@@ -13,9 +13,10 @@ import { CoachService } from "../coach/service";
 import type { Content } from "../content/laad-content";
 import { TESTGEBRUIKERS } from "../auth/testgebruikers";
 import { TOETSER_ROLLEN, type Rol } from "../auth/rollen";
-import { evalueer, extraVraagVanToepassing, OngeldigeInvoerFout, type BeslisInvoer, type CheckAntwoord } from "../domain/beslisregels";
+import { evalueer, OngeldigeInvoerFout, type CheckAntwoord } from "../domain/beslisregels";
 import { besluitInvoerSchema, eindstatus, type Besluit } from "../domain/besluiten";
 import type { Status } from "../domain/content-schema";
+import { beslisInvoerUit, toolGekozen } from "../domain/invoer";
 import { legeWizard, wizardDataSchema, type WizardData } from "../domain/wizard";
 import { ApiFoutClient } from "../components/client";
 import contentJson from "./content.generated.json";
@@ -241,11 +242,8 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
     if (!c) throw fout(404, "Niet gevonden.");
     const data = c.data;
     if (!data.beschrijving.trim()) throw fout(400, "Beschrijf eerst wat je wilt bereiken (stap 1).");
-    if (!data.tooladvies) throw fout(400, "Kies eerst een tool (stap 2).");
-    const invoer: BeslisInvoer = { checks: data.checks, rodeVlaggen: data.rodeVlaggen, extraVragen: {} };
-    for (const e of content.regelset.extra_vragen) {
-      if (extraVraagVanToepassing(e.id, invoer, content.regelset) && e.id in data.extraVragen) invoer.extraVragen![e.id] = data.extraVragen[e.id]!;
-    }
+    if (!data.tooladvies || !toolGekozen(data, content)) throw fout(400, "Kies eerst een tool (stap 2).");
+    const invoer = beslisInvoerUit(data, content);
     let u;
     try {
       u = evalueer(invoer, content.regelset);

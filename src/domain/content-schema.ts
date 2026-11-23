@@ -117,6 +117,12 @@ export const regelsetSchema = z
       /** Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde. */
       motivatie: tekst.optional(),
     }),
+    /** Een tool buiten de IJK Toolbox: minstens deze kleur en altijd deze toetsers. */
+    tool_buiten_toolbox: z.object({
+      minimale_uitkomst: id,
+      toetsers: z.array(id).min(1),
+      motivatie: tekst,
+    }),
     motivatie_rode_vlag: tekst,
   })
   .superRefine((r, ctx) => {
@@ -182,6 +188,12 @@ export const regelsetSchema = z
     }
     for (const c of [...r.dpia.vereist, ...r.dpia.minstens_een_van, ...r.dpia.altijd_bij]) controleer("dpia", c);
     for (const c of r.ai_act.minstens_een_van) controleer("ai_act", c);
+    if (!kleurIds.has(r.tool_buiten_toolbox.minimale_uitkomst)) {
+      fout(`tool_buiten_toolbox: onbekende kleur "${r.tool_buiten_toolbox.minimale_uitkomst}"`);
+    }
+    for (const t of r.tool_buiten_toolbox.toetsers) {
+      if (!toetserIds.has(t)) fout(`tool_buiten_toolbox: onbekende toetser "${t}"`);
+    }
   });
 
 function dubbel(ids: string[], wat: string, fout: (m: string) => void) {
@@ -208,6 +220,9 @@ export const spelregelsSchema = z.object({
 });
 export type Spelregels = z.infer<typeof spelregelsSchema>;
 
+/** Gereserveerd tool-id voor "Een andere tool (nog niet in de IJK Toolbox)". */
+export const ANDERE_TOOL = "andere_tool";
+
 export const toolsSchema = z
   .object({
     versie: tekst,
@@ -221,6 +236,7 @@ export const toolsSchema = z
     const toolIds = new Set(t.tools.map((x) => x.id));
     const fout = (message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message });
     dubbel(t.tools.map((x) => x.id), "tool", fout);
+    if (toolIds.has(ANDERE_TOOL)) fout(`tool-id "${ANDERE_TOOL}" is gereserveerd voor een tool buiten de toolbox`);
     dubbel(t.behoeften.map((x) => x.id), "behoefte", fout);
     for (const b of t.behoeften) {
       for (const tool of b.tools) if (!toolIds.has(tool)) fout(`behoefte ${b.id}: onbekende tool "${tool}"`);
@@ -302,6 +318,15 @@ export const tekstenSchema = z.object({
   contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
   dpia: z.object({ titel: tekst, uitleg: tekst }),
+  andere_tool: z.object({
+    optie: tekst,
+    naam_label: tekst,
+    link_label: tekst,
+    link_hulp: tekst,
+    link_fout: tekst,
+    uitleg: tekst,
+    kenmerk: tekst,
+  }),
   coach_niet_beschikbaar: tekst,
 });
 export type Teksten = z.infer<typeof tekstenSchema>;

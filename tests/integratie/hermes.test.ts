@@ -89,7 +89,7 @@ describe("terugval: ongeldig of geen antwoord → null (handmatig invullen)", ()
   });
 
   it("H8. een uitleg die een andere uitkomst noemt dan berekend wordt geweigerd", async () => {
-    const uitkomst = evalueer(invoer({ rodeVlaggen: { niet_goedgekeurde_tool: true } }), regelset);
+    const uitkomst = evalueer(invoer({ rodeVlaggen: { open_zonder_toetsing: true } }), regelset);
     expect(await coach.uitleg({ beschrijving: "x #andere-uitkomst", tool: "hubbi", uitkomst, antwoorden: {} }, ctx)).toBeNull();
   });
 

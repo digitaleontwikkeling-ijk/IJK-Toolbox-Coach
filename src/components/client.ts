@@ -1,7 +1,7 @@
 "use client";
 /** Hulpfuncties voor de browser: API-aanroepen en de content. */
 import { useEffect, useState } from "react";
-import type { Regelset, Spelregels, Teksten, ToolsConfig } from "@/domain/content-schema";
+import { ANDERE_TOOL, type Regelset, type Spelregels, type Teksten, type ToolsConfig } from "@/domain/content-schema";
 import type { AdviesRij } from "@/db/adviezen";
 import { volledigPad } from "@/lib/paden";
 
@@ -78,6 +78,19 @@ export function useContent(): ContentDto | null {
 
 export function toolNaam(c: ContentDto, id: string | undefined): string {
   return c.tools.tools.find((t) => t.id === id)?.naam ?? id ?? "";
+}
+
+/** Naam van de gekozen tool; bij een tool buiten de toolbox de naam die de medewerker opgaf. */
+export function gekozenToolNaam(c: ContentDto, t: { tool: string; andereTool?: { naam: string } } | null | undefined): string {
+  if (!t) return "";
+  if (t.tool === ANDERE_TOOL) return t.andereTool?.naam.trim() || c.teksten.andere_tool.optie;
+  return toolNaam(c, t.tool);
+}
+
+/** Naam met kenmerk, bijvoorbeeld "Notion (nog niet in de IJK Toolbox)". */
+export function toolWeergave(c: ContentDto, t: { tool: string; andereTool?: { naam: string } }): string {
+  const naam = gekozenToolNaam(c, t);
+  return t.tool === ANDERE_TOOL ? `${naam} (${c.teksten.andere_tool.kenmerk})` : naam;
 }
 
 export function kleurVan(c: ContentDto, id: string) {

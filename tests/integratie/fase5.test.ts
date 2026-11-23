@@ -185,7 +185,7 @@ describe("toetsing", () => {
       rodeVlaggen: VOLLEDIG.rodeVlaggen,
       uitkomst: "oranje",
       dpiaSignaal: true,
-      regelversie: "0.6",
+      regelversie: "0.7",
       besluiten: [],
     });
     await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE });
@@ -266,8 +266,8 @@ describe("beheer", () => {
 describe("regelset 0.4: contact volgt, ter informatie en AI Act", () => {
   // Rood zonder alternatief: Vertrouwelijkheid = Groot (scenario 9).
   const ROOD_ZONDER_ALT = { ...GROEN, checks: { ...GROEN.checks, impact: { ...GROEN.checks.impact, vertrouwelijkheid: "groot" } } };
-  // Rood met alternatief: rode vlag 1.
-  const ROOD_MET_ALT = { ...GROEN, rodeVlaggen: { ...GROEN.rodeVlaggen, niet_goedgekeurde_tool: true } };
+  // Rood met alternatief: aanvullende vraag 3 (open zonder toetsing).
+  const ROOD_MET_ALT = { ...GROEN, rodeVlaggen: { ...GROEN.rodeVlaggen, open_zonder_toetsing: true } };
 
   it("F17. rood zonder alternatief: direct een melding aan Team DO en status 'contact volgt'", async () => {
     const a = (await nieuwAdvies(ANNA, ROOD_ZONDER_ALT)) as unknown as { id: string; status: string; referentie: string };
@@ -323,5 +323,31 @@ describe("regelset 0.4: contact volgt, ter informatie en AI Act", () => {
     expect(rij.dpia_signaal).toBe(false);
     expect(rij.antwoorden.checks.impact).toEqual({ beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" });
     expect(a.toetsers).toEqual(["toetser_compliance"]);
+  });
+});
+
+describe("regelset 0.7: tool buiten de IJK Toolbox", () => {
+  const ANDERE = {
+    ...GROEN,
+    tooladvies: { tool: "andere_tool", bron: "medewerker", motivatie: "", geaccepteerd: true, andereTool: { naam: "Notion", link: "https://www.notion.so" } },
+  };
+
+  it("F22. verder groen → Eerst toetsen; de aanvraag gaat naar beide toetsers, met de naam en link van de tool", async () => {
+    const a = await nieuwAdvies(ANNA, ANDERE);
+    expect(a).toMatchObject({ uitkomst: "oranje", toetsers: ["toetser_compliance", "toetser_architect"] });
+    expect((a as unknown as { motivatie: string }).motivatie).toBe("De tool zit nog niet in de IJK Toolbox.");
+    const r = await actie(a.id);
+    expect(r.json.status).toBe("in_toetsing");
+    expect(mock.ontvangen[0]!.body).toMatchObject({
+      type: "toetsing",
+      tool: { id: "andere_tool", naam: "Notion", buitenToolbox: true, link: "https://www.notion.so" },
+      toetsers: [{ rol: "toetser_compliance" }, { rol: "toetser_architect" }],
+    });
+  });
+
+  it("F23. een tool uit de toolbox staat in de payload met buitenToolbox: false", async () => {
+    const a = await nieuwAdvies(ANNA, ALLEEN_ARCHITECT);
+    await actie(a.id);
+    expect(mock.ontvangen[0]!.body.tool).toEqual({ id: "claude_code", naam: "Claude Code", buitenToolbox: false });
   });
 });

@@ -62,7 +62,7 @@ describe("invoercontrole", () => {
   it("R9. meerdere fouten worden allemaal tegelijk gemeld", () => {
     const i = invoer({ checks: { data: "onzin" } });
     delete i.checks.gebruikers;
-    delete i.rodeVlaggen.niet_goedgekeurde_tool;
+    delete i.rodeVlaggen.persoonlijke_inlog_of_secrets;
     expect(fouten(() => evalueer(i, regelset))).toHaveLength(3);
   });
 });
@@ -80,17 +80,17 @@ describe("hoogste kleur en motivatie", () => {
     const u = evalueer(
       invoer({
         checks: { impact: "groot" },
-        rodeVlaggen: { niet_goedgekeurde_tool: true, persoonlijke_inlog_of_secrets: true },
+        rodeVlaggen: { persoonlijke_inlog_of_secrets: true, proces_zonder_eigenaar: true },
       }),
       regelset,
     );
     expect(u.redenen.map((r) => (r.soort === "check" ? r.checkId : r.soort === "rode_vlag" ? r.vlagId : r.signaal))).toEqual([
-      "niet_goedgekeurde_tool",
       "persoonlijke_inlog_of_secrets",
+      "proces_zonder_eigenaar",
       "impact",
     ]);
     expect(u.motivatie).toBe(
-      "Een tool die IJK niet heeft goedgekeurd, een persoonlijke inlog of wachtwoorden/API-keys in de code en Groot (Impact – Integriteit).",
+      "Een persoonlijke inlog of wachtwoorden/API-keys in de code, een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer en Groot (Impact – Integriteit).",
     );
   });
 
