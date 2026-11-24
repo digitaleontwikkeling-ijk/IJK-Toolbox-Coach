@@ -40,7 +40,7 @@ interface DemoAdvies {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: NonNullable<WizardData["tooladvies"]>;
-  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean>; verdieping?: Record<string, string> };
+  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean | "onzeker">; verdieping?: Record<string, string> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];

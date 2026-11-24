@@ -3,6 +3,11 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.8.1 (concept)
+
+- Extra vraag "Gaat het om bijzondere persoonsgegevens?" heeft nu ook "Weet ik niet zeker" (`onzeker_mogelijk`).
+  Telt bij de privacy-telling als indicator, net als bij de andere privacyvragen. Geen nieuwe beslisregel.
+
 ## regelset 0.8 en tools 0.6 (concept)
 
 Privacy (pre-DPIA) en AI-risico geïntegreerd in de checks. Keuzes B1–B8 in `docs/analyse-privacy-ai.md` (akkoord

@@ -23,6 +23,8 @@ test("vragen verschijnen alleen als ze nodig zijn; terugzetten naar openbare geg
   // Koppelen is een signaal, geen bewijs: een verduidelijking met inleiding (geen nieuwe vraag over systemen).
   await expect(page.locator("#veld-koppeling_datasets")).toContainText("Je koppelt systemen");
   await kies(page, "kwetsbare_groepen", "Ja");
+  // Ook bij de extra vraag over bijzondere persoonsgegevens kun je twijfel aangeven.
+  await kies(page, "bijzondere_persoonsgegevens", "Weet ik niet zeker");
 
   // Toegankelijkheid van stap 3 met de extra vragen.
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();

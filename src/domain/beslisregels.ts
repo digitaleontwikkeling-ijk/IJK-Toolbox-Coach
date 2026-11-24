@@ -16,6 +16,14 @@
 import type { Antwoord, Check, Deelvraag, Kleur, Regelset, Vervolgactie } from "./content-schema";
 import { analyseer, evalueerAi, evalueerDpia, type AiUitkomst, type DpiaUitkomst, type Feit } from "./verdieping";
 
+/** Antwoord op een extra vraag: ja, nee, of (als de vraag dat toestaat) "weet ik niet zeker". */
+export type ExtraAntwoord = boolean | "onzeker";
+
+/** Is dit een geldig antwoord op deze extra vraag? */
+export function geldigExtraAntwoord(w: unknown, onzekerMogelijk: boolean): w is ExtraAntwoord {
+  return typeof w === "boolean" || (onzekerMogelijk && w === "onzeker");
+}
+
 /** Antwoord op een check: één antwoord-id, een lijst (meerdere antwoorden) of per deelvraag een antwoord-id. */
 export type CheckAntwoord = string | string[] | Record<string, string>;
 
@@ -28,7 +36,7 @@ export interface BeslisInvoer {
    */
   checks: Record<string, CheckAntwoord>;
   /** extra-vraag-id → ja/nee. Alleen nodig als de extra vraag van toepassing is. */
-  extraVragen?: Record<string, boolean>;
+  extraVragen?: Record<string, ExtraAntwoord>;
   /** rode-vlag-id → ja/nee. Elke rode vlag die van toepassing is, moet beantwoord zijn. */
   rodeVlaggen: Record<string, boolean>;
   /** Verdiepingsvragen (privacy en AI): gegeven-id → antwoord-id. Alleen relevante vragen tellen mee. */
@@ -170,7 +178,9 @@ export function valideerInvoer(invoer: BeslisInvoer, regelset: Regelset): string
 
   for (const extra of regelset.extra_vragen) {
     if (!extraVraagVanToepassing(extra.id, invoer, regelset)) continue;
-    if (typeof invoer.extraVragen?.[extra.id] !== "boolean") fouten.push(`extra vraag "${extra.id}" is niet beantwoord`);
+    if (!geldigExtraAntwoord(invoer.extraVragen?.[extra.id], extra.onzeker_mogelijk)) {
+      fouten.push(`extra vraag "${extra.id}" is niet beantwoord`);
+    }
   }
 
   const vlagIds = new Set(regelset.rode_vlaggen.map((v) => v.id));

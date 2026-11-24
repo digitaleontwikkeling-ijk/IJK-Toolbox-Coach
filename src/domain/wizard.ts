@@ -78,7 +78,8 @@ export const wizardDataSchema = z.object({
   checksVoorgesteld: z.boolean().default(false),
   /** Heeft de medewerker de uitleg vóór fase 2 gezien? (één keer per idee) */
   fase2UitlegGezien: z.boolean().default(false),
-  extraVragen: z.record(id, z.boolean()).default({}),
+  /** Extra vragen: ja/nee, of "onzeker" als de vraag dat toestaat. */
+  extraVragen: z.record(id, z.union([z.boolean(), z.literal("onzeker")])).default({}),
   /** Verdiepingsvragen (privacy en AI): gegeven-id → antwoord-id. Alleen relevante vragen tellen mee. */
   verdieping: z.record(id, id).default({}),
   rodeVlaggen: z.record(id, z.boolean()).default({}),

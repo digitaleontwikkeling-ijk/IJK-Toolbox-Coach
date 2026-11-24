@@ -228,6 +228,21 @@ describe("privacy-telling", () => {
     expect(met({ grote_schaal: "weet_niet", kwetsbare_groepen: "weet_niet" }).dpia).toMatchObject({ score: 2, klasse: "waarschijnlijk" });
   });
 
+  it("P2b. bijzondere persoonsgegevens 'weet ik niet zeker': telt als indicator, met herkomst", () => {
+    const u = evalueer(invoer({ checks: PG, extraVragen: { bijzondere_persoonsgegevens: "onzeker" }, verdieping: { grote_schaal: "ja" } }), regelset);
+    const i = u.dpia.indicatoren.find((x) => x.id === "bijzondere_persoonsgegevens")!;
+    expect(i).toMatchObject({ waarde: "weet_niet", telt: true, feit: { bron: "extra_vraag.bijzondere_persoonsgegevens" } });
+    expect(u.dpia.klasse).toBe("waarschijnlijk");
+  });
+
+  it("P2c. 'weet ik niet zeker' alleen bij extra vragen die dat toestaan", () => {
+    const r = structuredClone(regelset);
+    r.extra_vragen.find((e) => e.id === "bijzondere_persoonsgegevens")!.onzeker_mogelijk = false;
+    expect(fouten(() => evalueer(invoer({ checks: PG, extraVragen: { bijzondere_persoonsgegevens: "onzeker" } }, r), r))).toContain(
+      'extra vraag "bijzondere_persoonsgegevens" is niet beantwoord',
+    );
+  });
+
   it("P3. Data = Weet ik niet zeker: oranje en het privacyspoor start (B1)", () => {
     const i = invoer({ checks: { data: "weet_niet" }, extraVragen: NIET_BIJZONDER });
     expect(feit(i, "persoonsgegevens")!.waarde).toBe("onzeker");

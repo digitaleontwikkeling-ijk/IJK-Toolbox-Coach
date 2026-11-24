@@ -142,7 +142,13 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                 .map((e) => (
                   <tr key={e.id}>
                     <th scope="row">{e.vraag}</th>
-                    <td>{advies.antwoorden.extraVragen[e.id] ? "Ja" : "Nee"}</td>
+                    <td>
+                      {advies.antwoorden.extraVragen[e.id] === "onzeker"
+                        ? "Weet ik niet zeker"
+                        : advies.antwoorden.extraVragen[e.id]
+                          ? "Ja"
+                          : "Nee"}
+                    </td>
                   </tr>
                 ))}
               {r.gegevens

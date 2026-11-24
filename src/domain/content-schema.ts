@@ -75,6 +75,8 @@ const extraVraagSchema = z.object({
   toon_bij: z.array(id).min(1),
   vraag: tekst,
   uitleg: tekst.optional(),
+  /** Mag de medewerker "Weet ik niet zeker" antwoorden? (telt bij de privacy-telling als indicator) */
+  onzeker_mogelijk: z.boolean().default(false),
 });
 
 const rodeVlagSchema = z.object({

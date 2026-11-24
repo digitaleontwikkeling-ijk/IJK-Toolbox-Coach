@@ -20,7 +20,7 @@ import type { Gegeven, GegevenId, Regelset } from "./content-schema";
 /** De antwoorden die de verdieping leest (een deel van de invoer van de beslisregels). */
 export interface VerdiepingInvoer {
   checks: Record<string, string | string[] | Record<string, string>>;
-  extraVragen?: Record<string, boolean>;
+  extraVragen?: Record<string, boolean | "onzeker">;
   rodeVlaggen: Record<string, boolean>;
   /** gegeven-id → antwoord-id */
   verdieping?: Record<string, string>;
@@ -265,10 +265,11 @@ export function analyseer(invoer: VerdiepingInvoer, regelset: Regelset): Verdiep
   };
 
   // Bijzondere persoonsgegevens: de bestaande extra vraag bij Data (niet opnieuw vragen).
-  if (dpiaActief(ctx) && typeof invoer.extraVragen?.bijzondere_persoonsgegevens === "boolean") {
+  const bijzonder = invoer.extraVragen?.bijzondere_persoonsgegevens;
+  if (dpiaActief(ctx) && (typeof bijzonder === "boolean" || bijzonder === "onzeker")) {
     feiten.set("bijzondere_persoonsgegevens", {
       id: "bijzondere_persoonsgegevens",
-      waarde: invoer.extraVragen.bijzondere_persoonsgegevens ? "ja" : "nee",
+      waarde: bijzonder === "onzeker" ? "weet_niet" : bijzonder ? "ja" : "nee",
       bron: "extra_vraag.bijzondere_persoonsgegevens",
       herkomst: "expliciet",
       zekerheid: "zeker",

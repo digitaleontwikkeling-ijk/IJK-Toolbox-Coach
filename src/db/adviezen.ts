@@ -102,7 +102,7 @@ export interface AdviesRij {
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: Tooladvies;
   /** Per check het antwoord; bij Impact per deelvraag (beschikbaarheid, integriteit, vertrouwelijkheid). */
-  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean>; verdieping?: Record<string, string> };
+  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean | "onzeker">; verdieping?: Record<string, string> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];

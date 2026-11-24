@@ -5,7 +5,7 @@
  * Welke verdiepingsvragen nodig zijn, bepaalt `analyseer` (domein): wat al bekend is, wordt niet gevraagd.
  */
 import type { Check } from "@/domain/content-schema";
-import { rodeVlagVanToepassing } from "@/domain/beslisregels";
+import { geldigExtraAntwoord, rodeVlagVanToepassing } from "@/domain/beslisregels";
 import { analyseer, type OpenVraag } from "@/domain/verdieping";
 import { alsLijst, Keuze, JA_NEE, naarJaNee } from "../Keuze";
 import type { StapProps } from "./types";
@@ -143,9 +143,11 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
             fout={ontbrekend.has(e.id)}
             legend={e.vraag}
             vraag={e.uitleg}
-            opties={JA_NEE}
-            waarde={naarJaNee(data.extraVragen[e.id])}
-            onKies={(v) => wijzig((d) => ({ ...d, extraVragen: { ...d.extraVragen, [e.id]: v === "ja" } }))}
+            opties={e.onzeker_mogelijk ? [...JA_NEE, { id: "onzeker", label: "Weet ik niet zeker" }] : JA_NEE}
+            waarde={data.extraVragen[e.id] === "onzeker" ? "onzeker" : naarJaNee(data.extraVragen[e.id] as boolean | undefined)}
+            onKies={(v) =>
+              wijzig((d) => ({ ...d, extraVragen: { ...d.extraVragen, [e.id]: v === "onzeker" ? "onzeker" : v === "ja" } }))
+            }
           />
         </div>
       ));
@@ -281,7 +283,7 @@ export function alleVelden(content: Content, data: Data): { id: string; naam: st
     const gekozen = alsLijst(huidig);
     for (const e of r.extra_vragen) {
       if (e.check === c.id && gekozen.some((g) => e.toon_bij.includes(g))) {
-        uit.push({ id: e.id, naam: e.vraag, beantwoord: typeof data.extraVragen[e.id] === "boolean" });
+        uit.push({ id: e.id, naam: e.vraag, beantwoord: geldigExtraAntwoord(data.extraVragen[e.id], e.onzeker_mogelijk) });
       }
     }
     for (const v of verdieping.vragen.filter((x) => x.gegeven.plek === c.id)) {
