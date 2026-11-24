@@ -84,9 +84,26 @@ export function laadContent(map: string = standaardContentMap()): Content {
     spelregels[tool.id] = s;
   }
   const teksten = leesYaml(map, "teksten.yaml", tekstenSchema);
+  controleerTekstenBijRegelset(teksten, regelset);
   const iconen: Record<string, string> = {};
   for (const tool of tools.tools) if (tool.icoon) iconen[tool.id] = leesIcoon(map, tool.icoon);
   return { regelset, tools, spelregels, teksten, iconen };
+}
+
+/** Teksten die bij onderdelen van de regelset horen, moeten bij elkaar passen (klassen, check-antwoorden). */
+function controleerTekstenBijRegelset(t: Teksten, r: Regelset) {
+  const fouten: string[] = [];
+  for (const k of r.dpia.klassen) if (!t.privacy.per_klasse[k.id]) fout(`privacy.per_klasse: tekst voor klasse "${k.id}" ontbreekt`);
+  for (const k of r.ai_risico.klassen) if (!t.ai.per_klasse[k.id]) fout(`ai.per_klasse: tekst voor klasse "${k.id}" ontbreekt`);
+  for (const sleutel of Object.keys(t.techniek.punten)) {
+    const [check, antwoord] = sleutel.split(".");
+    const c = r.checks.find((x) => x.id === check);
+    if (!c || !c.antwoorden.some((a) => a.id === antwoord)) fout(`techniek.punten: onbekend antwoord "${sleutel}"`);
+  }
+  if (fouten.length) throw new ContentFout("teksten.yaml", fouten);
+  function fout(m: string) {
+    fouten.push(m);
+  }
 }
 
 let cache: Content | undefined;

@@ -8,7 +8,7 @@ import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
   it("C1. de meegeleverde content is geldig en heeft een versie", () => {
-    expect(regelset.versie).toBe("0.7");
+    expect(regelset.versie).toBe("0.8");
     expect(regelset.checks.map((c) => c.id)).toEqual(["data", "systemen", "gebruikers", "autonomie", "impact", "afhankelijkheid"]);
     expect(regelset.rode_vlaggen).toHaveLength(4);
     expect(regelset.checks.find((c) => c.id === "impact")!.deelvragen.map((d) => d.id)).toEqual(["beschikbaarheid", "integriteit", "vertrouwelijkheid"]);
@@ -86,10 +86,10 @@ describe("schema vangt fouten in de content", () => {
     expect(meldingen(r)).toContain('check systemen: onbekende toetser "toetser_marketing"');
   });
 
-  it("S3. DPIA-regel verwijst naar een antwoord dat niet bestaat", () => {
+  it("S3. AI-regel verwijst naar een antwoord dat niet bestaat", () => {
     const r = kopieRegelset();
-    r.dpia.minstens_een_van.push({ check: "impact", antwoorden: ["catastrofaal"] });
-    expect(meldingen(r)).toContain('dpia: onbekend antwoord "catastrofaal" bij check impact');
+    r.ai_risico.regels.push({ gegeven: "ai_toezicht", antwoord: "catastrofaal", klasse: "hoog" });
+    expect(meldingen(r)).toContain('ai_risico: onbekend antwoord "catastrofaal" bij ai_toezicht');
   });
 
   it("S4. dubbele antwoord-id binnen een check", () => {

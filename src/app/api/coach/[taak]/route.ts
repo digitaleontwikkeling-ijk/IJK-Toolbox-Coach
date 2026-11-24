@@ -50,6 +50,8 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
             motivatie: advies.motivatie,
             toetsers: advies.toetsers,
             dpiaSignaal: advies.dpiaSignaal, aiActSignaal: advies.aiActSignaal, contactNodig: false,
+            dpiaKlasse: advies.dpia?.klasseNaam ?? null,
+            aiKlasse: advies.aiRisico?.klasseNaam ?? null,
             voorwaarden: advies.voorwaarden,
             alternatieven: advies.alternatieven,
           },

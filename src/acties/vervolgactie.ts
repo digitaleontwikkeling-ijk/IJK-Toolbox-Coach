@@ -90,7 +90,17 @@ export function maakPayloads(advies: AdviesRij, o: Omit<VervolgactieOpties, "adv
     const toetsers = advies.toetsers.map((rol) => ({ rol, naam: content.regelset.toetsers.find((t) => t.id === rol)?.naam ?? rol }));
     const link = `${appUrl}/toetsing/${advies.id}`;
     return [
-      { ...basis, type: "toetsing", link, toetsers, motivatie: advies.motivatie, dpiaSignaal: advies.dpiaSignaal },
+      {
+        ...basis,
+        type: "toetsing",
+        link,
+        toetsers,
+        motivatie: advies.motivatie,
+        dpiaSignaal: advies.dpiaSignaal,
+        // Alleen de klassen; de onderbouwing (indicatoren, herkomst) leest de toetser in de app.
+        privacy: advies.dpia?.actief ? { klasse: advies.dpia.klasse, score: advies.dpia.score } : null,
+        ai: advies.aiRisico?.actief ? { klasse: advies.aiRisico.klasse } : null,
+      },
       {
         ...basis,
         type: "teams_melding",

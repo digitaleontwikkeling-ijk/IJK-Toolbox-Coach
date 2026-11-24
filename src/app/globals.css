@@ -317,3 +317,19 @@ fieldset.keuze legend + * { clear: both; }
 .tool-icoon--groot { height: 1.6em; max-width: 6em; vertical-align: -0.35em; margin-right: 0.5em; }
 /* Op een gekozen (donkere) knop: logo op een wit vlakje, zodat donkere logo's zichtbaar blijven. */
 .keuze__optie input:checked + label .tool-icoon { background: var(--wit); border-radius: 4px; padding: 1px 3px; box-sizing: content-box; }
+
+/* ---------- Beoordelingen op de adviescard (privacy, AI, techniek) ---------- */
+.beoordeling { border-left: 4px solid var(--water); background: var(--wolk); padding: 0.75rem 1rem; border-radius: var(--radius); }
+.beoordeling h3 { margin-top: 0; }
+.beoordeling p, .beoordeling ul { margin: 0.25rem 0; }
+.beoordeling__sub { font-weight: 600; }
+.herkomst { color: var(--tekst-zacht); font-size: 0.875rem; }
+.disclaimer { font-size: 0.875rem; color: var(--tekst-zacht); border-top: 1px solid var(--rand); padding-top: 0.75rem; margin: 0; }
+
+/* ---------- Verdieping in stap 3 ---------- */
+.verdieping { margin-top: 0.75rem; }
+.verdieping__intro { margin: 0.75rem 0 0.5rem; }
+.verdieping__groep { border-left: 3px solid var(--water); padding-left: 0.75rem; margin-top: 0.75rem; }
+.verdieping__groep > h4 { margin: 0 0 0.25rem; }
+.verdieping__signaal { font-style: italic; }
+.voortgang { font-weight: 600; margin: 0.5rem 0 1rem; }

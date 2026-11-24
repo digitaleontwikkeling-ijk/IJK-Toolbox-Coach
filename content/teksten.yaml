@@ -137,14 +137,6 @@ beheer:
   titel: Beheer
   intro: Alle adviezen en de inhoud van de coach. De inhoud (tools, spelregels, beslisregels) wijzig je via Git in de map content/; elke wijziging krijgt een nieuw versienummer. Je inzage wordt vastgelegd in de audit-log.
 
-# Signaal dat de compliance officer de toepassing moet classificeren volgens de AI Act.
-ai_act:
-  titel: AI Act-classificatie nodig
-  uitleg: >-
-    De AI Act is de Europese wet voor AI. Omdat de oplossing zelfstandig handelt of adviseert of beslist over
-    mensen, bepaalt de AI governance & compliance officer in welke risicoklasse je toepassing valt. Daarom laat je
-    je idee in dat geval altijd eerst toetsen.
-
 # Bij check 6: lijst met wat je extra moet regelen per antwoord.
 extra_regelen_titel: Wat moet je extra regelen?
 
@@ -153,9 +145,68 @@ contact_opnieuw:
   melding: Team Digitale Ontwikkeling is nog niet op de hoogte gebracht. Probeer het opnieuw.
   knop: Team Digitale Ontwikkeling informeren
 
-dpia:
-  titel: Mogelijk is een DPIA nodig
-  uitleg: Een DPIA (gegevensbeschermingseffectbeoordeling) brengt de privacyrisico's van een toepassing in kaart. Bij jouw antwoorden is die mogelijk verplicht. De AI governance & compliance officer kijkt met je mee.
+# Verdieping in stap 3 en de beoordelingen op de adviescard (regelset 0.8). TODO: valideren door toetsers
+verdieping:
+  privacy_intro: >-
+    Je gaf aan dat je persoonsgegevens gebruikt. Daarom stel ik bij een paar checks nog een extra vraag over wat de
+    oplossing met die gegevens doet.
+  privacy_intro_onzeker: >-
+    Je weet niet zeker of je persoonsgegevens gebruikt. Daarom gaan we voor de zekerheid uit van wel, en stel ik bij
+    een paar checks nog een extra vraag.
+  ai_titel: Over de AI in je oplossing
+  ai_intro: Je gaf aan dat je oplossing AI gebruikt. Daarom wil ik nog iets beter begrijpen wat de AI doet.
+  ai_intro_onzeker: >-
+    Je weet niet zeker of je oplossing AI gebruikt. Daarom gaan we voor de zekerheid uit van wel en stel ik nog een paar
+    vragen over wat de oplossing doet.
+  tool_voorstel: Voorgesteld op basis van de gekozen tool
+  voortgang: "Nog {aantal} van {totaal} vragen te beantwoorden."
+  voortgang_een: "Nog 1 van {totaal} vragen te beantwoorden."
+  voortgang_klaar: Alle {totaal} vragen zijn beantwoord.
+
+privacy:
+  titel: Privacy
+  niet_nodig: Je gebruikt geen persoonsgegevens. Een privacybeoordeling (DPIA) is daarom niet nodig.
+  per_klasse:
+    geen: Er is geen of één privacy-indicator. Een volledige DPIA is waarschijnlijk niet nodig.
+    waarschijnlijk: >-
+      Er zijn twee privacy-indicatoren. Waarschijnlijk is een volledige DPIA (gegevensbeschermingseffectbeoordeling)
+      nodig. De AI governance & compliance officer kijkt met je mee.
+    verplicht: >-
+      Er zijn drie of meer privacy-indicatoren. Een volledige DPIA (gegevensbeschermingseffectbeoordeling) is verplicht.
+      De AI governance & compliance officer kijkt met je mee.
+  indicatoren_titel: "Wat telde mee:"
+  geen_indicatoren: Geen van de privacy-indicatoren is van toepassing.
+
+ai:
+  titel: AI
+  niet_nodig: Je oplossing gebruikt geen AI. Een AI-risicobeoordeling is daarom niet nodig.
+  per_klasse:
+    laag: Bij je antwoorden is het risico van de AI laag.
+    beperkt: Bij je antwoorden is het risico van de AI beperkt. Regel wat hieronder staat.
+    hoog: >-
+      Bij je antwoorden is het risico van de AI hoog. De AI governance & compliance officer bepaalt in welke klasse van de
+      AI Act (de Europese wet voor AI) je toepassing valt.
+  redenen_titel: "Dit gaf de doorslag:"
+  feiten_titel: "Wat we weten over de AI:"
+
+techniek:
+  titel: Techniek en beheer
+  intro: "Regel en laat beoordelen:"
+  # Per check.antwoord. Getoond als dat antwoord is gekozen.
+  punten:
+    systemen.lezen: Een goedgekeurde koppeling met IJK-credentials en alleen leesrechten.
+    systemen.koppelen: De rechten en credentials van de koppeling, en logging.
+    systemen.schrijven: Wat de oplossing mag wijzigen in het bedrijfssysteem, met logging en herstel bij fouten.
+    gebruikers.afdeling: Beheer en ondersteuning voor alle gebruikers in de afdeling.
+    gebruikers.organisatie: Beheer, ondersteuning en continuïteit voor gebruikers in heel IJK.
+    gebruikers.extern: Beveiligde toegang voor mensen buiten IJK.
+    afhankelijkheid.persoonlijk: Documentatie en beveiliging.
+    afhankelijkheid.team: Eigenaarschap, beheer en logging.
+    afhankelijkheid.bedrijf: Monitoring, architectuur, continuïteit en lifecycle management.
+
+disclaimer: >-
+  Deze uitkomst is een eerste risico-indicatie en geen definitief juridisch of compliance-oordeel. Laat de beoordeling
+  waar nodig controleren door de relevante specialist vanuit Privacy, Security of AI.
 
 # Stap 2: een tool die (nog) niet in de IJK Toolbox zit. TODO: valideren door toetsers
 andere_tool:

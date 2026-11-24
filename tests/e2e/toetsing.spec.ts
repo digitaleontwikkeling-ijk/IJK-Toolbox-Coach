@@ -1,7 +1,7 @@
 /** Van aanvraag tot besluit: medewerker → beide toetsers → medewerker ziet de uitkomst. */
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3, naarChecks } from "./hulp";
+import { geenRodeVlaggen, kies, login, naarStap3, naarChecks, rustigeVerdieping } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 let referentie = "";
@@ -21,6 +21,7 @@ test("medewerker dient een aanvraag in voor toetsing", async ({ page }) => {
   await naarStap3(page, "Een verzuimdashboard bouwen voor de afdeling met gegevens uit AFAS.");
   await naarChecks(page);
   await kies(page, "bijzondere_persoonsgegevens", "Ja");
+  await rustigeVerdieping(page, { kwetsbare_groepen: "Ja" });
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
@@ -48,7 +49,7 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await expect(page.getByRole("heading", { name: `Aanvraag ${referentie}` })).toBeVisible();
   await expect(page.getByRole("link", { name: "anna@voorbeeld.invalid" })).toHaveAttribute("href", "mailto:anna@voorbeeld.invalid");
   await expect(page.getByText("Een verzuimdashboard bouwen")).toBeVisible();
-  await expect(page.locator(".adviescard")).toContainText("Mogelijk is een DPIA nodig");
+  await expect(page.locator(".adviescard")).toContainText("Privacy: Waarschijnlijk volledige DPIA nodig");
   await geenOvertredingen(page);
 
   // Voorwaarden zijn verplicht bij "met voorwaarden".

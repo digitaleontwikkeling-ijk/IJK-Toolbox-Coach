@@ -248,7 +248,21 @@ export function Wizard() {
       }
     }
     setFout(null);
-    wijzig((d) => ({ ...d, tooladvies: { ...d.tooladvies!, geaccepteerd: true } }));
+    wijzig((d) => {
+      const metAi = content!.tools.tools.find((x) => x.id === d.tooladvies!.tool)?.ai === true;
+      // Tool met AI: "Gebruikt je oplossing AI?" vooraf op Ja (de medewerker bevestigt of past aan).
+      const voorstel = metAi && d.verdieping.ai_gebruik === undefined;
+      return {
+        ...d,
+        tooladvies: { ...d.tooladvies!, geaccepteerd: true },
+        ...(voorstel
+          ? {
+              verdieping: { ...d.verdieping, ai_gebruik: "ja" },
+              coachVoorstellen: { ...d.coachVoorstellen, "tool.ai_gebruik": { voorstel: "ja", zekerheid: "middel" as const } },
+            }
+          : {}),
+      };
+    });
     gaNaar(3);
     if (!dataRef.current!.checksVoorgesteld) await vulChecksVoor();
   }

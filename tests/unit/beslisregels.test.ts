@@ -146,19 +146,12 @@ describe("toetsers en DPIA-signaal", () => {
     expect(u.toetsers).toEqual(["toetser_compliance"]);
   });
 
-  it.each([
-    ["bijzondere persoonsgegevens", {}, { bijzondere_persoonsgegevens: true }],
-    ["autonomie = handelen", { autonomie: "handelen" }, {}],
-    ["autonomie = beslissen", { autonomie: "beslissen" }, {}],
-    ["gebruikers = organisatie", { gebruikers: "organisatie" }, {}],
-    ["gebruikers = extern", { gebruikers: "extern" }, {}],
-    ["impact = serieus", { impact: "serieus" }, {}],
-    ["impact = groot", { impact: "groot" }, {}],
-  ])("R19. persoonsgegevens + %s → DPIA-signaal", (_naam, checks, extra) => {
+  it("R19. persoonsgegevens met twee privacy-indicatoren → DPIA-signaal (regelset 0.8: telling, zie verdieping.test.ts)", () => {
     const u = evalueer(
       invoer({
-        checks: { data: "persoonsgegevens", ...checks },
-        extraVragen: { bijzondere_persoonsgegevens: false, ...extra },
+        checks: { data: "persoonsgegevens", gebruikers: "organisatie" },
+        extraVragen: { bijzondere_persoonsgegevens: true },
+        verdieping: { grote_schaal: "ja" },
       }),
       regelset,
     );
@@ -174,11 +167,18 @@ describe("toetsers en DPIA-signaal", () => {
   });
 
   it("R21. bij een DPIA-signaal gaat de toetsing ook naar compliance, zelfs als Data niet oranje scoort", () => {
-    // Fictieve regelset waarin persoonsgegevens geel scoort: laat zien dat de DPIA-regel apart werkt.
+    // Fictieve regelset waarin persoonsgegevens geel scoort: laat zien dat de DPIA-klasse apart werkt.
     const r = kopieRegelset();
     r.checks.find((c) => c.id === "data")!.antwoorden.find((a) => a.id === "persoonsgegevens")!.kleur = "geel";
     const u = evalueer(
-      invoer({ checks: { data: "persoonsgegevens", gebruikers: "organisatie" }, extraVragen: { bijzondere_persoonsgegevens: false } }, r),
+      invoer(
+        {
+          checks: { data: "persoonsgegevens", gebruikers: "organisatie" },
+          extraVragen: { bijzondere_persoonsgegevens: true },
+          verdieping: { grote_schaal: "ja" },
+        },
+        r,
+      ),
       r,
     );
     expect(u.kleur).toBe("oranje");

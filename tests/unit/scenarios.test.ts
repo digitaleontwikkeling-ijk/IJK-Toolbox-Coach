@@ -54,38 +54,49 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.toetsers).toEqual([]);
   });
 
-  it("4. Verzuimdashboard van mijn afdeling (Claude Code) → oranje, beide toetsers, DPIA-signaal", () => {
+  it("4. Verzuimdashboard van mijn afdeling (Claude Code) → oranje, beide toetsers, waarschijnlijk DPIA (0.8: 2 indicatoren)", () => {
     const u = evalueer(
       invoer({
         checks: { data: "persoonsgegevens", systemen: "lezen", gebruikers: "afdeling", autonomie: "lezen", impact: B("serieus") },
         extraVragen: { bijzondere_persoonsgegevens: true },
+        // Verzuim: gegevens van zieke medewerkers (kwetsbare groep) en gezondheid (bijzonder).
+        verdieping: { kwetsbare_groepen: "ja" },
       }),
       regelset,
     );
     expect(u.kleur).toBe("oranje");
     expect(u.toetsers).toEqual(BEIDE);
     expect(u.dpiaSignaal).toBe(true);
+    expect(u.dpia.klasse).toBe("waarschijnlijk");
     expect(u.aiActSignaal).toBe(false);
+    expect(u.aiRisico.actief).toBe(false);
     expect(u.motivatie).toBe("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact – Beschikbaarheid).");
   });
 
-  it("5. HR-gegevens wekelijks automatisch in AFAS verwerken (HubBI) → oranje, beide toetsers, DPIA- en AI Act-signaal", () => {
+  it("5. HR-gegevens wekelijks automatisch in AFAS verwerken (HubBI, zonder AI) → oranje, beide toetsers, DPIA; geen AI-beoordeling (0.8, B3)", () => {
     const u = evalueer(
       invoer({
         checks: { data: "persoonsgegevens", systemen: "schrijven", gebruikers: "afdeling", autonomie: "handelen", impact: I("serieus"), afhankelijkheid: "team" },
         extraVragen: { bijzondere_persoonsgegevens: false },
+        verdieping: { koppeling_datasets: "ja", grote_schaal: "ja" },
       }),
       regelset,
     );
     expect(u.kleur).toBe("oranje");
     expect(u.toetsers).toEqual(BEIDE);
     expect(u.dpiaSignaal).toBe(true);
-    expect(u.aiActSignaal).toBe(true);
+    // Handelen zonder AI is geen AI-toepassing meer (was tot regelset 0.8 een AI Act-signaal).
+    expect(u.aiActSignaal).toBe(false);
+    expect(u.aiRisico.actief).toBe(false);
   });
 
   it("6. AI beoordeelt cv's en kiest kandidaten (AI Flows) → rood, met alternatief, beide toetsers", () => {
     const u = evalueer(
-      invoer({ checks: { data: "persoonsgegevens", autonomie: "beslissen", impact: I("groot") }, extraVragen: { bijzondere_persoonsgegevens: false } }),
+      invoer({
+        checks: { data: "persoonsgegevens", autonomie: "beslissen", impact: I("groot") },
+        extraVragen: { bijzondere_persoonsgegevens: false },
+        verdieping: { ai_gebruik: "ja" },
+      }),
       regelset,
     );
     expect(u.kleur).toBe("rood");
@@ -94,7 +105,10 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.contactNodig).toBe(false);
     expect(u.toetsers).toEqual(BEIDE);
     expect(u.dpiaSignaal).toBe(true);
+    // Profilering en besluit (afgeleid uit Beslissen) en AI → verplicht; AI direct (afgeleid) → hoog.
+    expect(u.dpia.klasse).toBe("verplicht");
     expect(u.aiActSignaal).toBe(true);
+    expect(u.aiRisico.klasse).toBe("hoog");
   });
 
   it("7. Een tool buiten de IJK Toolbox (verder alles groen) → Eerst toetsen, door beide toetsers (regelset 0.7)", () => {
@@ -112,13 +126,14 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.alternatieven).toEqual(["Gebruik IJK-credentials."]);
   });
 
-  it("9. Alles groen, behalve Vertrouwelijkheid = Groot → rood (geen alternatief: contact volgt; DPIA-signaal)", () => {
+  it("9. Alles groen, behalve Vertrouwelijkheid = Groot → rood (geen alternatief: contact volgt; zonder persoonsgegevens geen DPIA, 0.8 B2)", () => {
     const u = evalueer(invoer({ checks: { impact: V("groot") } }), regelset);
     expect(u.kleur).toBe("rood");
     expect(u.motivatie).toBe("Groot (Impact – Vertrouwelijkheid).");
     expect(u.alternatieven).toEqual([]);
     expect(u.contactNodig).toBe(true);
-    expect(u.dpiaSignaal).toBe(true);
+    expect(u.dpiaSignaal).toBe(false);
+    expect(u.dpia.actief).toBe(false);
     expect(u.toetsers).toEqual(BEIDE);
   });
 
@@ -129,10 +144,18 @@ describe("testscenario's hoofdstuk 7", () => {
     expect(u.dpiaSignaal).toBe(false);
   });
 
-  it("11. AI keurt zelfstandig facturen goed voor betaling → oranje, AI Act-signaal, géén DPIA-signaal", () => {
-    const u = evalueer(invoer({ checks: { data: "intern", autonomie: "handelen", impact: I("serieus") } }), regelset);
+  it("11. AI keurt zelfstandig facturen goed voor betaling → oranje (Handelen), AI-risico beoordeeld, géén DPIA", () => {
+    const u = evalueer(
+      invoer({
+        checks: { data: "intern", autonomie: "handelen", impact: I("serieus") },
+        // Facturen, niet over mensen; de AI is beperkt uitlegbaar.
+        verdieping: { ai_gebruik: "ja", ai_invloed: "nee", ai_uitlegbaarheid: "beperkt" },
+      }),
+      regelset,
+    );
     expect(u.kleur).toBe("oranje");
-    expect(u.aiActSignaal).toBe(true);
+    expect(u.aiRisico.klasse).toBe("beperkt");
+    expect(u.aiActSignaal).toBe(false);
     expect(u.dpiaSignaal).toBe(false);
     expect(u.toetsers).toEqual(["toetser_compliance"]);
   });

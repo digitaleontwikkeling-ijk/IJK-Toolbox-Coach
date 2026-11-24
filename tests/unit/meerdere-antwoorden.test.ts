@@ -30,11 +30,12 @@ describe("meerdere antwoorden per check", () => {
     expect(u.motivatie).toBe("Schrijven in bedrijfssystemen (Systemen).");
   });
 
-  it("M4. DPIA-signaal als persoonsgegevens één van de gekozen datasoorten is", () => {
+  it("M4. privacy-telling als persoonsgegevens één van de gekozen datasoorten is", () => {
     const u = evalueer(
       invoer({
         checks: { data: ["intern", "persoonsgegevens"], gebruikers: ["collegas", "extern"] },
         extraVragen: { bijzondere_persoonsgegevens: false },
+        verdieping: { grote_schaal: "ja", kwetsbare_groepen: "ja" },
       }),
       regelset,
     );

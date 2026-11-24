@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, vinkAan, naarChecks } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, rustigeVerdieping, vinkAan, naarChecks } from "./hulp";
 
 test.describe.configure({ mode: "serial" });
 
@@ -26,6 +26,8 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(page.locator(".foutmelding")).toContainText("Vraag 1");
 
   await kies(page, "bijzondere_persoonsgegevens", "Ja");
+  // Verzuim: zieke medewerkers zijn een kwetsbare groep → 2 privacy-indicatoren.
+  await rustigeVerdieping(page, { kwetsbare_groepen: "Ja" });
   await geenRodeVlaggen(page);
 
   // Terug en weer vooruit: niets kwijt.
@@ -44,7 +46,10 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(card).toContainText("Persoonsgegevens (Data), Afdeling (Gebruikers) en Serieus (Impact – Vertrouwelijkheid).");
   await expect(card).toContainText("AI governance & compliance officer");
   await expect(card).toContainText("architect Digitale Ontwikkeling");
-  await expect(card).toContainText("Mogelijk is een DPIA nodig");
+  await expect(card).toContainText("Privacy: Waarschijnlijk volledige DPIA nodig");
+  await expect(card).toContainText("Mensen in een kwetsbare positie: Ja (jouw antwoord)");
+  await expect(card).toContainText("AI: niet van toepassing");
+  await expect(card).toContainText("eerste risico-indicatie");
   await expect(card).toContainText(/TC-\d{4}-\d{4}/);
   await expect(card).toContainText("adviesregister");
   // De coach legt uit in het chatvenster.
@@ -113,7 +118,10 @@ test("rode vlag: Niet op deze manier, met alternatief en zonder aanvraagknop", a
   await naarStap3(page, "Ik wil een rooster-app met echte gegevens zonder toetsing op internet zetten (testscenario).");
   await naarChecks(page);
   await kies(page, "open_zonder_toetsing", "Ja");
-  for (const v of ["persoonlijke_inlog_of_secrets", "ai_beslist_over_mensen", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
+  // "AI beslist over mensen" verschijnt alleen bij Autonomie = Beslissen (regelset 0.8).
+  await expect(page.locator("#veld-ai_beslist_over_mensen")).toHaveCount(0);
+  for (const v of ["persoonlijke_inlog_of_secrets", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
+  await rustigeVerdieping(page);
   // Coach is onzeker over sommige checks: die moet de medewerker bevestigen of zijn al voorgesteld.
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");

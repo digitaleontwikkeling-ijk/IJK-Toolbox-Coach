@@ -80,18 +80,55 @@ const extraVraagSchema = z.object({
 const rodeVlagSchema = z.object({
   id,
   nummer: z.number().int().positive(),
+  /** Alleen stellen bij deze antwoorden op een check; anders is het antwoord "nee". */
+  toon_bij: z.object({ check: id, antwoorden: z.array(id).min(1) }).optional(),
   vraag: tekst,
   uitleg: tekst.optional(),
   kort: tekst,
   alternatief: tekst.optional(),
 });
 
-const conditieSchema = z.union([
-  z.object({ check: id, deelvraag: id.optional(), antwoorden: z.array(id).min(1) }).strict(),
-  z.object({ extra_vraag: id }).strict(),
-  z.object({ rode_vlag: id }).strict(),
-]);
-export type Conditie = z.infer<typeof conditieSchema>;
+/**
+ * De gegevens die de verdieping (privacy en AI) kent. De afleidingen uit de checks staan in
+ * `verdieping.ts`; de vragen en teksten in de regelset. Beide moeten precies deze id's kennen.
+ */
+export const GEGEVEN_IDS = [
+  "ai_gebruik",
+  "kwetsbare_groepen",
+  "koppeling_datasets",
+  "grote_schaal",
+  "profilering",
+  "geautomatiseerd_besluit",
+  "significante_gevolgen",
+  "ai_invloed",
+  "ai_doorslaggevend",
+  "ai_domein",
+  "ai_discriminatie",
+  "ai_herziening",
+  "ai_transparantie",
+  "ai_toezicht",
+  "ai_uitlegbaarheid",
+] as const;
+export type GegevenId = (typeof GEGEVEN_IDS)[number];
+/** DPIA-indicatoren kunnen ook uit de extra vraag over bijzondere persoonsgegevens komen. */
+export const DPIA_BRONNEN = [...GEGEVEN_IDS, "bijzondere_persoonsgegevens"] as const;
+
+const gegevenSchema = z.object({
+  id: z.enum(GEGEVEN_IDS),
+  spoor: z.enum(["basis", "dpia", "ai"]),
+  /** Onder welke check de vraag verschijnt. */
+  plek: id,
+  naam: tekst,
+  vraag: tekst,
+  /** Waarom vragen we dit? (korte zin onder de vraag) */
+  uitleg: tekst,
+  /** Inleiding als er al gedeeltelijke informatie is (de vraag wordt dan een verduidelijking). */
+  signaal: tekst.optional(),
+  antwoorden: z.array(z.object({ id, label: tekst })).min(2),
+});
+export type Gegeven = z.infer<typeof gegevenSchema>;
+
+const klasseMetMinimum = z.object({ id, naam: tekst, minimale_uitkomst: id.optional() });
 
 export const regelsetSchema = z
   .object({
@@ -103,19 +140,21 @@ export const regelsetSchema = z
     extra_vragen: z.array(extraVraagSchema).default([]),
     rode_vlag_kleur: id,
     rode_vlaggen: z.array(rodeVlagSchema).default([]),
+    /** Verdieping: vragen voor privacy (pre-DPIA) en AI-risico. */
+    gegevens: z.array(gegevenSchema),
     dpia: z.object({
-      vereist: z.array(conditieSchema).min(1),
-      minstens_een_van: z.array(conditieSchema).min(1),
-      altijd_bij: z.array(conditieSchema).default([]),
       toetser: id,
+      indicatoren: z.array(z.object({ id: z.enum(DPIA_BRONNEN), naam: tekst })).length(8),
+      /** Oplopend op "vanaf"; de eerste begint bij 0. */
+      klassen: z.array(klasseMetMinimum.extend({ vanaf: z.number().int().min(0) })).min(1),
+      motivatie: tekst,
     }),
-    ai_act: z.object({
-      minstens_een_van: z.array(conditieSchema).min(1),
+    ai_risico: z.object({
       toetser: id,
-      /** Bij een AI Act-signaal is de uitkomst minstens deze kleur. */
-      minimale_uitkomst: id.optional(),
-      /** Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde. */
-      motivatie: tekst.optional(),
+      /** Van laag naar hoog. */
+      klassen: z.array(klasseMetMinimum).min(1),
+      regels: z.array(z.object({ gegeven: z.enum(GEGEVEN_IDS), antwoord: id, klasse: id, voorwaarde: tekst.optional() })),
+      motivatie: tekst,
     }),
     /** Een tool buiten de IJK Toolbox: minstens deze kleur en altijd deze toetsers. */
     tool_buiten_toolbox: z.object({
@@ -163,31 +202,39 @@ export const regelsetSchema = z
       }
     }
 
-    const controleer = (waar: string, cond: Conditie) => {
-      if ("extra_vraag" in cond) {
-        if (!extraIds.has(cond.extra_vraag)) fout(`${waar}: onbekende extra vraag "${cond.extra_vraag}"`);
-        return;
+    for (const v of r.rode_vlaggen) {
+      if (!v.toon_bij) continue;
+      const c = checkById.get(v.toon_bij.check);
+      if (!c) fout(`rode vlag ${v.id}: onbekende check "${v.toon_bij.check}"`);
+      else for (const a of v.toon_bij.antwoorden) {
+        if (!c.antwoorden.some((x) => x.id === a)) fout(`rode vlag ${v.id}: onbekend antwoord "${a}"`);
       }
-      if ("rode_vlag" in cond) {
-        if (!vlagIds.has(cond.rode_vlag)) fout(`${waar}: onbekende rode vlag "${cond.rode_vlag}"`);
-        return;
-      }
-      const c = checkById.get(cond.check);
-      if (!c) return fout(`${waar}: onbekende check "${cond.check}"`);
-      if (cond.deelvraag && !c.deelvragen.some((d) => d.id === cond.deelvraag)) {
-        fout(`${waar}: onbekende deelvraag "${cond.deelvraag}" bij check ${c.id}`);
-      }
-      for (const a of cond.antwoorden) {
-        if (!c.antwoorden.some((x) => x.id === a)) fout(`${waar}: onbekend antwoord "${a}" bij check ${c.id}`);
-      }
-    };
-    if (!toetserIds.has(r.dpia.toetser)) fout(`dpia: onbekende toetser "${r.dpia.toetser}"`);
-    if (!toetserIds.has(r.ai_act.toetser)) fout(`ai_act: onbekende toetser "${r.ai_act.toetser}"`);
-    if (r.ai_act.minimale_uitkomst && !kleurIds.has(r.ai_act.minimale_uitkomst)) {
-      fout(`ai_act: onbekende kleur "${r.ai_act.minimale_uitkomst}"`);
     }
-    for (const c of [...r.dpia.vereist, ...r.dpia.minstens_een_van, ...r.dpia.altijd_bij]) controleer("dpia", c);
-    for (const c of r.ai_act.minstens_een_van) controleer("ai_act", c);
+
+    // Verdieping
+    dubbel(r.gegevens.map((g) => g.id), "gegeven", fout);
+    for (const g of GEGEVEN_IDS) if (!r.gegevens.some((x) => x.id === g)) fout(`gegevens: "${g}" ontbreekt`);
+    for (const g of r.gegevens) {
+      if (!checkById.has(g.plek)) fout(`gegeven ${g.id}: onbekende plek (check) "${g.plek}"`);
+      dubbel(g.antwoorden.map((a) => a.id), `antwoord bij gegeven ${g.id}`, fout);
+    }
+    const antwoordBestaat = (gegeven: string, antwoord: string) =>
+      r.gegevens.find((g) => g.id === gegeven)?.antwoorden.some((a) => a.id === antwoord) ?? false;
+    if (!toetserIds.has(r.dpia.toetser)) fout(`dpia: onbekende toetser "${r.dpia.toetser}"`);
+    dubbel(r.dpia.indicatoren.map((i) => i.id), "DPIA-indicator", fout);
+    if (r.dpia.klassen[0]?.vanaf !== 0) fout("dpia: de eerste klasse moet vanaf 0 gelden");
+    for (let i = 1; i < r.dpia.klassen.length; i++) {
+      if (r.dpia.klassen[i]!.vanaf <= r.dpia.klassen[i - 1]!.vanaf) fout("dpia: klassen moeten oplopen");
+    }
+    for (const k of [...r.dpia.klassen, ...r.ai_risico.klassen]) {
+      if (k.minimale_uitkomst && !kleurIds.has(k.minimale_uitkomst)) fout(`klasse ${k.id}: onbekende kleur "${k.minimale_uitkomst}"`);
+    }
+    if (!toetserIds.has(r.ai_risico.toetser)) fout(`ai_risico: onbekende toetser "${r.ai_risico.toetser}"`);
+    const aiKlassen = new Set(r.ai_risico.klassen.map((k) => k.id));
+    for (const regel of r.ai_risico.regels) {
+      if (!aiKlassen.has(regel.klasse)) fout(`ai_risico: onbekende klasse "${regel.klasse}"`);
+      if (!antwoordBestaat(regel.gegeven, regel.antwoord)) fout(`ai_risico: onbekend antwoord "${regel.antwoord}" bij ${regel.gegeven}`);
+    }
     if (!kleurIds.has(r.tool_buiten_toolbox.minimale_uitkomst)) {
       fout(`tool_buiten_toolbox: onbekende kleur "${r.tool_buiten_toolbox.minimale_uitkomst}"`);
     }
@@ -233,6 +280,11 @@ export const toolsSchema = z
           naam: tekst,
           omschrijving: tekst.optional(),
           spelregels: tekst,
+          /**
+           * Gebruikt deze tool zelf AI? Een sterk signaal: de vraag "Gebruikt je oplossing AI?" wordt dan
+           * vooraf op "Ja" gezet, maar de medewerker bevestigt of past aan (het gaat om wat de oplossing doet).
+           */
+          ai: z.boolean().optional(),
           /** Optioneel logo, bijvoorbeeld iconen/hubbi.png (png, svg of webp, max. 200 kB). */
           icoon: z
             .string()
@@ -327,11 +379,30 @@ export const tekstenSchema = z.object({
     ter_informatie: tekst,
     ter_informatie_uitleg: tekst,
   }),
-  ai_act: z.object({ titel: tekst, uitleg: tekst }),
   extra_regelen_titel: tekst,
   contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
-  dpia: z.object({ titel: tekst, uitleg: tekst }),
+  verdieping: z.object({
+    privacy_intro: tekst,
+    privacy_intro_onzeker: tekst,
+    ai_titel: tekst,
+    ai_intro: tekst,
+    ai_intro_onzeker: tekst,
+    tool_voorstel: tekst,
+    voortgang: tekst,
+    voortgang_een: tekst,
+    voortgang_klaar: tekst,
+  }),
+  privacy: z.object({
+    titel: tekst,
+    niet_nodig: tekst,
+    per_klasse: z.record(z.string(), tekst),
+    indicatoren_titel: tekst,
+    geen_indicatoren: tekst,
+  }),
+  ai: z.object({ titel: tekst, niet_nodig: tekst, per_klasse: z.record(z.string(), tekst), redenen_titel: tekst, feiten_titel: tekst }),
+  techniek: z.object({ titel: tekst, intro: tekst, punten: z.record(z.string(), tekst) }),
+  disclaimer: tekst,
   andere_tool: z.object({
     optie: tekst,
     naam_label: tekst,

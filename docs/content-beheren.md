@@ -6,7 +6,7 @@ beoordeeld en terug te draaien is.
 
 | Bestand | Inhoud |
 | --- | --- |
-| `content/regelset.yaml` | Uitkomsten en kleuren, de zes checks met schalen, extra vraag, rode vlaggen, toetsers, DPIA-regels, voorwaarden (geel), alternatieven (rood), teksten voor "Waarom deze kleur?" |
+| `content/regelset.yaml` | Uitkomsten en kleuren, de zes checks met schalen, extra vraag, rode vlaggen, toetsers, voorwaarden (geel), alternatieven (rood), teksten voor "Waarom deze kleur?", en de verdieping: privacy- en AI-vragen (`gegevens`), DPIA-telling (`dpia`) en AI-risico (`ai_risico`) |
 | `content/tools.yaml` | Tools in de IJK Toolbox, behoeften → tools, keuzehulp voor de coach |
 | `content/spelregels/<tool>.yaml` | Per tool: zelf doen / eerst toetsen / altijd |
 | `content/teksten.yaml` | Teksten in de interface (stappen, knoppen, statussen, uitleg) |
@@ -64,8 +64,11 @@ veld `toetser` van de check wie de aanvraag krijgt.
 **Een rode vlag toevoegen** (`regelset.yaml`, onder `rode_vlaggen`): geef een nieuwe `id`, het volgende `nummer`,
 de `vraag`, een korte omschrijving (`kort`, voor "Waarom deze kleur?") en een `alternatief`.
 
-**Een DPIA-situatie toevoegen** (`regelset.yaml`, onder `dpia.minstens_een_van`):
-
-```yaml
-    - { check: afhankelijkheid, antwoorden: [bedrijf] }
-```
+**Privacy en AI (regelset 0.8)**: zie `docs/analyse-privacy-ai.md`.
+- Tekst van een verdiepingsvraag, de uitleg ("waarom") of de inleiding bij een signaal: `gegevens` in `regelset.yaml`.
+- DPIA-drempels: `dpia.klassen` (`vanaf` = aantal indicatoren; `minimale_uitkomst` = minstens deze kleur).
+- AI-regels: `ai_risico.regels` (gegeven + antwoord → klasse, met een voorwaarde voor bij "Beperkt").
+- Teksten op de adviescard: `privacy`, `ai`, `techniek` en `disclaimer` in `teksten.yaml`.
+- **Welke vraag wanneer** (en welke antwoorden uit de checks worden hergebruikt) staat in één bestand:
+  `src/domain/verdieping.ts`. Een nieuwe vraag toevoegen vraagt dus ook een (kleine) codewijziging en een test.
+- Of een tool zelf AI gebruikt: `ai: true` in `tools.yaml` (de AI-vraag staat dan vooraf op "Ja").

@@ -182,10 +182,11 @@ describe("toetsing", () => {
     expect(r.json.advies).toMatchObject({
       beschrijving: VOLLEDIG.beschrijving,
       antwoorden: { checks: VOLLEDIG.checks, extraVragen: { bijzondere_persoonsgegevens: true } },
-      rodeVlaggen: VOLLEDIG.rodeVlaggen,
+      // "AI beslist over mensen" wordt alleen gesteld bij Autonomie = Beslissen (regelset 0.8).
+      rodeVlaggen: { persoonlijke_inlog_of_secrets: false, open_zonder_toetsing: false, proces_zonder_eigenaar: false },
       uitkomst: "oranje",
       dpiaSignaal: true,
-      regelversie: "0.7",
+      regelversie: "0.8",
       besluiten: [],
     });
     await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE });
@@ -315,13 +316,24 @@ describe("regelset 0.4: contact volgt, ter informatie en AI Act", () => {
     expect([404, 409]).toContain((await besluit(zonder.id, COMPLIANCE, { besluit: "goedgekeurd" })).status);
   });
 
-  it("F21. het AI Act-signaal en de deelscores van Impact staan in het adviesregister", async () => {
-    const data = { ...GROEN, checks: { ...GROEN.checks, autonomie: "handelen", impact: { beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" } } };
+  it("F21. AI-risico en privacy staan met herkomst in het adviesregister; oude antwoorden niet (regelset 0.8)", async () => {
+    const data = {
+      ...GROEN,
+      checks: { ...GROEN.checks, autonomie: "handelen", impact: { beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" } },
+      // kwetsbare_groepen staat nog in het concept (uit VOLLEDIG), maar is zonder persoonsgegevens niet relevant.
+      verdieping: { ...GROEN.verdieping, ai_gebruik: "ja", ai_invloed: "indirect", ai_discriminatie: "ja" },
+    };
     const a = await nieuwAdvies(ANNA, data);
-    const rij = (await db().query("SELECT ai_act_signaal, dpia_signaal, antwoorden FROM advies WHERE id = $1", [a.id])).rows[0];
+    const rij = (await db().query("SELECT ai_act_signaal, dpia_signaal, antwoorden, dpia, ai_risico, feiten FROM advies WHERE id = $1", [a.id])).rows[0];
     expect(rij.ai_act_signaal).toBe(true);
     expect(rij.dpia_signaal).toBe(false);
+    expect(rij.dpia).toMatchObject({ actief: false, klasse: null });
+    expect(rij.ai_risico).toMatchObject({ actief: true, klasse: "hoog", domein: "anders" });
+    expect(rij.ai_risico.redenen[0]).toMatchObject({ gegeven: "ai_discriminatie", antwoord: "ja", feit: { herkomst: "expliciet", bron: "verdieping.ai_discriminatie" } });
     expect(rij.antwoorden.checks.impact).toEqual({ beschikbaarheid: "beperkt", integriteit: "serieus", vertrouwelijkheid: "nauwelijks" });
+    expect(rij.antwoorden.verdieping.kwetsbare_groepen).toBeUndefined();
+    expect(rij.antwoorden.verdieping.ai_discriminatie).toBe("ja");
+    expect(rij.feiten.find((f: { id: string }) => f.id === "check.autonomie").gebruiktDoor).toEqual(["toolbox"]);
     expect(a.toetsers).toEqual(["toetser_compliance"]);
   });
 });

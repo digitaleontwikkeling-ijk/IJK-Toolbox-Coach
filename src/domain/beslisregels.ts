@@ -8,11 +8,13 @@
  * Regel: uitkomst = hoogste kleur over alle checks en rode vlaggen.
  * - Bij een check met meerdere antwoorden telt het antwoord met de hoogste kleur.
  * - Bij een check met deelvragen (Impact: B, I, V) telt de hoogste deelscore.
- * - Bij een AI Act-signaal is de uitkomst minstens de ingestelde kleur (oranje).
  * - Bij een tool buiten de IJK Toolbox is de uitkomst minstens de ingestelde kleur (oranje),
  *   en gaat de aanvraag naar de ingestelde toetsers.
+ * - Privacy (pre-DPIA) en AI-risico zijn twee aparte beoordelingen (zie verdieping.ts). Hun klasse kan de
+ *   uitkomst verhogen tot een minimale kleur (regelset: dpia.klassen en ai_risico.klassen).
  */
-import type { Antwoord, Check, Conditie, Deelvraag, Kleur, Regelset, Vervolgactie } from "./content-schema";
+import type { Antwoord, Check, Deelvraag, Kleur, Regelset, Vervolgactie } from "./content-schema";
+import { analyseer, evalueerAi, evalueerDpia, type AiUitkomst, type DpiaUitkomst, type Feit } from "./verdieping";
 
 /** Antwoord op een check: één antwoord-id, een lijst (meerdere antwoorden) of per deelvraag een antwoord-id. */
 export type CheckAntwoord = string | string[] | Record<string, string>;
@@ -27,8 +29,10 @@ export interface BeslisInvoer {
   checks: Record<string, CheckAntwoord>;
   /** extra-vraag-id → ja/nee. Alleen nodig als de extra vraag van toepassing is. */
   extraVragen?: Record<string, boolean>;
-  /** rode-vlag-id → ja/nee. Elke rode vlag moet beantwoord zijn. */
+  /** rode-vlag-id → ja/nee. Elke rode vlag die van toepassing is, moet beantwoord zijn. */
   rodeVlaggen: Record<string, boolean>;
+  /** Verdiepingsvragen (privacy en AI): gegeven-id → antwoord-id. Alleen relevante vragen tellen mee. */
+  verdieping?: Record<string, string>;
   /** Koos de medewerker een tool die (nog) niet in de IJK Toolbox zit? */
   toolBuitenToolbox?: boolean;
 }
@@ -44,8 +48,8 @@ export type Reden =
       antwoordLabel: string;
     }
   | { soort: "rode_vlag"; vlagId: string; kort: string }
-  /** Een signaal (AI Act, tool buiten de toolbox) dat de uitkomst naar een minimale kleur verhoogde. */
-  | { soort: "signaal"; signaal: "ai_act" | "tool_buiten_toolbox"; tekst: string };
+  /** Een beoordeling (tool buiten de toolbox, privacy, AI) die de uitkomst naar een minimale kleur verhoogde. */
+  | { soort: "signaal"; signaal: "tool_buiten_toolbox" | "dpia" | "ai_risico"; tekst: string };
 
 export interface BeslisUitkomst {
   regelversie: string;
@@ -58,8 +62,14 @@ export interface BeslisUitkomst {
   motivatie: string;
   /** Toetsers bij deze uitkomst (zie `toetsers` bij de kleur in de regelset). */
   toetsers: string[];
+  /** Privacy: de DPIA-klasse is minstens "waarschijnlijk" (een klasse met een minimale uitkomst). */
   dpiaSignaal: boolean;
+  /** AI: het hoogste AI-risico (de compliance officer classificeert volgens de AI Act). */
   aiActSignaal: boolean;
+  dpia: DpiaUitkomst;
+  aiRisico: AiUitkomst;
+  /** Alle feiten met herkomst (traceerbaarheid). */
+  feiten: Feit[];
   /** Alleen gevuld als de vervolgactie een accountaanvraag met voorwaarden is. */
   voorwaarden: string[];
   /** Alleen gevuld als de uitkomst "alleen vastleggen" is (geen aanvraag). */
@@ -98,6 +108,21 @@ export function extraVraagVanToepassing(extraId: string, invoer: BeslisInvoer, r
   const extra = regelset.extra_vragen.find((e) => e.id === extraId);
   if (!extra) return false;
   return gekozenIds(invoer, extra.check).some((id) => extra.toon_bij.includes(id));
+}
+
+/** Wordt deze aanvullende vraag gesteld? (Sommige alleen bij een bepaald antwoord op een check.) */
+export function rodeVlagVanToepassing(vlagId: string, invoer: BeslisInvoer, regelset: Regelset): boolean {
+  const v = regelset.rode_vlaggen.find((x) => x.id === vlagId);
+  if (!v) return false;
+  if (!v.toon_bij) return true;
+  return gekozenIds(invoer, v.toon_bij.check).some((id) => v.toon_bij!.antwoorden.includes(id));
+}
+
+/** De rode vlaggen zoals ze meetellen: een vraag die niet gesteld wordt, telt als "nee". */
+function rodeVlaggenDieTellen(invoer: BeslisInvoer, regelset: Regelset): Record<string, boolean> {
+  const uit: Record<string, boolean> = {};
+  for (const v of regelset.rode_vlaggen) uit[v.id] = rodeVlagVanToepassing(v.id, invoer, regelset) && invoer.rodeVlaggen?.[v.id] === true;
+  return uit;
 }
 
 // ---------- Invoercontrole ----------
@@ -153,8 +178,14 @@ export function valideerInvoer(invoer: BeslisInvoer, regelset: Regelset): string
     if (!vlagIds.has(id)) fouten.push(`onbekende rode vlag "${id}"`);
   }
   for (const vlag of regelset.rode_vlaggen) {
+    if (!rodeVlagVanToepassing(vlag.id, invoer, regelset)) continue;
     if (typeof invoer.rodeVlaggen?.[vlag.id] !== "boolean") fouten.push(`rode vlag "${vlag.id}" is niet beantwoord`);
   }
+
+  // Verdieping (privacy en AI): alleen de vragen die nu relevant zijn en niet uit eerdere antwoorden volgen.
+  const v = analyseer({ ...invoer, rodeVlaggen: rodeVlaggenDieTellen(invoer, regelset) }, regelset);
+  fouten.push(...v.fouten);
+  for (const q of v.vragen) if (q.antwoord === undefined) fouten.push(`vraag "${q.gegeven.id}" is niet beantwoord`);
   return fouten;
 }
 
@@ -183,31 +214,44 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     // Alleen de keuzes met de hoogste kleur bepalen de score van deze check.
     return { check, kleur, bepalend: keuzes.filter((k) => k.antwoord.kleur === kleur) };
   });
-  const vlaggenJa = regelset.rode_vlaggen.filter((v) => invoer.rodeVlaggen[v.id] === true);
+  const vlaggen = rodeVlaggenDieTellen(invoer, regelset);
+  const vlaggenJa = regelset.rode_vlaggen.filter((v) => vlaggen[v.id]);
 
-  // 2. Signalen.
-  const geldt = (c: Conditie) => conditieGeldt(c, invoer, regelset);
-  const dpiaSignaal =
-    (regelset.dpia.vereist.every(geldt) && regelset.dpia.minstens_een_van.some(geldt)) ||
-    regelset.dpia.altijd_bij.some(geldt);
-  const aiActSignaal = regelset.ai_act.minstens_een_van.some(geldt);
+  // 2. Privacy (pre-DPIA) en AI-risico: aparte beoordelingen op dezelfde feiten.
+  const analyse = analyseer({ ...invoer, rodeVlaggen: vlaggen }, regelset);
+  const dpia = evalueerDpia(analyse, regelset);
+  const aiRisico = evalueerAi(analyse, regelset);
+  const dpiaKlasse = regelset.dpia.klassen.find((k) => k.id === dpia.klasse);
+  const aiKlasse = regelset.ai_risico.klassen.find((k) => k.id === aiRisico.klasse);
+  const dpiaSignaal = !!dpiaKlasse?.minimale_uitkomst;
+  const aiActSignaal = !!aiKlasse && aiKlasse.id === regelset.ai_risico.klassen[regelset.ai_risico.klassen.length - 1]!.id;
 
-  // 3. Hoogste kleur over checks en rode vlaggen. Een AI Act-signaal en een tool buiten de toolbox
-  //    verhogen de uitkomst tot minstens de ingestelde kleur, zodat de toetsers altijd meekijken.
+  // 3. Hoogste kleur over checks en rode vlaggen. Een tool buiten de toolbox en de klassen van privacy en AI
+  //    verhogen de uitkomst tot minstens de ingestelde kleur.
   let hoogste = 0;
   for (const s of checkScores) hoogste = Math.max(hoogste, rangVan(s.kleur));
   if (vlaggenJa.length > 0) hoogste = Math.max(hoogste, rangVan(regelset.rode_vlag_kleur));
   const buiten = invoer.toolBuitenToolbox === true;
-  const minima: { signaal: "ai_act" | "tool_buiten_toolbox"; rang: number; tekst: string }[] = [];
+  type Minimum = { signaal: "tool_buiten_toolbox" | "dpia" | "ai_risico"; rang: number; tekst: string; toetsers: string[] };
+  const minima: Minimum[] = [];
   if (buiten) {
     const tb = regelset.tool_buiten_toolbox;
-    minima.push({ signaal: "tool_buiten_toolbox", rang: rangVan(tb.minimale_uitkomst), tekst: tb.motivatie });
+    minima.push({ signaal: "tool_buiten_toolbox", rang: rangVan(tb.minimale_uitkomst), tekst: tb.motivatie, toetsers: tb.toetsers });
   }
-  if (aiActSignaal && regelset.ai_act.minimale_uitkomst) {
+  if (dpiaKlasse?.minimale_uitkomst) {
     minima.push({
-      signaal: "ai_act",
-      rang: rangVan(regelset.ai_act.minimale_uitkomst),
-      tekst: regelset.ai_act.motivatie ?? "AI Act-classificatie nodig",
+      signaal: "dpia",
+      rang: rangVan(dpiaKlasse.minimale_uitkomst),
+      tekst: regelset.dpia.motivatie.replace("{klasse}", dpiaKlasse.naam).replace("{aantal}", String(dpia.score)),
+      toetsers: [regelset.dpia.toetser],
+    });
+  }
+  if (aiKlasse?.minimale_uitkomst) {
+    minima.push({
+      signaal: "ai_risico",
+      rang: rangVan(aiKlasse.minimale_uitkomst),
+      tekst: regelset.ai_risico.motivatie.replace("{klasse}", aiKlasse.naam),
+      toetsers: [regelset.ai_risico.toetser],
     });
   }
   const verhogers = minima.filter((m) => m.rang > hoogste);
@@ -242,16 +286,23 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     toetsers = regelset.toetsers.map((t) => t.id);
   } else if (kleur.toetsers === "per_check") {
     const nodig = new Set(doorslagChecks.map((s) => s.check.toetser));
-    if (dpiaSignaal) nodig.add(regelset.dpia.toetser);
-    if (aiActSignaal) nodig.add(regelset.ai_act.toetser);
-    if (buiten) for (const t of regelset.tool_buiten_toolbox.toetsers) nodig.add(t);
+    // Toetsers van de beoordelingen die minstens een kleur met toetsers vragen (privacy, AI, tool buiten de toolbox).
+    for (const m of minima) {
+      if (regelset.kleuren[m.rang]!.toetsers !== "geen") for (const t of m.toetsers) nodig.add(t);
+    }
     toetsers = regelset.toetsers.map((t) => t.id).filter((t) => nodig.has(t));
   }
 
   // 6. Voorwaarden (alleen bij een accountaanvraag met voorwaarden).
   const voorwaarden =
     kleur.vervolgactie === "accountaanvraag_met_voorwaarden"
-      ? uniek(doorslagChecks.flatMap((s) => s.bepalend.map((k) => k.antwoord.voorwaarde)).filter(isTekst))
+      ? uniek(
+          [
+            ...doorslagChecks.flatMap((s) => s.bepalend.map((k) => k.antwoord.voorwaarde)),
+            // AI-risico "beperkt": de voorwaarden bij de antwoorden die het risico bepaalden.
+            ...aiRisico.redenen.map((r) => r.voorwaarde),
+          ].filter(isTekst),
+        )
       : [];
 
   // 7. Alternatieven (alleen als er geen aanvraag mogelijk is). Geen alternatief → eventueel contact.
@@ -276,6 +327,9 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
     toetsers,
     dpiaSignaal,
     aiActSignaal,
+    dpia,
+    aiRisico,
+    feiten: analyse.feiten,
     voorwaarden,
     alternatieven,
     contactNodig,
@@ -303,20 +357,6 @@ function gekozenKeuzes(check: Check, invoer: BeslisInvoer): Keuze[] {
   }
   const ids = gekozenIds(invoer, check.id);
   return check.antwoorden.filter((a) => ids.includes(a.id)).map((antwoord) => ({ antwoord }));
-}
-
-function conditieGeldt(c: Conditie, invoer: BeslisInvoer, regelset: Regelset): boolean {
-  if ("extra_vraag" in c) {
-    // Een antwoord op een extra vraag telt alleen als die vraag van toepassing is.
-    return extraVraagVanToepassing(c.extra_vraag, invoer, regelset) && invoer.extraVragen?.[c.extra_vraag] === true;
-  }
-  if ("rode_vlag" in c) return invoer.rodeVlaggen[c.rode_vlag] === true;
-  if (c.deelvraag) {
-    const a = deelvraagAntwoord(invoer, c.check, c.deelvraag);
-    return a !== undefined && c.antwoorden.includes(a);
-  }
-  // Zonder deelvraag: één van de gekozen antwoorden (bij deelvragen: één van de deelscores) staat in de lijst.
-  return gekozenIds(invoer, c.check).some((id) => c.antwoorden.includes(id));
 }
 
 /** "a", "a en b", "a, b en c" */

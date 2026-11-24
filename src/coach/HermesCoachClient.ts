@@ -126,6 +126,8 @@ export class HermesCoachClient implements CoachClient {
           alternatieven: uitkomst.alternatieven,
           toetsing_nodig: uitkomst.toetsers.length > 0,
           dpia_mogelijk_nodig: uitkomst.dpiaSignaal,
+          privacy: uitkomst.dpiaKlasse ?? null,
+          ai_risico: uitkomst.aiKlasse ?? null,
         },
       },
       { tool },

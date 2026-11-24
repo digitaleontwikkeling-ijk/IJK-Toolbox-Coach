@@ -41,7 +41,11 @@ export interface UitlegInvoer {
   beschrijving: string;
   tool: string;
   /** Door de beslisregels berekend; de coach legt alleen uit. */
-  uitkomst: BeslisUitkomst;
+  uitkomst: Omit<BeslisUitkomst, "dpia" | "aiRisico" | "feiten"> & {
+    /** Namen van de klassen voor privacy en AI (of null als die beoordeling niet nodig was). */
+    dpiaKlasse?: string | null;
+    aiKlasse?: string | null;
+  };
   /** Gekozen antwoorden, als leesbare labels: { "Data": "Intern", ... } */
   antwoorden: Record<string, string>;
 }

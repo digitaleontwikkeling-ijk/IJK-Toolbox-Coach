@@ -6,14 +6,14 @@ Een webapp waarin medewerkers van IJK via een wizard advies krijgen over het ver
 | Fase | Stap |
 | --- | --- |
 | 1 · Welke tool past? | 1. Wat wil je bereiken? · 2. Welke tool past? |
-| 2 · Mag ik dit doen? | 3. Zes checks (+ rode vlaggen) · 4. Advies in één van vier kleuren, met de vervolgactie |
+| 2 · Mag ik dit doen? | 3. Zes checks, met waar nodig vragen over privacy en AI (+ aanvullende vragen) · 4. Advies in één van vier kleuren, met de privacy- en AI-beoordeling en de vervolgactie |
 
 De coach (Hermes Agent) voert het gesprek, vraagt door en legt uit. **De webapp bewaakt het stappenpad en berekent
 de uitkomst met vaste beslisregels; het taalmodel bepaalt nooit de kleur.** De app werkt ook volledig zonder AI.
 
 > **Status: proof of concept.** Gebruik alleen testgegevens en fictieve voorbeelden. Volgens het IJK-kader moet deze
 > app zelf eerst worden getoetst (door beide toetsers) voordat hij met echte gegevens of door collega's wordt gebruikt.
-> De regelset is versie `0.7` en nog niet gevalideerd.
+> De regelset is versie `0.8` en nog niet gevalideerd.
 
 ## Demo bekijken
 
@@ -132,11 +132,11 @@ Hermes API-server (profiel toolbox-coach)     Webhooks naar flows van IJK
 
 ## Nog open (te valideren door IJK)
 
-- Regelset `0.7` is nog niet gevalideerd door de toetsers. Zoek in `content/` op `TODO:` voor de open punten:
+- Regelset `0.8` is nog niet gevalideerd door de toetsers. Zoek in `content/` op `TODO:` voor de open punten:
   - placeholders voor de voorwaarden bij Autonomie = Lezen en Impact = Beperkt;
   - de BIV-voorbeelden bij Impact (afstemmen op het IJK-risicomanagementproces);
   - of oranje op Impact-Beschikbaarheid ook naar de architect moet;
-  - het AI Act-signaal en de extra vraag "Gaat het advies over mensen?";
+  - de privacy-telling (8 indicatoren) en de AI-risicoregels (regelset 0.8, zie `docs/analyse-privacy-ai.md`);
   - de uitzondering bij aanvullende vraag 1 (Copilot workflows) en welke checks meerdere antwoorden toestaan;
   - de route voor een tool buiten de IJK Toolbox (minstens "Eerst toetsen", altijd beide toetsers).
 - Eerste test met echte Hermes, echte Entra-tenant en echte Teams (zie de documenten hierboven).

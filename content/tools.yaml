@@ -3,12 +3,15 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.5"
+versie: "0.6"
 
+# ai: true = de tool gebruikt zelf AI. Dan staat de vraag "Gebruikt je oplossing AI?" vooraf op "Ja"
+# (een sterk signaal, de medewerker bevestigt). Bij andere tools hangt het af van wat je bouwt.
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
     spelregels: spelregels/m365_copilot.yaml
+    ai: true
     icoon: iconen/m365_copilot.png
   - id: copilot_workflows
     naam: Copilot workflows
@@ -27,6 +30,7 @@ tools:
   - id: ai_flows
     naam: AI Flows
     spelregels: spelregels/ai_flows.yaml
+    ai: true
     icoon: iconen/ai_flows.png
   - id: claude_code
     naam: Claude Code
@@ -35,6 +39,7 @@ tools:
   - id: azure_openai
     naam: Azure OpenAI
     spelregels: spelregels/azure_openai.yaml
+    ai: true
     icoon: iconen/azure_openai.png
 
 behoeften:

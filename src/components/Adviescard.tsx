@@ -10,6 +10,7 @@ import { HoeWerktHetLink } from "./HoeWerktHet";
 import { hoeWerktHetHref } from "@/lib/paden";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
+import { Beoordelingen } from "./Beoordelingen";
 import { ToolIcoon } from "./ToolIcoon";
 import { datum, kleurVan, toetserNaam, toolWeergave, type AdviesDto, type ContentDto } from "./client";
 
@@ -91,6 +92,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           </section>
         )}
 
+        <Beoordelingen advies={advies} content={content} />
+
         {toetserNamen.length > 0 && (
           <section>
             <h3>{kleur.vervolgactie === "toetsing" ? "Wie toetst?" : "Wie kijkt mee?"}</h3>
@@ -98,19 +101,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           </section>
         )}
 
-        {advies.aiActSignaal && (
-          <section className="info" style={{ margin: 0 }}>
-            <h3>{t.ai_act.titel}</h3>
-            <p style={{ margin: 0 }}>{t.ai_act.uitleg}</p>
-          </section>
-        )}
-
-        {advies.dpiaSignaal && (
-          <section className="info" style={{ margin: 0 }}>
-            <h3>{t.dpia.titel}</h3>
-            <p style={{ margin: 0 }}>{t.dpia.uitleg}</p>
-          </section>
-        )}
+        <p className="disclaimer">{t.disclaimer}</p>
 
         <section>
           <h3>{weergave === "inzage" ? "Antwoorden" : "Je antwoorden"}</h3>
@@ -152,6 +143,14 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                   <tr key={e.id}>
                     <th scope="row">{e.vraag}</th>
                     <td>{advies.antwoorden.extraVragen[e.id] ? "Ja" : "Nee"}</td>
+                  </tr>
+                ))}
+              {r.gegevens
+                .filter((g) => advies.antwoorden.verdieping?.[g.id] !== undefined)
+                .map((g) => (
+                  <tr key={g.id}>
+                    <th scope="row">{g.vraag}</th>
+                    <td>{g.antwoorden.find((x) => x.id === advies.antwoorden.verdieping![g.id])?.label ?? "—"}</td>
                   </tr>
                 ))}
               <tr>

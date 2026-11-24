@@ -6,6 +6,7 @@ import * as conceptRoute from "@/app/api/concept/route";
 import * as conceptIdRoute from "@/app/api/concept/[id]/route";
 import * as adviesRoute from "@/app/api/advies/route";
 import { db } from "@/db/pool";
+import { RUSTIG } from "../helpers";
 
 export type Handler = (req: Request, ctx: { params: Promise<Record<string, string>> }) => Promise<Response>;
 
@@ -38,6 +39,9 @@ export const VOLLEDIG = {
   checks: { data: "persoonsgegevens", systemen: "lezen", gebruikers: "afdeling", autonomie: "lezen", impact: { beschikbaarheid: "serieus", integriteit: "nauwelijks", vertrouwelijkheid: "nauwelijks" }, afhankelijkheid: "experiment" },
   extraVragen: { bijzondere_persoonsgegevens: true },
   rodeVlaggen: { persoonlijke_inlog_of_secrets: false, ai_beslist_over_mensen: false, open_zonder_toetsing: false, proces_zonder_eigenaar: false },
+  // Verdieping (regelset 0.8): geen AI; privacy-indicatoren bijzondere persoonsgegevens (extra vraag) en
+  // kwetsbare groepen (zieke medewerkers) → 2 indicatoren → "Waarschijnlijk volledige DPIA nodig".
+  verdieping: { ...RUSTIG, kwetsbare_groepen: "ja" },
   chat: [{ rol: "medewerker", tekst: "Dit gesprek mag niet in het register." }],
 };
 

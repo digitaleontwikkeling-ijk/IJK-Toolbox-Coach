@@ -25,7 +25,7 @@ test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten e
   await expect(page.locator("#veld-proces_zonder_eigenaar")).toBeVisible();
 });
 
-test("AI Act-signaal: AI keurt zelfstandig facturen goed (scenario 11)", async ({ page }) => {
+test("AI-risico: AI keurt zelfstandig facturen goed (scenario 11, regelset 0.8)", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "AI keurt facturen zelfstandig goed voor betaling.");
   await naarChecks(page);
@@ -35,12 +35,22 @@ test("AI Act-signaal: AI keurt zelfstandig facturen goed (scenario 11)", async (
   await kies(page, "autonomie", "Handelen");
   await kiesImpact(page, { integriteit: "Serieus" });
   await kies(page, "afhankelijkheid", "Regelmatig, voor mijn eigen werk (persoonlijke oplossing)");
+  // AI Flows gebruikt AI: de vraag staat al op Ja (de medewerker bevestigt).
+  await expect(page.locator("#veld-ai_gebruik")).toContainText("Voorgesteld op basis van de gekozen tool");
+  await expect(page.locator("#veld-ai_gebruik").getByLabel("Ja", { exact: true })).toBeChecked();
+  await expect(page.getByRole("group", { name: "Over de AI in je oplossing" })).toBeVisible();
+  // Facturen, geen mensen: de vragen over betrokkenen verschijnen niet.
+  await kies(page, "ai_invloed", "Nee");
+  await expect(page.locator("#veld-ai_domein")).toHaveCount(0);
+  await kies(page, "ai_uitlegbaarheid", "Beperkt uitlegbaar");
   await geenRodeVlaggen(page);
+  await expect(page.locator(".voortgang")).toContainText("zijn beantwoord");
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   const card = page.locator(".adviescard");
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
-  await expect(card).toContainText("AI Act-classificatie nodig");
-  await expect(card).not.toContainText("Mogelijk is een DPIA nodig");
+  await expect(card).toContainText("AI: Beperkt risico");
+  await expect(card).toContainText("Uitlegbaarheid: Beperkt uitlegbaar (jouw antwoord)");
+  await expect(card).toContainText("Privacy: niet van toepassing");
   await expect(card.getByRole("row", { name: /5\. Impact/ })).toContainText("Integriteit: Serieus");
 });
 

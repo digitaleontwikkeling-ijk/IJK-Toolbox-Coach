@@ -38,12 +38,15 @@ describe("tool buiten de IJK Toolbox", () => {
     expect(v.alternatieven).toEqual(["Eerst toetsen, dan pas delen."]);
   });
 
-  it("T4. samen met een AI Act-signaal: beide redenen in de motivatie", () => {
-    const u = evalueer(buiten({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }), regelset);
+  it("T4. samen met een hoog AI-risico: beide redenen in de motivatie", () => {
+    const u = evalueer(
+      buiten({ checks: { autonomie: "adviseren" }, verdieping: { ai_gebruik: "ja", ai_invloed: "indirect", ai_herziening: "nee" } }),
+      regelset,
+    );
     expect(u.kleur).toBe("oranje");
     expect(u.redenen.filter((r) => r.soort === "signaal").map((r) => r.soort === "signaal" && r.signaal)).toEqual([
       "tool_buiten_toolbox",
-      "ai_act",
+      "ai_risico",
     ]);
   });
 

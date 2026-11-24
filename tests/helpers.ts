@@ -23,6 +23,7 @@ export function invoer(opties: {
   checks?: Record<string, CheckAntwoord>;
   extraVragen?: Record<string, boolean>;
   rodeVlaggen?: Record<string, boolean>;
+  verdieping?: Record<string, string>;
 } = {}, r: Regelset = regelset): BeslisInvoer {
   const checks: Record<string, CheckAntwoord> = {};
   for (const c of r.checks) {
@@ -40,5 +41,27 @@ export function invoer(opties: {
   }
   const rodeVlaggen: Record<string, boolean> = {};
   for (const v of r.rode_vlaggen) rodeVlaggen[v.id] = opties.rodeVlaggen?.[v.id] ?? false;
-  return { checks, extraVragen: opties.extraVragen ?? {}, rodeVlaggen };
+  return { checks, extraVragen: opties.extraVragen ?? {}, rodeVlaggen, verdieping: { ...RUSTIG, ...opties.verdieping } };
 }
+
+/**
+ * Antwoorden op de verdiepingsvragen die het risico niet verhogen. Alleen de vragen die relevant zijn tellen
+ * mee; de rest wordt genegeerd. Standaard: geen AI.
+ */
+export const RUSTIG: Record<string, string> = {
+  ai_gebruik: "nee",
+  kwetsbare_groepen: "nee",
+  koppeling_datasets: "nee",
+  grote_schaal: "nee",
+  profilering: "nee",
+  geautomatiseerd_besluit: "nee",
+  significante_gevolgen: "nee",
+  ai_invloed: "nee",
+  ai_doorslaggevend: "nee",
+  ai_domein: "anders",
+  ai_discriminatie: "nee",
+  ai_herziening: "altijd",
+  ai_transparantie: "ja",
+  ai_toezicht: "structureel",
+  ai_uitlegbaarheid: "goed",
+};

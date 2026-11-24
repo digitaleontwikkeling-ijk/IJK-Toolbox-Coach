@@ -17,6 +17,7 @@ import { evalueer, OngeldigeInvoerFout, type CheckAntwoord } from "../domain/bes
 import { besluitInvoerSchema, eindstatus, type Besluit } from "../domain/besluiten";
 import type { Status } from "../domain/content-schema";
 import { beslisInvoerUit, toolGekozen } from "../domain/invoer";
+import type { AiUitkomst, DpiaUitkomst, Feit } from "../domain/verdieping";
 import { legeWizard, wizardDataSchema, type WizardData } from "../domain/wizard";
 import { ApiFoutClient } from "../components/client";
 import contentJson from "./content.generated.json";
@@ -39,12 +40,15 @@ interface DemoAdvies {
   beschrijving: string;
   verduidelijking: { vraag: string; antwoord: string }[];
   tooladvies: NonNullable<WizardData["tooladvies"]>;
-  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean> };
+  antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean>; verdieping?: Record<string, string> };
   rodeVlaggen: Record<string, boolean>;
   uitkomst: string;
   toetsers: string[];
   dpiaSignaal: boolean;
   aiActSignaal: boolean;
+  dpia?: DpiaUitkomst | null;
+  aiRisico?: AiUitkomst | null;
+  feiten?: Feit[] | null;
   motivatie: string;
   voorwaarden: string[];
   alternatieven: string[];
@@ -228,6 +232,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
               regelversie: a.regelversie, kleur: kleur.id, uitkomst: kleur.uitkomst, vervolgactie: kleur.vervolgactie,
               redenen: [], motivatie: a.motivatie, toetsers: a.toetsers, dpiaSignaal: a.dpiaSignaal, aiActSignaal: a.aiActSignaal, contactNodig: false,
               voorwaarden: a.voorwaarden, alternatieven: a.alternatieven,
+              dpiaKlasse: a.dpia?.klasseNaam ?? null, aiKlasse: a.aiRisico?.klasseNaam ?? null,
             },
           },
           ctx,
@@ -261,7 +266,8 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       beschrijving: data.beschrijving.trim(),
       verduidelijking: data.verduidelijking.filter((v) => v.antwoord.trim()),
       tooladvies: data.tooladvies,
-      antwoorden: { checks: invoer.checks, extraVragen: invoer.extraVragen ?? {} },
+      antwoorden: { checks: invoer.checks, extraVragen: invoer.extraVragen ?? {}, verdieping: invoer.verdieping ?? {} },
+      dpia: u.dpia, aiRisico: u.aiRisico, feiten: u.feiten,
       rodeVlaggen: invoer.rodeVlaggen,
       uitkomst: u.kleur, toetsers: u.toetsers, dpiaSignaal: u.dpiaSignaal, aiActSignaal: u.aiActSignaal, motivatie: u.motivatie,
       voorwaarden: u.voorwaarden, alternatieven: u.alternatieven, regelversie: u.regelversie,
@@ -309,7 +315,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       const data = wizardDataSchema.parse({
         stap: 1, beschrijving: a.beschrijving, verduidelijking: a.verduidelijking, verduidelijkingGevraagd: true,
         tooladvies: { ...a.tooladvies, geaccepteerd: false }, checks: a.antwoorden.checks, checksVoorgesteld: true, fase2UitlegGezien: true,
-        extraVragen: a.antwoorden.extraVragen, rodeVlaggen: a.rodeVlaggen, vorigAdviesId: a.id,
+        extraVragen: a.antwoorden.extraVragen, verdieping: a.antwoorden.verdieping ?? {}, rodeVlaggen: a.rodeVlaggen, vorigAdviesId: a.id,
       });
       const c = { id: uuid(), pseudoniemId: g.pseudoniemId, data, adviesId: null, bijgewerktOp: nu() };
       s.concepten.push(c);

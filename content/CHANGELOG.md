@@ -3,6 +3,30 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.8 en tools 0.6 (concept)
+
+Privacy (pre-DPIA) en AI-risico geïntegreerd in de checks. Keuzes B1–B8 in `docs/analyse-privacy-ai.md` (akkoord
+gebruiker). TODO: valideren door de AI governance & compliance officer.
+
+- Data: nieuwe optie "Weet ik niet zeker" (oranje; start de privacyvragen) (B1).
+- Nieuwe vraag bij Autonomie: "Gebruikt je oplossing AI?" (B3). Staat vooraf op "Ja" bij tools met `ai: true`
+  (Microsoft 365 Copilot, AI Flows, Azure OpenAI).
+- Verdiepingsvragen onder de check waar ze bij horen, alleen als ze nodig zijn en niet uit eerdere antwoorden volgen.
+- **Privacy**: telling van 8 indicatoren ("ja" en "weet ik niet" tellen). 0–1: geen volledige DPIA; 2: waarschijnlijk;
+  ≥3: verplicht. Waarschijnlijk of verplicht → minstens *Eerst toetsen* + compliance officer (B4).
+  **Vervangt het DPIA-signaal** (B2). Gevolgen: de regel "Vertrouwelijkheid Serieus/Groot → altijd DPIA" vervalt
+  (zonder persoonsgegevens geen DPIA; de uitkomst blijft oranje/rood via Impact); scenario 4 heeft nu 2 indicatoren
+  nodig voor het DPIA-signaal.
+- **AI-risico**: 8 regels uit de opdracht; Hoog > Beperkt > Laag, alleen omhoog. Hoog → minstens *Eerst toetsen* +
+  compliance officer; Beperkt → minstens *Aan de slag met voorwaarden*, met de voorwaarde bij het antwoord (B4).
+  **Vervangt het AI Act-signaal**. Gevolgen: Handelen zonder AI geeft geen AI-beoordeling meer (scenario 5, B3);
+  "AI adviseert over mensen" alleen is niet meer automatisch *Eerst toetsen* (dat hangt nu af van de AI-antwoorden).
+- De extra vraag "Gaat het advies over mensen?" is opgegaan in de AI-vraag "Raakt wat de AI doet de rechten,
+  plichten of kansen van mensen?".
+- Aanvullende vraag "AI beslist zelfstandig over mensen" alleen bij Autonomie = Beslissen; anders "nee" (B7).
+- Vragen over betrokkenen (domein, discriminatie, herziening, toezicht) alleen als de AI mensen raakt (B5);
+  domein met "Iets anders" (B6).
+
 ## tools 0.5 (concept)
 
 - Logo's bij alle zes tools (`icoon`, uit de toolbox-sheet "Onze huidige digitale toolbox (2026)"); alleen het

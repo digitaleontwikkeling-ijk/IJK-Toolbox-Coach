@@ -1,5 +1,5 @@
 /**
- * Randgevallen bij Impact (BIV), het DPIA- en AI Act-signaal, toetsers bij rood en
+ * Randgevallen bij Impact (BIV), toetsers bij rood en
  * "contact volgt" (opdracht §4.2a, §4.4, §4.5).
  */
 import { describe, expect, it } from "vitest";
@@ -59,91 +59,8 @@ describe("Impact in drie deelvragen", () => {
   });
 });
 
-describe("DPIA-signaal", () => {
-  it("D1. Vertrouwelijkheid Serieus geeft altijd een DPIA-signaal, ook zonder aangevinkte persoonsgegevens", () => {
-    const u = evalueer(invoer({ checks: { data: "intern", impact: { vertrouwelijkheid: "serieus" } } }), regelset);
-    expect(u.dpiaSignaal).toBe(true);
-    expect(u.toetsers).toEqual(["toetser_compliance"]);
-  });
-
-  it("D2. Vertrouwelijkheid Beperkt zonder persoonsgegevens: geen DPIA-signaal", () => {
-    expect(evalueer(invoer({ checks: { impact: { vertrouwelijkheid: "beperkt" } } }), regelset).dpiaSignaal).toBe(false);
-  });
-
-  it("D3. persoonsgegevens + Beschikbaarheid Serieus (hoogste deelscore) geeft een DPIA-signaal", () => {
-    const u = evalueer(
-      invoer({ checks: { data: "persoonsgegevens", impact: { beschikbaarheid: "serieus" } }, extraVragen: { bijzondere_persoonsgegevens: false } }),
-      regelset,
-    );
-    expect(u.dpiaSignaal).toBe(true);
-  });
-});
-
-describe("AI Act-signaal", () => {
-  it("A1. Adviseren over mensen geeft een AI Act-signaal; de extra vraag is dan verplicht", () => {
-    expect(fouten(() => evalueer(invoer({ checks: { autonomie: "adviseren" } }), regelset))).toEqual([
-      'extra vraag "advies_over_mensen" is niet beantwoord',
-    ]);
-    const ja = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }), regelset);
-    expect(ja.aiActSignaal).toBe(true);
-    const nee = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: false } }), regelset);
-    expect(nee.aiActSignaal).toBe(false);
-  });
-
-  it("A2. rode vlag 3 (AI beslist zelfstandig over mensen) geeft een AI Act-signaal", () => {
-    expect(evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true } }), regelset).aiActSignaal).toBe(true);
-  });
-
-  it("A3. AI Act-signaal stuurt een toetsing ook naar de compliance officer", () => {
-    const u = evalueer(
-      invoer({ checks: { systemen: "koppelen", autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }),
-      regelset,
-    );
-    expect(u.kleur).toBe("oranje");
-    expect(u.toetsers).toEqual(BEIDE);
-  });
-
-  it("A4. AI Act-signaal en DPIA-signaal kunnen tegelijk gelden (AI selecteert sollicitanten)", () => {
-    const u = evalueer(
-      invoer({ checks: { data: "persoonsgegevens", autonomie: "beslissen" }, extraVragen: { bijzondere_persoonsgegevens: false } }),
-      regelset,
-    );
-    expect([u.dpiaSignaal, u.aiActSignaal]).toEqual([true, true]);
-  });
-});
-
-describe("AI Act-signaal maakt de uitkomst minstens 'Eerst toetsen'", () => {
-  it("A5. alles groen, maar AI adviseert over mensen → oranje, compliance officer, met uitleg", () => {
-    const u = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }), regelset);
-    expect(u.kleur).toBe("oranje");
-    expect(u.uitkomst).toBe("Eerst toetsen");
-    expect(u.toetsers).toEqual(["toetser_compliance"]);
-    expect(u.motivatie).toBe("AI Act-classificatie nodig (de AI adviseert over mensen, handelt of beslist).");
-  });
-
-  it("A6. geel met AI Act-signaal → oranje, zonder voorwaarden (die horen bij geel)", () => {
-    const u = evalueer(
-      invoer({ checks: { gebruikers: "collegas", autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }),
-      regelset,
-    );
-    expect(u.kleur).toBe("oranje");
-    expect(u.voorwaarden).toEqual([]);
-  });
-
-  it("A7. al oranje door een check: het signaal staat niet in 'Waarom deze kleur?'", () => {
-    const u = evalueer(invoer({ checks: { autonomie: "handelen" } }), regelset);
-    expect(u.kleur).toBe("oranje");
-    expect(u.motivatie).toBe("Handelen (Autonomie).");
-  });
-
-  it("A8. instelbaar: zonder minimale uitkomst blijft groen groen (wel met signaal)", () => {
-    const r = kopieRegelset();
-    delete r.ai_act.minimale_uitkomst;
-    const u = evalueer(invoer({ checks: { autonomie: "adviseren" }, extraVragen: { advies_over_mensen: true } }, r), r);
-    expect(u.kleur).toBe("groen");
-    expect(u.aiActSignaal).toBe(true);
-  });
-});
+// Het DPIA- en AI Act-signaal zijn in regelset 0.8 vervangen door de privacy-telling en het AI-risico:
+// zie tests/unit/verdieping.test.ts.
 
 describe("rood: toetsers en contact", () => {
   it("R1. bij rood kijken altijd beide toetsers mee", () => {
@@ -156,16 +73,27 @@ describe("rood: toetsers en contact", () => {
     expect(u.contactNodig).toBe(false);
   });
 
-  it("R3. rode vlag 3 zonder alternatief: Team Digitale Ontwikkeling neemt contact op", () => {
-    const u = evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true } }), regelset);
+  it("R3. rood zonder alternatief (Vertrouwelijkheid Groot): Team Digitale Ontwikkeling neemt contact op", () => {
+    const u = evalueer(invoer({ checks: { impact: { vertrouwelijkheid: "groot" } } }), regelset);
     expect(u.alternatieven).toEqual([]);
     expect(u.contactNodig).toBe(true);
   });
 
   it("R4. is er naast een oorzaak zonder alternatief ook een met alternatief, dan geen contact", () => {
-    const u = evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true, open_zonder_toetsing: true } }), regelset);
+    const u = evalueer(invoer({ checks: { impact: { vertrouwelijkheid: "groot" } }, rodeVlaggen: { open_zonder_toetsing: true } }), regelset);
     expect(u.alternatieven).toEqual(["Eerst toetsen, dan pas delen."]);
     expect(u.contactNodig).toBe(false);
+  });
+
+  it("R6. 'AI beslist over mensen' telt alleen bij Autonomie = Beslissen (regelset 0.8, B7)", () => {
+    // Niet gesteld, dus "nee", ook als er nog een oud antwoord "ja" in staat.
+    expect(evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: true } }), regelset).kleur).toBe("groen");
+    const u = evalueer(
+      invoer({ checks: { autonomie: "beslissen" }, rodeVlaggen: { ai_beslist_over_mensen: true }, verdieping: { ai_gebruik: "ja" } }),
+      regelset,
+    );
+    expect(u.kleur).toBe("rood");
+    expect(u.redenen.some((r) => r.soort === "rode_vlag" && r.vlagId === "ai_beslist_over_mensen")).toBe(true);
   });
 
   it("R5. bij oranje of lager is nooit contact nodig", () => {

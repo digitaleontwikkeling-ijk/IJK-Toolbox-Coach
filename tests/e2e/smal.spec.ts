@@ -1,6 +1,6 @@
 /** Smal scherm (telefoon / smal Teams-tabblad): geen horizontaal scrollen, niets valt buiten de kaarten. */
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, login, naarStap3, naarChecks } from "./hulp";
+import { geenRodeVlaggen, kies, login, naarStap3, naarChecks, rustigeVerdieping } from "./hulp";
 
 test("wizard en adviescard werken op een smal scherm", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
@@ -11,9 +11,10 @@ test("wizard en adviescard werken op een smal scherm", async ({ page }) => {
   await naarStap3(page, "Een verzuimdashboard voor de afdeling met gegevens uit AFAS.");
   await naarChecks(page);
   await kies(page, "bijzondere_persoonsgegevens", "Nee");
+  await rustigeVerdieping(page, { kwetsbare_groepen: "Ja", grote_schaal: "Ja" });
   await geenRodeVlaggen(page);
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
-  await expect(page.locator(".adviescard")).toContainText("Mogelijk is een DPIA nodig");
+  await expect(page.locator(".adviescard")).toContainText("gegevensbeschermingseffectbeoordeling");
 
   const overloop = await page.evaluate(() => {
     const kaart = document.querySelector(".adviescard")!.getBoundingClientRect();

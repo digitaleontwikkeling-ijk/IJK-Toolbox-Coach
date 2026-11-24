@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.7"
+versie: "0.8"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -96,6 +96,9 @@ checks:
           uitleg: "Naam, e-mailadres, personeelsnummer, of alles wat je direct of indirect aan een persoon kunt koppelen." }
       - { id: vertrouwelijk, label: Vertrouwelijk/gevoelig, kleur: oranje,
           uitleg: "Informatie die niet naar buiten mag of maar voor een kleine groep bedoeld is, zoals contracten, financiële gegevens of klantgegevens." }
+      # Regelset 0.8 (B1): bij twijfel over persoonsgegevens net zo voorzichtig als bij persoonsgegevens.
+      - { id: weet_niet, label: Weet ik niet zeker, kleur: oranje, kort: niet zeker of er persoonsgegevens in zitten,
+          uitleg: "Je weet niet zeker of er gegevens in zitten die je aan een persoon kunt koppelen. Dan gaan we voor de zekerheid uit van wel." }
 
   - id: systemen
     nummer: 2
@@ -255,18 +258,13 @@ checks:
         extra_regelen: "+ monitoring, architectuur, continuïteit, lifecycle management"
 
 # Extra vragen die alleen bij een bepaald antwoord worden gesteld.
+# (De vraag "Gaat het advies over mensen?" is in regelset 0.8 opgegaan in de AI-vraag over invloed op mensen.)
 extra_vragen:
   - id: bijzondere_persoonsgegevens
     check: data
-    toon_bij: [persoonsgegevens]
+    toon_bij: [persoonsgegevens, weet_niet]
     vraag: Gaat het om bijzondere persoonsgegevens, zoals gezondheid?
     uitleg: Bijzondere persoonsgegevens zijn extra gevoelig, zoals gegevens over gezondheid, religie of afkomst.
-  # Nodig voor het AI Act-signaal ("AI adviseert of beslist over mensen"). TODO: valideren door toetsers
-  - id: advies_over_mensen
-    check: autonomie
-    toon_bij: [adviseren]
-    vraag: Gaat het advies over mensen, bijvoorbeeld medewerkers, sollicitanten of klanten?
-    uitleg: Bijvoorbeeld een voorstel welke kandidaat het best past, of welke medewerker extra begeleiding nodig heeft.
 
 # Rode vlaggen: ja = altijd deze kleur. In de interface heten ze "Aanvullende vragen".
 rode_vlag_kleur: rood
@@ -282,6 +280,8 @@ rode_vlaggen:
     alternatief: Gebruik IJK-credentials.
   - id: ai_beslist_over_mensen
     nummer: 2
+    # Alleen gesteld als bij Autonomie "Beslissen" is gekozen; anders is het antwoord "nee" (regelset 0.8, B7).
+    toon_bij: { check: autonomie, antwoorden: [beslissen] }
     vraag: Beslist AI zelfstandig over mensen, met grote gevolgen?
     kort: AI die zelfstandig over mensen beslist
     # Geen alternatief in de presentatie: dan neemt Team Digitale Ontwikkeling contact op.
@@ -295,38 +295,6 @@ rode_vlaggen:
     vraag: Gaat een proces binnen IJK draaien op een persoonlijke oplossing zonder eigenaar of beheer?
     kort: een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer
     alternatief: Wijs een eigenaar aan en regel het beheer.
-
-# DPIA-signaal (DPIA = gegevensbeschermingseffectbeoordeling, verplicht bij hoog privacyrisico).
-# Signaal als ALLE voorwaarden in "vereist" gelden EN minstens één uit "minstens_een_van",
-# of als één van de voorwaarden in "altijd_bij" geldt.
-# Bij een check met deelvragen telt de hoogste deelscore, tenzij een deelvraag is genoemd.
-dpia:
-  vereist:
-    - { check: data, antwoorden: [persoonsgegevens] }
-  minstens_een_van:
-    - { extra_vraag: bijzondere_persoonsgegevens }
-    - { check: autonomie, antwoorden: [beslissen, handelen] }
-    - { check: gebruikers, antwoorden: [organisatie, extern] }
-    - { check: impact, antwoorden: [serieus, groot] }
-  # Vertrouwelijkheid weegt het zwaarst: Serieus of Groot geeft altijd een DPIA-signaal (ook zonder aangevinkte persoonsgegevens).
-  altijd_bij:
-    - { check: impact, deelvraag: vertrouwelijkheid, antwoorden: [serieus, groot] }
-  # Bij een DPIA-signaal gaat een aanvraag altijd (ook) naar deze toetser.
-  toetser: toetser_compliance
-
-# AI Act-signaal: de compliance officer classificeert de toepassing volgens de AI Act.
-# Apart spoor naast de DPIA, ook zonder persoonsgegevens. TODO: valideren door toetsers
-ai_act:
-  minstens_een_van:
-    - { check: autonomie, antwoorden: [handelen, beslissen] }
-    - { extra_vraag: advies_over_mensen }
-    - { rode_vlag: ai_beslist_over_mensen }
-  toetser: toetser_compliance
-  # Bij een AI Act-signaal is de uitkomst minstens deze kleur, zodat de compliance officer altijd meekijkt
-  # (keuze IJK). TODO: valideren door toetsers
-  minimale_uitkomst: oranje
-  # Tekst in "Waarom deze kleur?" als het signaal de kleur verhoogde.
-  motivatie: AI Act-classificatie nodig (de AI adviseert over mensen, handelt of beslist)
 
 # Tool buiten de IJK Toolbox: de medewerker kiest in stap 2 een tool die (nog) niet in de toolbox zit.
 # De zes checks en de aanvullende vragen gelden gewoon (de uitkomst kan dus ook rood worden),
@@ -343,3 +311,227 @@ tool_buiten_toolbox:
 # bijvoorbeeld "Persoonsgegevens (Data) en Koppelen (Systemen)".
 # Zo wordt een rode vlag in die opsomming beschreven ({kort} = korte omschrijving van de vlag):
 motivatie_rode_vlag: "{kort}"
+
+# =====================================================================================================
+# Verdieping: privacy (pre-DPIA) en AI-risico, geïntegreerd in de checks (regelset 0.8).
+# Bron: opdracht "Privacy/DPIA- en AI-risicoclassificatie integreren" (nov. 2026), keuzes B1–B8 in
+# docs/analyse-privacy-ai.md. TODO: valideren door de AI governance & compliance officer.
+#
+# Principe: vraag informatie maar één keer uit (REUSE → REFINE → ASK).
+# - Welke gegevens uit de checks kunnen worden afgeleid, staat in src/domain/verdieping.ts (één plek,
+#   met per afleiding de categorie: deterministisch = niet vragen, signaal = gerichte vraag met inleiding).
+# - Hier staan de vragen, antwoorden en teksten, en de regels voor de DPIA-telling en het AI-risico.
+#
+# Per gegeven:
+#   spoor:   basis (altijd) | dpia (bij persoonsgegevens of twijfel) | ai (als de oplossing AI gebruikt)
+#   plek:    onder welke check de vraag verschijnt
+#   vraag, uitleg ("waarom vragen we dit?"), antwoorden
+#   signaal: inleiding als er al gedeeltelijke informatie is (de vraag wordt dan een verduidelijking)
+#   naam:    korte naam in het resultaat
+# =====================================================================================================
+gegevens:
+  # ---- Basis: gebruikt de oplossing AI? (één antwoord voor DPIA-indicator 7 én het AI-spoor) ----
+  - id: ai_gebruik
+    spoor: basis
+    plek: autonomie
+    naam: AI
+    vraag: Gebruikt je oplossing AI, bijvoorbeeld om tekst te maken, iets te beoordelen of te voorspellen?
+    uitleg: Dan stel ik nog een paar vragen over wat de AI doet. Zonder AI slaan we die over.
+    antwoorden:
+      - { id: ja, label: "Ja" }
+      - { id: nee, label: "Nee" }
+      - { id: weet_niet, label: Weet ik niet zeker }
+
+  # ---- Privacy (pre-DPIA): de acht indicatoren, voor zover niet al bekend uit de checks ----
+  - id: kwetsbare_groepen
+    spoor: dpia
+    plek: data
+    naam: Kwetsbare groepen
+    vraag: Gaat het om gegevens van mensen in een kwetsbare positie, zoals kinderen, zieke of re-integrerende medewerkers, of sollicitanten?
+    uitleg: Je gaf aan dat je persoonsgegevens gebruikt. Daarom wil ik iets beter begrijpen om wie het gaat.
+    antwoorden: &jnw
+      - { id: ja, label: "Ja" }
+      - { id: nee, label: "Nee" }
+      - { id: weet_niet, label: Weet ik niet zeker }
+  - id: koppeling_datasets
+    spoor: dpia
+    plek: systemen
+    naam: Gegevens uit verschillende bronnen gecombineerd
+    vraag: Combineer je persoonsgegevens uit verschillende bronnen, bijvoorbeeld uit AFAS en een Excel-bestand?
+    uitleg: Gegevens combineren kan nieuwe informatie over mensen opleveren.
+    signaal: Je koppelt systemen of schrijft in een bedrijfssysteem. Dat betekent niet altijd dat je gegevens over mensen combineert.
+    antwoorden: *jnw
+  - id: grote_schaal
+    spoor: dpia
+    plek: gebruikers
+    naam: Grote schaal of structureel volgen
+    vraag: Verwerk je gegevens van veel mensen (bijvoorbeeld alle medewerkers of klanten), of volg je mensen structureel?
+    uitleg: Hoe meer mensen het raakt, hoe zorgvuldiger het moet.
+    signaal: Je oplossing wordt breed of structureel gebruikt. Dat zegt nog niet hoeveel mensen er in de gegevens staan.
+    antwoorden: *jnw
+  - id: profilering
+    spoor: dpia
+    plek: autonomie
+    naam: Beoordelen of rangschikken van mensen
+    vraag: Beoordeelt of rangschikt de oplossing mensen, bijvoorbeeld op prestaties, gedrag of geschiktheid?
+    uitleg: Je gebruikt persoonsgegevens. Daarom wil ik weten wat de oplossing met die gegevens doet.
+    antwoorden: *jnw
+  - id: geautomatiseerd_besluit
+    spoor: dpia
+    plek: autonomie
+    naam: Besluiten over mensen zonder menselijke controle
+    vraag: Neemt de oplossing zelf besluiten over mensen, zonder dat een mens die eerst controleert?
+    uitleg: Je gebruikt persoonsgegevens. Daarom wil ik weten wie er beslist.
+    signaal: Je gaf aan dat de oplossing zelf schrijft of handelt. Dat is niet altijd een besluit over mensen.
+    antwoorden: *jnw
+  - id: significante_gevolgen
+    spoor: dpia
+    plek: impact
+    naam: Grote gevolgen voor mensen
+    vraag: Kan het gevolgen hebben voor de mensen van wie de gegevens zijn, zoals voor hun baan, inkomen of gezondheid?
+    uitleg: Je gebruikt persoonsgegevens. Daarom wil ik weten wat het voor die mensen kan betekenen.
+    signaal: Je gaf aan dat de impact serieus of groot kan zijn. Ik wil weten of dat ook de mensen in de gegevens raakt.
+    antwoorden: *jnw
+
+  # ---- AI-spoor: alleen als de oplossing AI gebruikt (of als je het niet zeker weet) ----
+  - id: ai_invloed
+    spoor: ai
+    plek: autonomie
+    naam: Invloed op mensen
+    vraag: Raakt wat de AI doet de rechten, plichten of kansen van mensen?
+    uitleg: Bijvoorbeeld wie wordt uitgenodigd, wie extra begeleiding krijgt of welke klant een aanbod krijgt.
+    signaal: Je gaf aan dat de oplossing adviseert. Ik wil weten of dat advies over mensen gaat.
+    antwoorden:
+      - { id: nee, label: "Nee" }
+      - { id: indirect, label: "Ja, indirect (bijvoorbeeld als advies of signalering)" }
+      - { id: direct, label: "Ja, direct (de uitkomst beslist of weegt zwaar mee)" }
+  - id: ai_doorslaggevend
+    spoor: ai
+    plek: autonomie
+    naam: Gewicht van de AI-uitkomst
+    vraag: Hoe zwaar weegt de uitkomst van de AI in het besluit?
+    uitleg: Beslist de AI, of beslis jij op basis van wat de AI aangeeft?
+    signaal: Je gaf aan dat de oplossing adviseert. Ik wil weten hoe zwaar dat advies weegt.
+    antwoorden:
+      - { id: nee, label: "Niet doorslaggevend: een mens beslist" }
+      - { id: mede, label: "Mede bepalend" }
+      - { id: doorslaggevend, label: "Doorslaggevend" }
+  - id: ai_domein
+    spoor: ai
+    plek: autonomie
+    naam: Toepassingsgebied
+    vraag: Op welk gebied wordt de AI toegepast?
+    uitleg: Dit leggen we vast voor de toetsing. Het verandert de uitkomst niet.
+    antwoorden:
+      - { id: werk_hr, label: "Werk en HR, zoals werving, beoordeling of inzetbaarheid" }
+      - { id: onderwijs, label: Onderwijs of training }
+      - { id: diensten, label: "Toegang tot diensten, voorzieningen of subsidies" }
+      - { id: financieel, label: "Financiële of economische beoordeling, zoals krediet, risico of fraude" }
+      - { id: gezondheid, label: Gezondheid of welzijn }
+      - { id: veiligheid, label: "Veiligheid, toezicht of handhaving" }
+      - { id: anders, label: Iets anders }
+  - id: ai_discriminatie
+    spoor: ai
+    plek: autonomie
+    naam: Risico op ongelijke behandeling
+    vraag: Kan de AI leiden tot ongelijke behandeling, discriminatie of uitsluiting van mensen?
+    uitleg: AI kan onbedoeld groepen benadelen, bijvoorbeeld door scheve voorbeelddata.
+    antwoorden:
+      - { id: nee, label: "Nee" }
+      - { id: mogelijk, label: Mogelijk }
+      - { id: ja, label: "Ja" }
+  - id: ai_herziening
+    spoor: ai
+    plek: autonomie
+    naam: Herziening door een mens
+    vraag: Kunnen de mensen om wie het gaat een uitkomst van de AI laten herzien door een mens?
+    uitleg: Iemand moet bezwaar kunnen maken tegen een uitkomst die hem raakt.
+    antwoorden:
+      - { id: altijd, label: "Ja, altijd" }
+      - { id: beperkt, label: "Ja, maar beperkt" }
+      - { id: nee, label: "Nee" }
+      - { id: onzeker, label: Weet ik niet zeker }
+  - id: ai_transparantie
+    spoor: ai
+    plek: autonomie
+    naam: Informeren over AI
+    vraag: Worden de mensen om wie het gaat (of de gebruikers) geïnformeerd dat er AI wordt gebruikt?
+    uitleg: Mensen hebben het recht om te weten dat ze met AI te maken hebben.
+    antwoorden:
+      - { id: ja, label: "Ja" }
+      - { id: gedeeltelijk, label: Gedeeltelijk }
+      - { id: nee, label: "Nee" }
+      - { id: onzeker, label: Weet ik niet zeker }
+  - id: ai_toezicht
+    spoor: ai
+    plek: autonomie
+    naam: Menselijk toezicht
+    vraag: Kijkt er structureel een mens mee naar de uitkomsten van de AI?
+    uitleg: Bijvoorbeeld een vaste controle van een steekproef, of iemand die elke uitkomst bekijkt.
+    antwoorden:
+      - { id: structureel, label: "Ja, structureel" }
+      - { id: incidenteel, label: "Ja, af en toe" }
+      - { id: nee, label: "Nee" }
+      - { id: onzeker, label: Weet ik niet zeker }
+  - id: ai_uitlegbaarheid
+    spoor: ai
+    plek: autonomie
+    naam: Uitlegbaarheid
+    vraag: Kun je uitleggen hoe de AI tot een uitkomst komt, aan gebruikers of aan een toezichthouder?
+    uitleg: Bij generatieve AI, zoals Copilot, is dat vaak maar beperkt.
+    antwoorden:
+      - { id: goed, label: Goed uitlegbaar }
+      - { id: beperkt, label: Beperkt uitlegbaar }
+      - { id: niet, label: Niet uitlegbaar }
+      - { id: onbekend, label: Weet ik niet }
+
+# Privacy (pre-DPIA): telling van de acht indicatoren. "Ja" en "weet ik niet zeker" tellen allebei mee.
+# Alleen als er persoonsgegevens zijn, of als de medewerker dat niet zeker weet (Data).
+# Bron per indicator: een gegeven hierboven, of bijzondere_persoonsgegevens (extra vraag bij Data).
+dpia:
+  toetser: toetser_compliance
+  indicatoren:
+    - { id: profilering, naam: Mensen worden beoordeeld of gerangschikt }
+    - { id: geautomatiseerd_besluit, naam: Besluiten over mensen zonder menselijke controle }
+    - { id: significante_gevolgen, naam: Mogelijk grote gevolgen voor de mensen in de gegevens }
+    - { id: bijzondere_persoonsgegevens, naam: Bijzondere persoonsgegevens }
+    - { id: grote_schaal, naam: Gegevens van veel mensen of structureel volgen }
+    - { id: kwetsbare_groepen, naam: Mensen in een kwetsbare positie }
+    - { id: ai_gebruik, naam: Nieuwe technologie (AI) }
+    - { id: koppeling_datasets, naam: Gegevens uit verschillende bronnen gecombineerd }
+  # Klasse = de hoogste klasse waarvan "vanaf" ≤ het aantal indicatoren.
+  # minimale_uitkomst: de Toolbox-uitkomst is minstens deze kleur (B4).
+  klassen:
+    - { id: geen, naam: Geen volledige DPIA nodig, vanaf: 0 }
+    - { id: waarschijnlijk, naam: Waarschijnlijk volledige DPIA nodig, vanaf: 2, minimale_uitkomst: oranje }
+    - { id: verplicht, naam: Volledige DPIA verplicht, vanaf: 3, minimale_uitkomst: oranje }
+  # Tekst in "Waarom deze kleur?" als de DPIA-klasse de kleur verhoogde.
+  motivatie: "{klasse} ({aantal} privacy-indicatoren)"
+
+# AI-risico: Hoog > Beperkt > Geen/laag. De klasse kan alleen omhoog (hoogste over alle regels).
+# regels: per gegeven en antwoord de klasse (antwoorden die niet genoemd zijn: "ga verder", geen verhoging),
+#   met een voorwaarde voor bij "Aan de slag met voorwaarden" (Beperkt).
+ai_risico:
+  toetser: toetser_compliance
+  klassen:
+    - { id: laag, naam: Geen of laag risico }
+    - { id: beperkt, naam: Beperkt risico, minimale_uitkomst: geel }
+    - { id: hoog, naam: Hoog risico, minimale_uitkomst: oranje }
+  regels:
+    - { gegeven: ai_invloed, antwoord: direct, klasse: hoog }
+    - { gegeven: ai_discriminatie, antwoord: ja, klasse: hoog }
+    - { gegeven: ai_herziening, antwoord: nee, klasse: hoog }
+    - { gegeven: ai_doorslaggevend, antwoord: doorslaggevend, klasse: hoog }
+    - { gegeven: ai_transparantie, antwoord: nee, klasse: hoog }
+    - { gegeven: ai_transparantie, antwoord: gedeeltelijk, klasse: beperkt,
+        voorwaarde: Vertel de mensen om wie het gaat (of de gebruikers) duidelijk dat er AI wordt gebruikt. }
+    - { gegeven: ai_toezicht, antwoord: nee, klasse: hoog }
+    - { gegeven: ai_toezicht, antwoord: incidenteel, klasse: beperkt,
+        voorwaarde: Regel dat er structureel een mens meekijkt naar de uitkomsten van de AI. }
+    - { gegeven: ai_uitlegbaarheid, antwoord: niet, klasse: hoog }
+    - { gegeven: ai_uitlegbaarheid, antwoord: beperkt, klasse: beperkt,
+        voorwaarde: Controleer de uitkomsten van de AI zelf, want de AI kan niet goed uitleggen hoe hij tot een uitkomst komt. }
+    - { gegeven: ai_uitlegbaarheid, antwoord: onbekend, klasse: beperkt,
+        voorwaarde: Zoek uit hoe de AI tot een uitkomst komt en controleer de uitkomsten zelf. }
+  # Tekst in "Waarom deze kleur?" als het AI-risico de kleur verhoogde.
+  motivatie: "{klasse} bij het gebruik van AI"

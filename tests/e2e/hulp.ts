@@ -62,8 +62,47 @@ export const RODE_VLAGGEN = [
   "proces_zonder_eigenaar",
 ];
 
+/** Antwoorden op de verdiepingsvragen (privacy en AI) die het risico niet verhogen. */
+export const RUSTIGE_VERDIEPING: Record<string, string> = {
+  ai_gebruik: "Nee",
+  kwetsbare_groepen: "Nee",
+  koppeling_datasets: "Nee",
+  grote_schaal: "Nee",
+  profilering: "Nee",
+  geautomatiseerd_besluit: "Nee",
+  significante_gevolgen: "Nee",
+  ai_invloed: "Nee",
+  ai_doorslaggevend: "Niet doorslaggevend: een mens beslist",
+  ai_domein: "Iets anders",
+  ai_discriminatie: "Nee",
+  ai_herziening: "Ja, altijd",
+  ai_transparantie: "Ja",
+  ai_toezicht: "Ja, structureel",
+  ai_uitlegbaarheid: "Goed uitlegbaar",
+};
+
+/**
+ * Beantwoordt de zichtbare verdiepingsvragen die nog open staan met een rustig antwoord
+ * (of met `antwoorden[id]`). Herhaalt, omdat een antwoord nieuwe vragen kan laten verschijnen.
+ */
+export async function rustigeVerdieping(page: Page, antwoorden: Record<string, string> = {}) {
+  for (let ronde = 0; ronde < 10; ronde++) {
+    let gedaan = false;
+    for (const blok of await page.locator("div.verdieping[id^=veld-]").all()) {
+      const id = (await blok.getAttribute("id"))!.replace(/^veld-/, "");
+      if ((await blok.locator("input:checked").count()) > 0) continue;
+      await kies(page, id, antwoorden[id] ?? RUSTIGE_VERDIEPING[id] ?? "Nee");
+      gedaan = true;
+    }
+    if (!gedaan) return;
+  }
+}
+
+/** Alle zichtbare aanvullende vragen op "Nee", en open verdiepingsvragen rustig beantwoorden. */
 export async function geenRodeVlaggen(page: Page) {
+  await rustigeVerdieping(page);
   for (const v of RODE_VLAGGEN) {
+    if ((await page.locator(`#veld-${v}`).count()) === 0) continue;
     await kies(page, v, "Nee");
   }
 }

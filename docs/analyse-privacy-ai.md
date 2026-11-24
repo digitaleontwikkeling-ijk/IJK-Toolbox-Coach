@@ -1,6 +1,7 @@
 # Analyse en mapping: Privacy/DPIA en AI-risico integreren in de IJK Toolbox Coach
 
-Status: **fase 1 (analyse) en fase 2 (mapping)**. Er is nog geen code gewijzigd. De open beslissingen staan in §6.
+Status: **gebouwd in regelset 0.8** (keuzes B1–B8 akkoord). §1–§6 zijn de analyse en mapping vooraf; §8 beschrijft
+wat er is gebouwd en waar dat afwijkt van de mapping.
 
 **Bronnen**
 - Code: deze repository, regelset `0.7`, tools `0.5`.
@@ -294,3 +295,89 @@ De 16 scenario's uit de opdracht komen als unittests op `leidFeitenAf`, `relevan
 `evalueerAi`. Scenario 8, 9 en 13 (wijzigen en terug) komen daarnaast als integratietest en e2e-test, en scenario 16
 als e2e-test met axe en toetsenbordbediening. De bestaande scenario's 1–12 blijven, behalve waar B2 of B3 een
 uitkomst bewust verandert. Dat leg ik vast in de CHANGELOG.
+
+---
+
+## 8. Oplevering (regelset 0.8)
+
+### 8.1 Wat er is gebouwd
+- **Eén intake.** De verdiepingsvragen verschijnen onder de check waar ze bij horen (Data, Systemen, Gebruikers,
+  Autonomie, Impact), elk met een zin over het waarom. Bij een verduidelijking staat er een inleiding die het
+  eerdere antwoord noemt. De AI-vragen staan als groep "Over de AI in je oplossing" onder Autonomie. Er is geen
+  apart scherm of formulier.
+- **Eén bron van waarheid.** Alleen de antwoorden worden opgeslagen (`WizardData.verdieping`). De feiten worden er
+  altijd opnieuw uit berekend door `analyseer` (`src/domain/verdieping.ts`). Vragen die niet relevant zijn, of
+  vragen waarvan het antwoord al uit een check volgt, tellen niet mee en komen niet in het register. Wordt een vraag
+  weer relevant, dan staat het eerdere antwoord er weer (scenario 13).
+- **Voortgang.** "Nog N van M vragen te beantwoorden" op basis van de vragen die nu relevant zijn (`role="status"`).
+- **Drie beoordelingen, één advies.** `evalueer` geeft naast de Toolbox-uitkomst ook `dpia`, `aiRisico` en
+  `feiten`. De klassen kunnen de uitkomst alleen verhogen (B4). De adviescard toont:
+  - de Toolbox-uitkomst;
+  - "Privacy: <klasse>" met de indicatoren die meetelden, elk met herkomst ("jouw antwoord" of "afgeleid uit …");
+  - "AI: <klasse>" met de antwoorden die de doorslag gaven (en de voorwaarde), plus wat we verder weten over de AI;
+  - "Techniek en beheer";
+  - "Wie toetst?";
+  - de disclaimer.
+- **Traceerbaarheid.** Elk feit heeft `bron` (bijv. `check.autonomie`, `verdieping.ai_invloed`,
+  `extra_vraag.…`, `rode_vlag.…`), `herkomst` (expliciet/afgeleid), `zekerheid` en `gebruiktDoor`
+  (toolbox/dpia/ai). Ook de checks zelf zijn feiten, met de beoordelingen die ze voeden. Alles staat in het register
+  (kolommen `dpia`, `ai_risico` en `feiten`, migratie 005), samen met `regelversie`.
+- **Routering.** Alleen de bestaande rollen en webhooks. De toetsingswebhook krijgt `privacy: { klasse, score }` en
+  `ai: { klasse }`. Er zijn geen nieuwe bestemmingen.
+- **Wijzigingen.** "Er is iets veranderd" neemt de verdiepingsantwoorden mee. Het nieuwe advies verwijst naar het
+  vorige, zoals bij de bestaande versieketen.
+
+### 8.2 Afwijkingen van de mapping (§4)
+
+| Mapping | Gebouwd | Reden |
+| --- | --- | --- |
+| D8: "Alleen Lezen uit één bron → nee" | Alleen **Geen** → nee. Bij Lezen wordt de vraag gesteld. | Of het om één bron gaat, is niet bekend. Afleiden zou te sterk zijn (§23 van de opdracht). |
+| D1: `advies_over_mensen` = ja → profilering | Alleen Beslissen → profilering. Anders wordt de vraag gesteld (alleen bij persoonsgegevens). | `advies_over_mensen` is opgegaan in A1 (invloed op mensen). Dat is een signaal, geen bewijs van profilering. |
+| A5: alleen Beslissen → doorslaggevend | Ook A1 = "Ja, direct" → doorslaggevend | "Direct" is gedefinieerd als "de uitkomst beslist of weegt zwaar mee". Opnieuw vragen zou dubbel zijn. |
+| A7: Assisteren → structureel toezicht | Niet nodig | Alleen Assisteren → A1 = nee → A7 wordt niet gesteld (B5). |
+| §5: de coach vult verdiepingsvragen vooraf in | Alleen de AI-vraag, vooraf op basis van de tool (`ai: true`) | De mock- en Hermes-coach vullen alleen de checks in. Uitbreiden kan later via de checks-taak. |
+| `aiActSignaal` | = AI-klasse Hoog | De compliance officer classificeert formeel volgens de AI Act. Beperkt geeft voorwaarden. |
+
+### 8.3 Bestanden
+- **Nieuw:**
+  - `src/domain/verdieping.ts`
+  - `src/components/Beoordelingen.tsx`
+  - `src/db/migraties/005_privacy_ai.sql`
+  - `tests/unit/verdieping.test.ts`
+  - `tests/e2e/verdieping-wizard.spec.ts`
+- **Gewijzigd:**
+  - content: `content/regelset.yaml`, `tools.yaml`, `teksten.yaml`, `CHANGELOG.md`
+  - domein: `src/domain/content-schema.ts`, `beslisregels.ts`, `invoer.ts`, `wizard.ts`
+  - wizard: `src/components/wizard/Stap3.tsx`, `Wizard.tsx`
+  - adviescard: `src/components/Adviescard.tsx`
+  - opslag en vervolgacties: `src/db/adviezen.ts`, `src/register/register.ts`, `src/acties/vervolgactie.ts`
+  - coach: `src/coach/CoachClient.ts`, `HermesCoachClient.ts`, `src/app/api/coach/[taak]/route.ts`
+  - demo en laden: `src/demo/api.ts`, `src/content/laad-content.ts`
+  - stijl: `src/app/globals.css`
+  - de bestaande tests (§8.4)
+- **Hergebruikt:**
+  - `Keuze` (radio's, uitleg, foutmarkering, toetsenbord);
+  - het patroon voor extra vragen in `Stap3`;
+  - `Adviescard`, `.info`-blokken, `CoachLabel`-stijl;
+  - de bestaande toetsersrollen, webhooks en versieketen.
+- **Geen nieuwe dependencies.**
+
+### 8.4 Tests
+- **Unit:**
+  - `verdieping.test.ts`: scenario's 1–15 uit de opdracht, de DPIA-telling, alle AI-regels en de invoercontrole;
+  - bestaande scenario's bijgewerkt waar B2/B3 een uitkomst bewust veranderen (4, 5, 6, 9 en 11; zie CHANGELOG).
+- **Integratie:** opslag van `dpia`, `ai_risico` en `feiten` met herkomst; oude antwoorden worden niet opgeslagen (F21).
+- **E2e:**
+  - vragen verschijnen en verdwijnen bij het wijzigen van Data, en eerdere antwoorden komen terug;
+  - axe-controle van stap 3 met de extra vragen;
+  - toetsenbordbediening en voortgang;
+  - de AI-vraag vooraf ingevuld op basis van de tool;
+  - de AI-groep, en de adviescard met privacy en AI.
+
+### 8.5 Open punten
+- De drempels, de AI-regels en alle nieuwe teksten moeten nog worden gevalideerd door de AI governance & compliance
+  officer (`TODO` in `regelset.yaml` en `teksten.yaml`).
+- Let op het effect van "Uitlegbaarheid: Weet ik niet → Beperkt" (B8): veel toepassingen met generatieve AI worden
+  minstens *Aan de slag met voorwaarden*.
+- De coach (Hermes) kan de verdiepingsvragen nog niet vooraf invullen. Dat is een mogelijke volgende stap.
+- Er is geen ESLint-configuratie in het project. De kwaliteitscontrole loopt via TypeScript strict, build en tests.

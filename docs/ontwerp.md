@@ -190,5 +190,8 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Eerdere keuzes blijven: kleuren uit het huisstijlhandboek, meerdere antwoorden bij checks 1–4, "Aanvullende vragen".
 - Regelset 0.5: een AI Act-signaal maakt de uitkomst minstens *Eerst toetsen* (`ai_act.minimale_uitkomst`), zodat de
   compliance officer altijd meekijkt (keuze IJK).
+- **Regelset 0.8: privacy (pre-DPIA) en AI-risico geïntegreerd** (zie `docs/analyse-privacy-ai.md`). Dit vervangt het
+  DPIA-signaal (B2) en het AI Act-signaal; de regel "Vertrouwelijkheid Serieus/Groot → DPIA" en de extra vraag
+  "Gaat het advies over mensen?" zijn vervallen. Kolommen `dpia`, `ai_risico` en `feiten` (migratie 005).
 - Toetsers en beheerders dienen zelf geen aanvragen in (keuze IJK): zij krijgen de rol medewerker niet,
   ook niet automatisch bij Entra ID. Vangnet: wie toch beide rollen heeft, kan zijn eigen aanvraag niet toetsen.
