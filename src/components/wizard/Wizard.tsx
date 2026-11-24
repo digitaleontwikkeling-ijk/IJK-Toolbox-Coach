@@ -217,11 +217,12 @@ export function Wizard() {
       wijzig((x) => ({
         ...x,
         verduidelijkingGevraagd: true,
-        verduidelijking: vragen.map((v) => ({ vraag: v.vraag, antwoord: "", opties: v.opties })),
+        verduidelijking: vragen.map((v) => ({ vraag: v.vraag, antwoord: "", opties: v.opties, gekozen: [], eigen: "" })),
         chat: vragen.length ? [...x.chat, { rol: "coach", tekst: vragen.map((v) => v.vraag).join("\n") }] : x.chat,
       }));
       if (vragen.length) {
-        setTimeout(() => document.getElementById("verduidelijking-0")?.focus(), 50);
+        // Naar de eerste vraag: het tekstveld, of de eerste keuzeknop.
+        setTimeout(() => (document.querySelector("#verduidelijking-0, #veld-verduidelijking-0 input") as HTMLElement | null)?.focus(), 50);
         return;
       }
     }

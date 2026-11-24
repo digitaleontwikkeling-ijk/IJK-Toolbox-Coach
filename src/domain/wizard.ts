@@ -56,8 +56,11 @@ export const wizardDataSchema = z.object({
       z.object({
         vraag: kort,
         antwoord: z.string().max(1000).default(""),
-        /** Antwoordopties van de coach (keuzelijst); leeg = open vraag. Een eigen antwoord kan altijd. */
+        /** Antwoordopties van de coach; leeg = open vraag. Een eigen antwoord kan altijd. */
         opties: z.array(z.string().trim().max(100)).max(6).default([]),
+        /** Gekozen opties (meerdere mogelijk) en een eigen antwoord ("Iets anders"). `antwoord` = beide samen. */
+        gekozen: z.array(z.string().trim().max(100)).max(6).default([]),
+        eigen: z.string().max(500).default(""),
       }),
     )
     .max(MAX_VERDUIDELIJKENDE_VRAGEN)

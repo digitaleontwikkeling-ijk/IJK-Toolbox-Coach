@@ -3,7 +3,7 @@
  */
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
-import { geenRodeVlaggen, kies, kiesImpact, login, naarChecks, naarStap3, rustigeVerdieping } from "./hulp";
+import { geenRodeVlaggen, kies, kiesImpact, login, naarChecks, naarStap3, rustigeVerdieping, vinkAan } from "./hulp";
 
 test("vragen verschijnen alleen als ze nodig zijn; terugzetten naar openbare gegevens haalt ze weer weg", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
@@ -60,30 +60,35 @@ test("toetsenbord: een verdiepingsvraag beantwoorden met pijltjes, en de voortga
   await expect(voortgang).not.toHaveText(voor);
 });
 
-test("verduidelijkende vragen: kiezen uit een lijst, of 'Iets anders…' met een eigen antwoord", async ({ page }) => {
+test("verduidelijkende vragen: meerdere antwoorden kiezen, en 'Iets anders' met een eigen antwoord", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
   await page.getByLabel("Jouw probleem of idee").fill("Vergaderingen moeten automatisch worden uitgeschreven");
   await page.getByRole("button", { name: "Volgende →" }).click();
-  const gegevens = page.getByLabel("Met welke gegevens ga je werken?");
-  await expect(gegevens).toBeFocused();
-  await gegevens.selectOption("Weet ik niet zeker");
-  const wie = page.getByLabel("Wie gaat de oplossing gebruiken?");
-  await wie.selectOption({ label: "Iets anders…" });
+  const gegevens = page.getByRole("group", { name: /Met welke gegevens ga je werken\?/ });
+  // De focus staat op de eerste keuze van de eerste vraag.
+  await expect(gegevens.getByRole("checkbox").first()).toBeFocused();
+  await expect(gegevens).toContainText("Je kunt meerdere antwoorden kiezen.");
+  await vinkAan(page, "verduidelijking-0", "Interne werkinformatie, zoals werkinstructies");
+  await vinkAan(page, "verduidelijking-0", "Weet ik niet zeker");
+  await vinkAan(page, "verduidelijking-1", "Mijn team of een paar collega's");
+  await vinkAan(page, "verduidelijking-1", "Iets anders");
   const eigen = page.getByLabel("Jouw eigen antwoord op: Wie gaat de oplossing gebruiken?");
   await expect(eigen).toBeFocused();
-  await eigen.fill("Het projectteam en twee externe adviseurs");
+  await eigen.fill("Twee externe adviseurs");
 
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(r.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 
-  // Vooruit en terug: de antwoorden staan er nog (ook het eigen antwoord).
+  // Vooruit en terug: alle keuzes en het eigen antwoord staan er nog.
   await page.getByRole("button", { name: "Volgende →" }).click();
   await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();
   await page.getByRole("button", { name: "← Terug" }).click();
-  await expect(page.getByLabel("Met welke gegevens ga je werken?")).toHaveValue("Weet ik niet zeker");
-  await expect(page.getByLabel("Jouw eigen antwoord op: Wie gaat de oplossing gebruiken?")).toHaveValue("Het projectteam en twee externe adviseurs");
+  await expect(page.getByLabel("Interne werkinformatie, zoals werkinstructies")).toBeChecked();
+  await expect(page.getByLabel("Weet ik niet zeker")).toBeChecked();
+  await expect(page.getByLabel("Mijn team of een paar collega's")).toBeChecked();
+  await expect(page.getByLabel("Jouw eigen antwoord op: Wie gaat de oplossing gebruiken?")).toHaveValue("Twee externe adviseurs");
 
-  // Het gekozen antwoord helpt de coach bij het voorinvullen van de checks.
+  // De antwoorden helpen de coach bij het voorinvullen van de checks.
   await page.getByRole("button", { name: "Volgende →" }).click();
   await naarChecks(page);
   await expect(page.locator("#veld-data > fieldset").first().getByLabel("Weet ik niet zeker", { exact: true }).first()).toBeChecked();
