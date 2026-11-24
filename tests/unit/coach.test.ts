@@ -38,6 +38,35 @@ describe("coach: validatie en terugval", () => {
     expect(await s.tooladvies({ ...vv, uitsluiten: ["claude_code"] }, ctx)).toBeNull();
   });
 
+  it("K4a. verduidelijkende vragen mogen antwoordopties hebben; een losse vraag is een open vraag", async () => {
+    const s = new CoachService(
+      nep({ verduidelijk: { vragen: ["Open vraag?", { vraag: "Welke gegevens?", opties: ["Persoonsgegevens", "Alleen testdata"] }] } }),
+      content,
+    );
+    expect(await s.verduidelijk({ beschrijving: "x" }, ctx)).toEqual({
+      vragen: [
+        { vraag: "Open vraag?", opties: [] },
+        { vraag: "Welke gegevens?", opties: ["Persoonsgegevens", "Alleen testdata"] },
+      ],
+    });
+  });
+
+  it("K4b. meer dan zes antwoordopties wordt geweigerd", async () => {
+    const s = new CoachService(nep({ verduidelijk: { vragen: [{ vraag: "a?", opties: ["1", "2", "3", "4", "5", "6", "7"] }] } }), content);
+    expect(await s.verduidelijk({ beschrijving: "x" }, ctx)).toBeNull();
+  });
+
+  it("K4c. de oefencoach geeft bij een vage beschrijving vragen met opties, en gebruikt het gekozen antwoord bij de checks", async () => {
+    const s = new CoachService(new MockCoachClient(content), content);
+    const r = await s.verduidelijk({ beschrijving: "Teams moet automatisch kunnen transcriberen" }, ctx);
+    expect(r!.vragen[0]!.opties).toContain("Gegevens over personen, zoals namen of e-mailadressen");
+    const checks = await s.checksVoorinvullen(
+      { beschrijving: "Teams transcriberen", verduidelijking: [{ vraag: r!.vragen[0]!.vraag, antwoord: "Weet ik niet zeker" }], tool: "m365_copilot" },
+      ctx,
+    );
+    expect(checks!.find((c) => c.check === "data")).toMatchObject({ voorstel: "weet_niet" });
+  });
+
   it("K4. meer dan twee verduidelijkende vragen wordt geweigerd", async () => {
     const s = new CoachService(nep({ verduidelijk: { vragen: ["a?", "b?", "c?"] } }), content);
     expect(await s.verduidelijk({ beschrijving: "x" }, ctx)).toBeNull();

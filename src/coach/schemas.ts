@@ -8,8 +8,16 @@ import { MAX_VERDUIDELIJKENDE_VRAGEN } from "../domain/wizard";
 
 const tekst = (max: number) => z.string().trim().min(1).max(max);
 
+/**
+ * Verduidelijkende vragen: een losse vraag (open antwoord) of een vraag met 2 tot 6 antwoordopties.
+ * De wizard voegt zelf "Iets anders…" toe, zodat de medewerker altijd een eigen antwoord kan geven.
+ */
+const verduidelijkendeVraag = z.union([
+  tekst(300).transform((vraag) => ({ vraag, opties: [] as string[] })),
+  z.object({ vraag: tekst(300), opties: z.array(tekst(100)).max(6).default([]) }),
+]);
 export const verduidelijkSchema = z.object({
-  vragen: z.array(tekst(300)).max(MAX_VERDUIDELIJKENDE_VRAGEN),
+  vragen: z.array(verduidelijkendeVraag).max(MAX_VERDUIDELIJKENDE_VRAGEN),
 });
 
 export function tooladviesSchema(content: Content, uitsluiten: string[] = []) {

@@ -29,12 +29,25 @@ export class MockCoachClient implements CoachClient {
   constructor(private readonly content: Content) {}
 
   async verduidelijk({ beschrijving }: VerduidelijkInvoer) {
-    const vragen: string[] = [];
+    const vragen: { vraag: string; opties: string[] }[] = [];
     if (!heeft(beschrijving, /gegevens|data|testdata|persoon|klant/)) {
-      vragen.push("Met welke gegevens ga je werken? Bijvoorbeeld gegevens over personen, klanten of alleen testdata?");
+      vragen.push({
+        vraag: "Met welke gegevens ga je werken?",
+        opties: [
+          "Gegevens over personen, zoals namen of e-mailadressen",
+          "Klantgegevens of andere vertrouwelijke informatie",
+          "Interne werkinformatie, zoals werkinstructies",
+          "Openbare informatie",
+          "Alleen testdata",
+          "Weet ik niet zeker",
+        ],
+      });
     }
     if (!heeft(beschrijving, /mezelf|mij|collega|team|afdeling|organisatie|klanten/)) {
-      vragen.push("Wie gaat de oplossing gebruiken: alleen jij, je team of meer mensen?");
+      vragen.push({
+        vraag: "Wie gaat de oplossing gebruiken?",
+        opties: ["Alleen ik", "Mijn team of een paar collega's", "Mijn afdeling", "Heel IJK (de hele organisatie)", "Ook mensen buiten IJK, zoals klanten"],
+      });
     }
     return { vragen };
   }
@@ -61,11 +74,13 @@ export class MockCoachClient implements CoachClient {
       checks.push({ check, voorstel, zekerheid, ...(vervolgvraag ? { vervolgvraag } : {}) });
 
     // Data
-    if (/verzuim|\bhr\b|hr-|cv|kandidat|salaris|persoonsgegevens|medewerkergegevens/.test(t)) {
+    if (/verzuim|\bhr\b|hr-|cv|kandidat|salaris|persoonsgegevens|medewerkergegevens|over personen/.test(t)) {
       zet("data", "persoonsgegevens", "hoog");
+    } else if (/weet ik niet zeker/.test(t)) {
+      zet("data", "weet_niet", "laag", "Staan er gegevens in die je aan een persoon kunt koppelen, zoals namen?");
     } else if (/klantgegevens|vertrouwelijk|contract/.test(t)) {
       zet("data", "vertrouwelijk", "middel", "Staan er namen of andere gegevens over personen in?");
-    } else if (/testdata|openbaar/.test(t)) {
+    } else if (/testdata|openba/.test(t)) {
       zet("data", "openbaar", "middel");
     } else {
       zet("data", "intern", "laag", "Gebruik je gegevens over personen, zoals namen of e-mailadressen?");

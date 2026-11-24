@@ -65,8 +65,9 @@ export function systeemPrompt(taak: CoachTaak, c: Content, opties: { tool?: stri
 
 TAAK: verduidelijk
 De medewerker beschrijft een probleem of idee. Stel maximaal TWEE korte vragen die nodig zijn om een tool te kunnen adviseren en de risico's in te schatten (bijvoorbeeld welke gegevens, welke systemen, wie het gebruikt). Is de beschrijving al duidelijk genoeg, geef dan een lege lijst.
+Geef bij elke vraag 3 tot 6 korte antwoordopties die elkaar uitsluiten. Voeg zelf geen optie "anders" toe: de medewerker kan altijd een eigen antwoord typen.
 
-Formaat: {"vragen": ["...", "..."]}`;
+Formaat: {"vragen": [{"vraag": "...", "opties": ["...", "..."]}]}`;
     case "tooladvies":
       return `${BASIS}
 

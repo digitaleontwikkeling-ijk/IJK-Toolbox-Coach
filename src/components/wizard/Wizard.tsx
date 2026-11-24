@@ -212,13 +212,13 @@ export function Wizard() {
     }
     setFout(null);
     if (!d.verduidelijkingGevraagd) {
-      const r = await coach<{ vragen: string[] }>("verduidelijk", { beschrijving: d.beschrijving });
+      const r = await coach<{ vragen: { vraag: string; opties: string[] }[] }>("verduidelijk", { beschrijving: d.beschrijving });
       const vragen = r?.vragen ?? [];
       wijzig((x) => ({
         ...x,
         verduidelijkingGevraagd: true,
-        verduidelijking: vragen.map((vraag) => ({ vraag, antwoord: "" })),
-        chat: vragen.length ? [...x.chat, { rol: "coach", tekst: vragen.join("\n") }] : x.chat,
+        verduidelijking: vragen.map((v) => ({ vraag: v.vraag, antwoord: "", opties: v.opties })),
+        chat: vragen.length ? [...x.chat, { rol: "coach", tekst: vragen.map((v) => v.vraag).join("\n") }] : x.chat,
       }));
       if (vragen.length) {
         setTimeout(() => document.getElementById("verduidelijking-0")?.focus(), 50);

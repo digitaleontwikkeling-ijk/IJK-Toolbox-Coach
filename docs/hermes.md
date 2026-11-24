@@ -22,7 +22,7 @@ Controleer bij een nieuwe Hermes-versie of dit nog klopt.
 
 De vier coach-taken (plus vrije chat):
 
-1. **verduidelijk** – `{ "vragen": [max. 2] }`
+1. **verduidelijk** – `{ "vragen": [max. 2] }`; elke vraag is een tekst (open vraag) of `{ "vraag", "opties": [max. 6] }`. De wizard toont opties als keuzelijst en voegt zelf "Iets anders…" toe.
 2. **tooladvies** – `{ "behoefte", "tool", "motivatie" }`; tool moet in `content/tools.yaml` staan
 3. **checks** – `{ "checks": [{ "check", "voorstel", "zekerheid", "vervolgvraag?" }] }`; waarden uit de schaal
 4. **uitleg** – `{ "uitleg" }`; wordt geweigerd als de tekst een andere uitkomst noemt dan berekend

@@ -52,7 +52,14 @@ export const wizardDataSchema = z.object({
   stap: z.number().int().min(1).max(4).default(1),
   beschrijving: z.string().max(4000).default(""),
   verduidelijking: z
-    .array(z.object({ vraag: kort, antwoord: z.string().max(1000).default("") }))
+    .array(
+      z.object({
+        vraag: kort,
+        antwoord: z.string().max(1000).default(""),
+        /** Antwoordopties van de coach (keuzelijst); leeg = open vraag. Een eigen antwoord kan altijd. */
+        opties: z.array(z.string().trim().max(100)).max(6).default([]),
+      }),
+    )
     .max(MAX_VERDUIDELIJKENDE_VRAGEN)
     .default([]),
   /** Heeft de coach al om verduidelijking gevraagd? (maximaal één ronde) */
