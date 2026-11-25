@@ -37,8 +37,8 @@ export interface BeslisInvoer {
   checks: Record<string, CheckAntwoord>;
   /** extra-vraag-id → ja/nee. Alleen nodig als de extra vraag van toepassing is. */
   extraVragen?: Record<string, ExtraAntwoord>;
-  /** rode-vlag-id → ja/nee. Elke rode vlag die van toepassing is, moet beantwoord zijn. */
-  rodeVlaggen: Record<string, boolean>;
+  /** rode-vlag-id → ja/nee/"onzeker". Elke rode vlag die van toepassing is, moet beantwoord zijn. */
+  rodeVlaggen: Record<string, ExtraAntwoord>;
   /** Verdiepingsvragen (privacy en AI): gegeven-id → antwoord-id. Alleen relevante vragen tellen mee. */
   verdieping?: Record<string, string>;
   /** Koos de medewerker een tool die (nog) niet in de IJK Toolbox zit? */
@@ -57,7 +57,7 @@ export type Reden =
     }
   | { soort: "rode_vlag"; vlagId: string; kort: string }
   /** Een beoordeling (tool buiten de toolbox, privacy, AI) die de uitkomst naar een minimale kleur verhoogde. */
-  | { soort: "signaal"; signaal: "tool_buiten_toolbox" | "dpia" | "ai_risico"; tekst: string };
+  | { soort: "signaal"; signaal: "tool_buiten_toolbox" | "dpia" | "ai_risico" | "rode_vlag_onzeker"; tekst: string };
 
 export interface BeslisUitkomst {
   regelversie: string;
@@ -189,7 +189,7 @@ export function valideerInvoer(invoer: BeslisInvoer, regelset: Regelset): string
   }
   for (const vlag of regelset.rode_vlaggen) {
     if (!rodeVlagVanToepassing(vlag.id, invoer, regelset)) continue;
-    if (typeof invoer.rodeVlaggen?.[vlag.id] !== "boolean") fouten.push(`rode vlag "${vlag.id}" is niet beantwoord`);
+    if (!geldigExtraAntwoord(invoer.rodeVlaggen?.[vlag.id], true)) fouten.push(`rode vlag "${vlag.id}" is niet beantwoord`);
   }
 
   // Verdieping (privacy en AI): alleen de vragen die nu relevant zijn en niet uit eerdere antwoorden volgen.
@@ -226,6 +226,10 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
   });
   const vlaggen = rodeVlaggenDieTellen(invoer, regelset);
   const vlaggenJa = regelset.rode_vlaggen.filter((v) => vlaggen[v.id]);
+  // "Weet ik niet zeker" bij een aanvullende vraag die gesteld wordt.
+  const vlaggenOnzeker = regelset.rode_vlaggen.filter(
+    (v) => rodeVlagVanToepassing(v.id, invoer, regelset) && invoer.rodeVlaggen?.[v.id] === "onzeker",
+  );
 
   // 2. Privacy (pre-DPIA) en AI-risico: aparte beoordelingen op dezelfde feiten.
   const analyse = analyseer({ ...invoer, rodeVlaggen: vlaggen }, regelset);
@@ -242,8 +246,17 @@ export function evalueer(invoer: BeslisInvoer, regelset: Regelset): BeslisUitkom
   for (const s of checkScores) hoogste = Math.max(hoogste, rangVan(s.kleur));
   if (vlaggenJa.length > 0) hoogste = Math.max(hoogste, rangVan(regelset.rode_vlag_kleur));
   const buiten = invoer.toolBuitenToolbox === true;
-  type Minimum = { signaal: "tool_buiten_toolbox" | "dpia" | "ai_risico"; rang: number; tekst: string; toetsers: string[] };
+  type Minimum = { signaal: Extract<Reden, { soort: "signaal" }>["signaal"]; rang: number; tekst: string; toetsers: string[] };
   const minima: Minimum[] = [];
+  if (vlaggenOnzeker.length > 0) {
+    const o = regelset.rode_vlag_onzeker;
+    minima.push({
+      signaal: "rode_vlag_onzeker",
+      rang: rangVan(o.minimale_uitkomst),
+      tekst: o.motivatie.replace("{kort}", opsomming(vlaggenOnzeker.map((v) => v.kort))),
+      toetsers: o.toetsers,
+    });
+  }
   if (buiten) {
     const tb = regelset.tool_buiten_toolbox;
     minima.push({ signaal: "tool_buiten_toolbox", rang: rangVan(tb.minimale_uitkomst), tekst: tb.motivatie, toetsers: tb.toetsers });

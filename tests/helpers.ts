@@ -21,8 +21,8 @@ export function kopieRegelset(): Regelset {
  */
 export function invoer(opties: {
   checks?: Record<string, CheckAntwoord>;
-  extraVragen?: Record<string, boolean>;
-  rodeVlaggen?: Record<string, boolean>;
+  extraVragen?: Record<string, boolean | "onzeker">;
+  rodeVlaggen?: Record<string, boolean | "onzeker">;
   verdieping?: Record<string, string>;
 } = {}, r: Regelset = regelset): BeslisInvoer {
   const checks: Record<string, CheckAntwoord> = {};
@@ -39,7 +39,7 @@ export function invoer(opties: {
       checks[c.id] = gegeven ?? laagste;
     }
   }
-  const rodeVlaggen: Record<string, boolean> = {};
+  const rodeVlaggen: Record<string, boolean | "onzeker"> = {};
   for (const v of r.rode_vlaggen) rodeVlaggen[v.id] = opties.rodeVlaggen?.[v.id] ?? false;
   return { checks, extraVragen: opties.extraVragen ?? {}, rodeVlaggen, verdieping: { ...RUSTIG, ...opties.verdieping } };
 }

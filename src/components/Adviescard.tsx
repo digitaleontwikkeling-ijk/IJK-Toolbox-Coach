@@ -40,7 +40,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const link = andere?.link?.trim() && geldigeLink(andere.link) ? andere.link.trim() : null;
   const actie = t.vervolgacties[kleur.vervolgactie];
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
-  const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id]);
+  const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id] === true);
+  const vlaggenOnzeker = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id] === "onzeker");
   // Rood zonder alternatief: Team DO neemt contact op. Mislukte de melding, dan kan het opnieuw.
   const contactNodig = kleur.contact_als_geen_alternatief && kleur.vervolgactie === "alleen_vastleggen" && advies.alternatieven.length === 0;
   const contactOpnieuw = contactNodig && advies.status === "advies_gegeven";
@@ -161,7 +162,11 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                 ))}
               <tr>
                 <th scope="row">{t.aanvullende_vragen.titel}</th>
-                <td>{vlaggenJa.length ? vlaggenJa.map((v) => `Ja: ${v.kort}`).join("; ") : t.aanvullende_vragen.geen}</td>
+                <td>
+                  {vlaggenJa.length || vlaggenOnzeker.length
+                    ? [...vlaggenJa.map((v) => `Ja: ${v.kort}`), ...vlaggenOnzeker.map((v) => `Weet ik niet zeker: ${v.kort}`)].join("; ")
+                    : t.aanvullende_vragen.geen}
+                </td>
               </tr>
             </tbody>
           </table>

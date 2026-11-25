@@ -82,7 +82,8 @@ export const wizardDataSchema = z.object({
   extraVragen: z.record(id, z.union([z.boolean(), z.literal("onzeker")])).default({}),
   /** Verdiepingsvragen (privacy en AI): gegeven-id → antwoord-id. Alleen relevante vragen tellen mee. */
   verdieping: z.record(id, id).default({}),
-  rodeVlaggen: z.record(id, z.boolean()).default({}),
+  /** Aanvullende vragen: ja/nee, of "onzeker" (weet ik niet zeker). */
+  rodeVlaggen: z.record(id, z.union([z.boolean(), z.literal("onzeker")])).default({}),
   chat: z.array(chatBerichtSchema).max(200).default([]),
   /** Bij "Er is iets veranderd": het advies waarop dit concept voortbouwt. */
   vorigAdviesId: z.string().uuid().nullable().default(null),

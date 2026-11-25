@@ -21,7 +21,7 @@ import type { Gegeven, GegevenId, Regelset } from "./content-schema";
 export interface VerdiepingInvoer {
   checks: Record<string, string | string[] | Record<string, string>>;
   extraVragen?: Record<string, boolean | "onzeker">;
-  rodeVlaggen: Record<string, boolean>;
+  rodeVlaggen: Record<string, boolean | "onzeker">;
   /** gegeven-id → antwoord-id */
   verdieping?: Record<string, string>;
 }

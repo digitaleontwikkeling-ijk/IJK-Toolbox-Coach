@@ -158,6 +158,8 @@ export const regelsetSchema = z
       regels: z.array(z.object({ gegeven: z.enum(GEGEVEN_IDS), antwoord: id, klasse: id, voorwaarde: tekst.optional() })),
       motivatie: tekst,
     }),
+    /** "Weet ik niet zeker" bij een aanvullende vraag: minstens deze kleur, met deze toetsers. */
+    rode_vlag_onzeker: z.object({ minimale_uitkomst: id, toetsers: z.array(id).min(1), motivatie: tekst }),
     /** Een tool buiten de IJK Toolbox: minstens deze kleur en altijd deze toetsers. */
     tool_buiten_toolbox: z.object({
       minimale_uitkomst: id,
@@ -236,6 +238,12 @@ export const regelsetSchema = z
     for (const regel of r.ai_risico.regels) {
       if (!aiKlassen.has(regel.klasse)) fout(`ai_risico: onbekende klasse "${regel.klasse}"`);
       if (!antwoordBestaat(regel.gegeven, regel.antwoord)) fout(`ai_risico: onbekend antwoord "${regel.antwoord}" bij ${regel.gegeven}`);
+    }
+    if (!kleurIds.has(r.rode_vlag_onzeker.minimale_uitkomst)) {
+      fout(`rode_vlag_onzeker: onbekende kleur "${r.rode_vlag_onzeker.minimale_uitkomst}"`);
+    }
+    for (const t of r.rode_vlag_onzeker.toetsers) {
+      if (!toetserIds.has(t)) fout(`rode_vlag_onzeker: onbekende toetser "${t}"`);
     }
     if (!kleurIds.has(r.tool_buiten_toolbox.minimale_uitkomst)) {
       fout(`tool_buiten_toolbox: onbekende kleur "${r.tool_buiten_toolbox.minimale_uitkomst}"`);

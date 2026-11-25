@@ -3,6 +3,13 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## regelset 0.9 (concept)
+
+- Aanvullende vragen hebben nu ook "Weet ik niet zeker" (keuze IJK). Twijfel geeft minstens *Eerst toetsen* en beide
+  toetsers kijken mee (`rode_vlag_onzeker`); "Waarom deze kleur?" noemt de vraag ("Niet zeker bij: …").
+  Een "ja" elders blijft rood; twijfel bij een vraag die niet gesteld wordt, telt niet.
+  TODO: valideren door toetsers.
+
 ## regelset 0.8.1 (concept)
 
 - Extra vraag "Gaat het om bijzondere persoonsgegevens?" heeft nu ook "Weet ik niet zeker" (`onzeker_mogelijk`).

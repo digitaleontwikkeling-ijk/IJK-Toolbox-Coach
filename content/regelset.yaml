@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.8.1"
+versie: "0.9"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -297,6 +297,14 @@ rode_vlaggen:
     vraag: Gaat een proces binnen IJK draaien op een persoonlijke oplossing zonder eigenaar of beheer?
     kort: een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer
     alternatief: Wijs een eigenaar aan en regel het beheer.
+
+# "Weet ik niet zeker" bij een aanvullende vraag: de uitkomst is minstens deze kleur en beide toetsers
+# kijken mee, zodat er altijd iemand naar de twijfel kijkt (keuze IJK, regelset 0.9).
+# {kort} = de korte omschrijving van de vraag(en). TODO: valideren door toetsers
+rode_vlag_onzeker:
+  minimale_uitkomst: oranje
+  toetsers: [toetser_compliance, toetser_architect]
+  motivatie: "niet zeker bij: {kort}"
 
 # Tool buiten de IJK Toolbox: de medewerker kiest in stap 2 een tool die (nog) niet in de toolbox zit.
 # De zes checks en de aanvullende vragen gelden gewoon (de uitkomst kan dus ook rood worden),

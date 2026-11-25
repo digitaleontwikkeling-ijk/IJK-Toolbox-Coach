@@ -100,3 +100,38 @@ describe("rood: toetsers en contact", () => {
     expect(evalueer(invoer({ checks: { impact: { integriteit: "serieus" } } }), regelset).contactNodig).toBe(false);
   });
 });
+
+describe("aanvullende vragen: 'weet ik niet zeker' (regelset 0.9)", () => {
+  it("O1. verder groen → Eerst toetsen, beide toetsers, met de vraag in 'Waarom deze kleur?'", () => {
+    const u = evalueer(invoer({ rodeVlaggen: { open_zonder_toetsing: "onzeker" } }), regelset);
+    expect(u.kleur).toBe("oranje");
+    expect(u.toetsers).toEqual(BEIDE);
+    expect(u.motivatie).toBe("Niet zeker bij: een oplossing met echte gegevens die zonder toetsing openstaat.");
+    expect(u.alternatieven).toEqual([]);
+  });
+
+  it("O2. meerdere twijfels staan samen in de motivatie", () => {
+    const u = evalueer(invoer({ rodeVlaggen: { open_zonder_toetsing: "onzeker", proces_zonder_eigenaar: "onzeker" } }), regelset);
+    expect(u.motivatie).toBe(
+      "Niet zeker bij: een oplossing met echte gegevens die zonder toetsing openstaat en een IJK-proces op een persoonlijke oplossing zonder eigenaar of beheer.",
+    );
+  });
+
+  it("O3. een 'ja' elders blijft rood; twijfel verlaagt nooit", () => {
+    const u = evalueer(invoer({ rodeVlaggen: { open_zonder_toetsing: "onzeker", proces_zonder_eigenaar: true } }), regelset);
+    expect(u.kleur).toBe("rood");
+    expect(u.alternatieven).toEqual(["Wijs een eigenaar aan en regel het beheer."]);
+  });
+
+  it("O4. twijfel bij een vraag die niet gesteld wordt, telt niet", () => {
+    expect(evalueer(invoer({ rodeVlaggen: { ai_beslist_over_mensen: "onzeker" } }), regelset).kleur).toBe("groen");
+  });
+
+  it("O5. twijfel bij een check die al oranje is: geen extra reden, wel beide toetsers", () => {
+    const u = evalueer(invoer({ checks: { systemen: "koppelen" }, rodeVlaggen: { persoonlijke_inlog_of_secrets: "onzeker" } }), regelset);
+    expect(u.kleur).toBe("oranje");
+    expect(u.toetsers).toEqual(BEIDE);
+    expect(u.motivatie).toBe("Koppelen (Systemen).");
+  });
+});
+

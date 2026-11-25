@@ -95,3 +95,26 @@ test("verduidelijkende vragen: meerdere antwoorden kiezen, en 'Iets anders' met 
   await naarChecks(page);
   await expect(page.locator("#veld-data > fieldset").first().getByLabel("Weet ik niet zeker", { exact: true }).first()).toBeChecked();
 });
+
+test("aanvullende vraag 'Weet ik niet zeker' → Eerst toetsen, met beide toetsers", async ({ page }) => {
+  await login(page, "Testmedewerker Chris");
+  await naarStap3(page, "Een prototype voor mezelf met testdata.");
+  await naarChecks(page);
+  await kies(page, "data", "Openbaar");
+  await kies(page, "systemen", "Geen");
+  await kies(page, "gebruikers", "Alleen ik");
+  await kies(page, "autonomie", "Assisteren");
+  await kiesImpact(page);
+  await kies(page, "afhankelijkheid", "Eenmalig of om uit te proberen (experiment)");
+  await kies(page, "open_zonder_toetsing", "Weet ik niet zeker");
+  await geenRodeVlaggen(page);
+  // geenRodeVlaggen zet alle zichtbare vragen op Nee: zet de twijfel terug.
+  await kies(page, "open_zonder_toetsing", "Weet ik niet zeker");
+  await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+  const card = page.locator(".adviescard");
+  await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
+  await expect(card).toContainText("Niet zeker bij: een oplossing met echte gegevens die zonder toetsing openstaat.");
+  await expect(card).toContainText("Weet ik niet zeker: een oplossing met echte gegevens die zonder toetsing openstaat");
+  await expect(card).toContainText("AI governance & compliance officer");
+  await expect(card).toContainText("architect Digitale Ontwikkeling");
+});

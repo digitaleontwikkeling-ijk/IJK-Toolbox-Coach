@@ -257,9 +257,11 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
             legend={t.aanvullende_vragen.vraag_label.replace("{nummer}", String(nummer))}
             vraag={v.vraag}
             toelichting={v.uitleg}
-            opties={JA_NEE}
-            waarde={naarJaNee(data.rodeVlaggen[v.id])}
-            onKies={(x) => wijzig((d) => ({ ...d, rodeVlaggen: { ...d.rodeVlaggen, [v.id]: x === "ja" } }))}
+            opties={[...JA_NEE, { id: "onzeker", label: "Weet ik niet zeker" }]}
+            waarde={data.rodeVlaggen[v.id] === "onzeker" ? "onzeker" : naarJaNee(data.rodeVlaggen[v.id] as boolean | undefined)}
+            onKies={(x) =>
+              wijzig((d) => ({ ...d, rodeVlaggen: { ...d.rodeVlaggen, [v.id]: x === "onzeker" ? "onzeker" : x === "ja" } }))
+            }
           />
         </div>
       ))}
@@ -294,7 +296,7 @@ export function alleVelden(content: Content, data: Data): { id: string; naam: st
     uit.push({
       id: v.id,
       naam: content.teksten.aanvullende_vragen.vraag_label.replace("{nummer}", String(nummer)),
-      beantwoord: typeof data.rodeVlaggen[v.id] === "boolean",
+      beantwoord: geldigExtraAntwoord(data.rodeVlaggen[v.id], true),
     });
   }
   return uit;
