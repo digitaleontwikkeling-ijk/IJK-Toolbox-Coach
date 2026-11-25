@@ -19,6 +19,9 @@ de uitkomst met vaste beslisregels; het taalmodel bepaalt nooit de kleur.** De a
 
 **https://timbrons.github.io/IJK-Toolbox-Coach/**
 
+> Na de verhuizing naar de GitHub-omgeving van IJK wordt dit `https://<organisatie>.github.io/IJK-Toolbox-Coach/`.
+> Pas deze link dan aan.
+
 Wat de AI precies doet (en niet doet) staat op de pagina **Hoe werkt de coach?** (`/hoe-werkt-het`).
 
 De demo draait volledig in je browser: geen server, geen database, geen AI (oefencoach), geen echte aanvragen.
@@ -84,6 +87,8 @@ Er staan geen geheimen in de code.
 
 | Document | Onderwerp |
 | --- | --- |
+| [CLAUDE.md](CLAUDE.md) | Werkafspraken en context voor Claude Code (lees dit eerst bij een nieuwe sessie) |
+| [docs/opdracht.md](docs/opdracht.md) | De oorspronkelijke opdracht |
 | [docs/content-beheren.md](docs/content-beheren.md) | Regels, tools, spelregels en teksten wijzigen; versienummers |
 | [docs/hermes.md](docs/hermes.md) | Koppeling met Hermes Agent en inrichting van het profiel `toolbox-coach` |
 | [docs/acties.md](docs/acties.md) | Webhooks, statussen, toetsing, beheer en audit-log |
