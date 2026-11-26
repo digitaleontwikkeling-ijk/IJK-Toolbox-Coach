@@ -8,10 +8,13 @@ import { content, kopieRegelset, regelset } from "../helpers";
 
 describe("content-bestanden", () => {
   it("C1. de meegeleverde content is geldig en heeft een versie", () => {
-    expect(regelset.versie).toBe("0.9");
+    expect(regelset.versie).toBe("0.9.1");
     expect(regelset.checks.map((c) => c.id)).toEqual(["data", "systemen", "gebruikers", "autonomie", "impact", "afhankelijkheid"]);
     expect(regelset.rode_vlaggen).toHaveLength(4);
     expect(regelset.checks.find((c) => c.id === "impact")!.deelvragen.map((d) => d.id)).toEqual(["beschikbaarheid", "integriteit", "vertrouwelijkheid"]);
+    // Regelset 0.9.1: bij een experiment hoeft er niets extra's geregeld te worden (geen regel op de adviescard).
+    const afhankelijkheid = regelset.checks.find((c) => c.id === "afhankelijkheid")!;
+    expect(afhankelijkheid.antwoorden.find((a) => a.id === "experiment")!.extra_regelen).toBeUndefined();
   });
 
   it("C2. elke tool heeft spelregels met drie lijsten", () => {

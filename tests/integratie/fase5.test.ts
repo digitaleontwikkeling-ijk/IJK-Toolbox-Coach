@@ -186,7 +186,7 @@ describe("toetsing", () => {
       rodeVlaggen: { persoonlijke_inlog_of_secrets: false, open_zonder_toetsing: false, proces_zonder_eigenaar: false },
       uitkomst: "oranje",
       dpiaSignaal: true,
-      regelversie: "0.9",
+      regelversie: "0.9.1",
       besluiten: [],
     });
     await roep(toetsingRoute.GET as Handler, { gebruiker: COMPLIANCE });

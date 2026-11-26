@@ -8,7 +8,7 @@
 # Nog NIET gevalideerd door beide toetsers.
 # TODO: valideren door toetsers
 
-versie: "0.9"
+versie: "0.9.1"
 gevalideerd: false
 
 # Uitkomstkleuren, van laag naar hoog. De volgorde bepaalt welke kleur "het hoogst" is.
@@ -237,7 +237,6 @@ checks:
         label: Eenmalig of om uit te proberen (experiment)
         kort: Experiment
         kleur: groen
-        extra_regelen: Niets extra's.
       - id: persoonlijk
         uitleg: "Je gebruikt de oplossing regelmatig voor je eigen werk. Als hij stopt, heb jij er last van."
         label: Regelmatig, voor mijn eigen werk (persoonlijke oplossing)

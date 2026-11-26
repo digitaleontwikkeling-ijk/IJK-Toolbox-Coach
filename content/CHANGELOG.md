@@ -46,6 +46,12 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Teksten voor de chat in het gesprek (`chat_label`, `chat_label_klaar`, `chat_plaatshouder`, `chat_stuur`, `denkt`,
   `eerdere_berichten`). Ook geen nieuwe regelset.
 
+## regelset 0.9.1 (concept)
+
+- Afhankelijkheid = Experiment: geen tekst meer bij "Wat moet je extra regelen?" (was "Niets extra's."). Op de
+  adviescard staat dat onderdeel bij een experiment dus niet. Geen nieuwe of gewijzigde beslisregel; de uitkomst
+  verandert niet.
+
 ## regelset 0.9 (concept)
 
 - Aanvullende vragen hebben nu ook "Weet ik niet zeker" (keuze IJK). Twijfel geeft minstens *Eerst toetsen* en beide
