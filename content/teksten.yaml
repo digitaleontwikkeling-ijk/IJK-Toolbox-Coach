@@ -163,6 +163,34 @@ verdieping:
   voortgang_een: "Nog 1 van {totaal} vragen te beantwoorden."
   voortgang_klaar: Alle {totaal} vragen zijn beantwoord.
 
+# Stap 3 als gesprek: de coach stelt de vragen één voor één. De vragen zelf komen uit de regelset.
+# TODO: valideren (concepttekst)
+gesprek:
+  instructie: De coach loopt de checks met je door, één vraag tegelijk.
+  intro: >-
+    Ik loop zes checks met je door, één vraag tegelijk. Bij de meeste vragen heb ik op basis van je beschrijving al
+    een antwoord voorgesteld. Klopt het? Dan bevestig je het met één klik. Klopt het niet? Kies dan zelf.
+  intro_zonder_coach: >-
+    Ik loop zes checks met je door, één vraag tegelijk. Ik kon nu geen antwoorden voorstellen, dus je kiest zelf.
+  kop_check: "Check {nummer} van {totaal} · {naam}"
+  kop_aanvullend: "Aanvullende vraag {nummer}"
+  voorstel: "Op basis van je beschrijving denk ik: {antwoord}. Klopt dat?"
+  voorstel_onzeker: "Ik weet het niet zeker, maar ik denk: {antwoord}. Kijk je even mee?"
+  voorstel_tool: "Omdat de gekozen tool AI gebruikt, heb ik alvast gekozen: {antwoord}. Klopt dat?"
+  twijfel: "Ik twijfel nog: {vraag}"
+  al_bekend: "Dit hoef ik niet meer te vragen, want het volgt uit je antwoorden:"
+  wat_bedoel_je: Wat bedoel je hiermee?
+  vraag_coach: Stel de coach een vraag
+  bevestig: Ja, klopt
+  volgende: Volgende
+  wijzig: Wijzig
+  jouw_antwoord: "Jouw antwoord:"
+  klaar: >-
+    Dat waren alle vragen. Kijk je antwoorden hierboven nog even na; met Wijzig pas je er een aan. Klopt alles? Dan
+    bereken ik het advies met de vaste spelregels van IJK.
+  naar_lijst: Toon alle vragen op één pagina
+  naar_gesprek: Terug naar het gesprek
+
 privacy:
   titel: Privacy
   niet_nodig: Je gebruikt geen persoonsgegevens. Een privacybeoordeling (DPIA) is daarom niet nodig.

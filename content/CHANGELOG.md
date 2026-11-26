@@ -3,6 +3,11 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## teksten: stap 3 als gesprek (geen nieuwe regelset)
+
+- Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
+  antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
+
 ## regelset 0.9 (concept)
 
 - Aanvullende vragen hebben nu ook "Weet ik niet zeker" (keuze IJK). Twijfel geeft minstens *Eerst toetsen* en beide

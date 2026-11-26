@@ -117,12 +117,4 @@ export function Keuze(props: Props) {
   );
 }
 
-export const JA_NEE = [
-  { id: "ja", label: "Ja" },
-  { id: "nee", label: "Nee" },
-];
-export const naarJaNee = (b: boolean | undefined) => (b === undefined ? undefined : b ? "ja" : "nee");
-
-/** De gekozen antwoorden van een check altijd als lijst (bij deelvragen: alle deelantwoorden). */
-export const alsLijst = (w: string | string[] | Record<string, string> | undefined): string[] =>
-  Array.isArray(w) ? w : typeof w === "string" ? (w ? [w] : []) : w ? Object.values(w) : [];
+export { alsLijst, JA_NEE, naarJaNee } from "./wizard/velden";

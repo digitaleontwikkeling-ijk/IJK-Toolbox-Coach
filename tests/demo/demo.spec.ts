@@ -3,7 +3,6 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 const B = "/IJK-Toolbox-Coach";
-const kies = (p: Page, veld: string, label: string) => p.locator(`#veld-${veld}`).getByText(label, { exact: true }).first().click();
 
 async function login(page: Page, naam: string) {
   await page.goto(`${B}/login/`);
@@ -32,15 +31,17 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   // Eerst de uitleg over fase 2.
   await expect(page.getByRole("heading", { name: "Fase 2 · Mag ik dit doen?" })).toBeVisible();
   await page.getByRole("button", { name: "Begin met de checks →" }).click();
-  await expect(page.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
-  await kies(page, "bijzondere_persoonsgegevens", "Nee");
-  // Verdieping (privacy, AI): elke open vraag op "Nee"; een antwoord kan nieuwe vragen laten verschijnen.
-  for (let ronde = 0; ronde < 5; ronde++) {
-    for (const blok of await page.locator("div.verdieping[id^=veld-]").all()) {
-      if ((await blok.locator("input:checked").count()) === 0) await blok.getByText("Nee", { exact: true }).first().click();
+  // Het gesprek: de coach stelt de vragen één voor één; zijn voorstellen bevestig je, de rest op "Nee".
+  const actief = page.locator(".gesprek__bericht--actief");
+  await expect(actief.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
+  const verder = actief.getByRole("button", { name: /^(Ja, klopt|Volgende) →$/ });
+  for (let i = 0; i < 60 && (await verder.count()); i++) {
+    if ((await actief.locator(".keuze__opties input:checked").count()) === 0) {
+      await actief.locator(".keuze__opties label").getByText("Nee", { exact: true }).first().click();
     }
+    await verder.click();
   }
-  for (const v of ["persoonlijke_inlog_of_secrets", "open_zonder_toetsing", "proces_zonder_eigenaar"]) await kies(page, v, "Nee");
+  await expect(page.getByText("Dat waren alle vragen.")).toBeVisible();
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
   const ref = (await page.locator(".adviescard__voet strong").innerText()).trim();

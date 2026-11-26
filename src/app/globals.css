@@ -333,3 +333,25 @@ fieldset.keuze legend + * { clear: both; }
 .verdieping__groep > h4 { margin: 0 0 0.25rem; }
 .verdieping__signaal { font-style: italic; }
 .voortgang { font-weight: 600; margin: 0.5rem 0 1rem; }
+
+/* Stap 3 als gesprek: de coach stelt de vragen één voor één. Wie spreekt staat er altijd als tekst bij. */
+.knoppen--klein { margin-top: 0; gap: 0.25rem 1rem; }
+.gesprek { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.gesprek__paar { display: flex; flex-direction: column; gap: 0.5rem; }
+.gesprek__bericht { padding: 0.75rem 1rem; border-radius: var(--radius); max-width: 92%; }
+.gesprek__bericht p:first-of-type { margin-top: 0; }
+.gesprek__bericht p:last-child { margin-bottom: 0; }
+.gesprek__bericht--coach { background: var(--wolk); align-self: flex-start; }
+.gesprek__bericht--jij { background: var(--lucht); color: var(--wit); align-self: flex-end; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; }
+.gesprek__bericht--jij .gesprek__wie { flex-basis: 100%; }
+.gesprek__bericht--actief { max-width: 100%; width: 100%; background: var(--wit); border: 2px solid var(--water); }
+.gesprek__bericht--actief .keuze { background: transparent; margin-bottom: 0; }
+.gesprek__wie { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.25rem; }
+.gesprek__kop { font-size: 1.05rem; margin: 0 0 0.5rem; }
+.gesprek__kop-klein { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.15rem; }
+.gesprek__voorstel { font-style: italic; }
+.gesprek__hulp { margin-top: 0.75rem; }
+.gesprek__hulp summary { cursor: pointer; color: var(--water); text-decoration: underline; }
+.gesprek__wijzig { background: none; border: 0; padding: 0; color: var(--wit); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.875rem; }
+.gesprek__wijzig:focus-visible { outline: 3px solid var(--zon); outline-offset: 2px; }
+.extra-regelen h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }

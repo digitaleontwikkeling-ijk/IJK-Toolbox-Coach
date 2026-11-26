@@ -123,10 +123,19 @@ export async function naarStap3(page: Page, beschrijving: string) {
  * Van stap 2 naar de checks: klik op "<tool> past, verder" en daarna, als het uitlegscherm
  * over fase 2 verschijnt (één keer per idee), op "Begin met de checks".
  */
-export async function naarChecks(page: Page, knop: string | RegExp = /past, verder/) {
+export async function naarChecks(page: Page, knop: string | RegExp = /past, verder/, opties: { weergave?: "lijst" | "gesprek" } = {}) {
   await page.getByRole("button", { name: knop }).click();
   const begin = page.getByRole("button", { name: "Begin met de checks →" });
   await expect(begin.or(page.getByRole("heading", { name: /Zes checks/ })).first()).toBeVisible();
   if (await begin.isVisible()) await begin.click();
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
+  // Standaard toont de wizard het gesprek. De meeste tests vullen de lijst met alle vragen in.
+  if ((opties.weergave ?? "lijst") === "lijst") await naarLijst(page);
+}
+
+/** Stap 3: van het gesprek naar de lijst met alle vragen (als het gesprek open staat). */
+export async function naarLijst(page: Page) {
+  const knop = page.getByRole("button", { name: "Toon alle vragen op één pagina" });
+  if (await knop.isVisible()) await knop.click();
+  await expect(page.getByRole("button", { name: "Terug naar het gesprek" })).toBeVisible();
 }

@@ -5,31 +5,12 @@
  * Welke verdiepingsvragen nodig zijn, bepaalt `analyseer` (domein): wat al bekend is, wordt niet gevraagd.
  */
 import type { Check } from "@/domain/content-schema";
-import { geldigExtraAntwoord, rodeVlagVanToepassing } from "@/domain/beslisregels";
-import { analyseer, type OpenVraag } from "@/domain/verdieping";
-import { alsLijst, Keuze, JA_NEE, naarJaNee } from "../Keuze";
+import type { OpenVraag } from "@/domain/verdieping";
+import { Keuze } from "../Keuze";
 import type { StapProps } from "./types";
+import { alleVelden, alsLijst, JA_NEE, naarJaNee, verdiepingVan, zichtbareVlaggen } from "./velden";
 
-type Data = StapProps["data"];
-type Content = StapProps["content"];
-
-/** De verdieping bij de huidige antwoorden (pure berekening uit het domein). */
-export function verdiepingVan(content: Content, data: Data) {
-  const r = content.regelset;
-  const invoer = { checks: data.checks, extraVragen: data.extraVragen, rodeVlaggen: {}, verdieping: data.verdieping };
-  const vlaggen = Object.fromEntries(
-    r.rode_vlaggen.filter((v) => rodeVlagVanToepassing(v.id, invoer, r)).map((v) => [v.id, data.rodeVlaggen[v.id] === true]),
-  );
-  return analyseer({ ...invoer, rodeVlaggen: vlaggen }, r);
-}
-
-/** De aanvullende vragen die nu gesteld worden, met hun volgnummer. */
-function zichtbareVlaggen(content: Content, data: Data) {
-  const invoer = { checks: data.checks, rodeVlaggen: data.rodeVlaggen };
-  return content.regelset.rode_vlaggen
-    .filter((v) => rodeVlagVanToepassing(v.id, invoer, content.regelset))
-    .map((v, i) => ({ vlag: v, nummer: i + 1 }));
-}
+export { alleVelden, ontbrekendeVelden, verdiepingVan } from "./velden";
 
 interface Props extends StapProps {
   coachNietBeschikbaar: boolean;
@@ -267,44 +248,4 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
       ))}
     </>
   );
-}
-
-/** Alle vragen van stap 3 die nu gesteld worden: [veld-id, leesbare naam, beantwoord]. */
-export function alleVelden(content: Content, data: Data): { id: string; naam: string; beantwoord: boolean }[] {
-  const r = content.regelset;
-  const uit: { id: string; naam: string; beantwoord: boolean }[] = [];
-  const verdieping = verdiepingVan(content, data);
-  for (const c of r.checks) {
-    const huidig = data.checks[c.id];
-    if (c.deelvragen.length > 0) {
-      const perDeel = huidig && typeof huidig === "object" && !Array.isArray(huidig) ? huidig : {};
-      for (const d of c.deelvragen) uit.push({ id: `${c.id}-${d.id}`, naam: `${c.nummer}. ${c.naam} – ${d.naam}`, beantwoord: !!perDeel[d.id] });
-    } else {
-      uit.push({ id: c.id, naam: `${c.nummer}. ${c.naam}`, beantwoord: alsLijst(huidig).length > 0 });
-    }
-    const gekozen = alsLijst(huidig);
-    for (const e of r.extra_vragen) {
-      if (e.check === c.id && gekozen.some((g) => e.toon_bij.includes(g))) {
-        uit.push({ id: e.id, naam: e.vraag, beantwoord: geldigExtraAntwoord(data.extraVragen[e.id], e.onzeker_mogelijk) });
-      }
-    }
-    for (const v of verdieping.vragen.filter((x) => x.gegeven.plek === c.id)) {
-      uit.push({ id: v.gegeven.id, naam: v.gegeven.vraag, beantwoord: v.antwoord !== undefined });
-    }
-  }
-  for (const { vlag: v, nummer } of zichtbareVlaggen(content, data)) {
-    uit.push({
-      id: v.id,
-      naam: content.teksten.aanvullende_vragen.vraag_label.replace("{nummer}", String(nummer)),
-      beantwoord: geldigExtraAntwoord(data.rodeVlaggen[v.id], true),
-    });
-  }
-  return uit;
-}
-
-/** Welke velden van stap 3 ontbreken nog? Geeft [veld-id, leesbare naam]. */
-export function ontbrekendeVelden(content: Content, data: Data): [string, string][] {
-  return alleVelden(content, data)
-    .filter((v) => !v.beantwoord)
-    .map((v) => [v.id, v.naam]);
 }
