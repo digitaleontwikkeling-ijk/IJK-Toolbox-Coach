@@ -61,9 +61,12 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
 
       {advies && !kiesHandmatig && (
         <div className="knoppen">
-          <button type="button" className="knop knop--secundair" onClick={onAnderAdvies}>
-            {ikVorm ? g.andere_tool_knop : "Vraag de coach om een andere tool"}
-          </button>
+          {/* In het gesprek geen knop: wie een andere tool wil, kiest zelf of vraagt het in de chat. */}
+          {!ikVorm && (
+            <button type="button" className="knop knop--secundair" onClick={onAnderAdvies}>
+              Vraag de coach om een andere tool
+            </button>
+          )}
           <button type="button" className="knop knop--tekst" onClick={() => setZelfKiezen(true)}>
             Zelf een tool kiezen
           </button>

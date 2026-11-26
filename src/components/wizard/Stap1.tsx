@@ -91,7 +91,6 @@ export function Stap1({ content, data, wijzig, fout }: StapProps & { fout: strin
       {data.verduidelijking.length > 0 && (
         <section aria-labelledby="verduidelijking-titel">
           <h2 id="verduidelijking-titel">De coach heeft nog {data.verduidelijking.length === 1 ? "een vraag" : "twee vragen"}</h2>
-          <p className="hulptekst">Beantwoorden is niet verplicht, maar helpt de coach om je beter te adviseren.</p>
           {data.verduidelijking.map((v, i) => (
             <Verduidelijking
               key={i}
