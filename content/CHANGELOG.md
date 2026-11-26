@@ -8,6 +8,7 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Mijn aanvragen, advies bekijken: kop "Jouw use case" (was "Jouw beschrijving").
 - Gesprek: geen knoppen "Toon als formulier" en "Toon alle vragen op één pagina" meer.
 - Gesprek: geen automatische uitleg van de coach onder de adviescard (herhaalde de kaart); de chat blijft. In het
   formulier komt de uitleg nog in het chatvenster.

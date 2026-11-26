@@ -40,7 +40,7 @@ export function AdviesPagina({ id }: { id: string }) {
       {content && advies && (
         <>
           <div className="paneel paneel--vlak" style={{ marginBottom: "1rem" }}>
-            <h2>Jouw beschrijving</h2>
+            <h2>{content.teksten.gesprek.beschrijving_label}</h2>
             <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{advies.beschrijving}</p>
           </div>
           <Adviescard advies={advies} content={content} onActie={actie} actieBezig={actieBezig} actieFout={actieFout} />
