@@ -262,7 +262,7 @@ gesprek:
     # Per vervolgactie (de naam van de uitkomst staat ervoor, uit de regelset).
     per_vervolgactie:
       accountaanvraag: >-
-        Als je een tool gaat gebruiken waar een licentie voor nodig is, dan verstuur ik direct een aanvraag voor je.
+        Als je een tool gaat gebruiken waar een licentie voor nodig is, dan kun je met één klik een aanvraag versturen.
       accountaanvraag_met_voorwaarden: Je vraagt een account aan. De voorwaarden stuur ik mee met het advies.
       toetsing: >-
         Je aanvraag gaat naar de juiste toetser(s). Zij beoordelen eerst jouw use case op de te toetsen onderdelen,
