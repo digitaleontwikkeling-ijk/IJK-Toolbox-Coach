@@ -104,15 +104,15 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   await page.getByText("Lees het gesprek terug").click();
   await expect(paren(page).first()).toBeVisible();
   await expect(page.getByRole("button", { name: /^Wijzig/ })).toHaveCount(0);
-  // De uitleg van de coach komt in het gesprek, bij het advies.
-  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach").first()).toBeVisible();
+  // Geen automatische uitleg onder de kaart (die herhaalt de kaart); wel het chatveld.
+  await expect(advies.locator(".gesprek__bericht--chat")).toHaveCount(0);
   // Geen knop "Vraag stellen": het chatveld staat direct onder de kaart.
   await expect(advies.getByRole("button", { name: "Vraag stellen" })).toHaveCount(0);
   await advies.getByLabel("Vragen over het advies? Stel ze aan mij").focus();
   await page.keyboard.type("Wat moet ik nu doen?");
   await page.keyboard.press("Enter");
   await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--jij")).toContainText("Wat moet ik nu doen?");
-  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach")).toHaveCount(2);
+  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach")).toHaveCount(1);
   const r3 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r3.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 

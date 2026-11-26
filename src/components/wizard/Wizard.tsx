@@ -332,8 +332,11 @@ export function Wizard() {
       const r = await api<{ advies: AdviesDto }>("/api/advies", { body: { conceptId } });
       setAdvies(r.advies);
       gaNaar(4);
-      const uitleg = await coach<string>("uitleg", { adviesId: r.advies.id });
-      if (uitleg) zegCoach(uitleg, weergaveRef.current === "gesprek" ? "advies" : undefined);
+      // In het gesprek geen automatische uitleg: die herhaalt wat op de adviescard staat. Vragen kan in de chat.
+      if (weergaveRef.current !== "gesprek") {
+        const uitleg = await coach<string>("uitleg", { adviesId: r.advies.id });
+        if (uitleg) zegCoach(uitleg);
+      }
     } catch (e) {
       setFout(e instanceof ApiFoutClient ? e.message : "Het advies kon niet worden berekend.");
       setFoutDetails(e instanceof ApiFoutClient && e.details ? e.details.map((d) => `|${d}`) : null);
