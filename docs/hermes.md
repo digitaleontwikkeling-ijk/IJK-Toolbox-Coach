@@ -26,7 +26,8 @@ De vier coach-taken (plus vrije chat):
 2. **tooladvies** – `{ "behoefte", "tool", "motivatie" }`; tool moet in `content/tools.yaml` staan
 3. **checks** – `{ "checks": [{ "check", "voorstel", "zekerheid", "vervolgvraag?" }] }`; waarden uit de schaal
 4. **uitleg** – `{ "uitleg" }`; wordt geweigerd als de tekst een andere uitkomst noemt dan berekend
-5. **chat** – `{ "antwoord" }`
+5. **chat** – `{ "antwoord" }`. In het gesprek (stap 3) bevat de invoer ook `huidige_vraag`: de check, de vraag, de uitleg
+   en de antwoordopties uit de regelset. De coach legt die vraag dan uit; de medewerker kiest zelf.
 
 ## Privacy
 

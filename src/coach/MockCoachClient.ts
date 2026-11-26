@@ -145,8 +145,18 @@ export class MockCoachClient implements CoachClient {
     return { uitleg: delen.filter(Boolean).join(" ") };
   }
 
-  async chat({ vraag, tool }: ChatInvoer) {
-    const genoemd = this.content.tools.tools.find((t) => vraag.toLowerCase().includes(t.naam.toLowerCase()))?.id ?? tool;
+  async chat({ vraag, tool, onderwerp }: ChatInvoer) {
+    const expliciet = this.content.tools.tools.find((t) => vraag.toLowerCase().includes(t.naam.toLowerCase()))?.id;
+    // In het gesprek: uitleg over de vraag waar de medewerker nu is (tenzij hij naar een tool vraagt).
+    if (onderwerp && !expliciet) {
+      // Noemt de medewerker een antwoord? Dan alleen dat antwoord uitleggen.
+      const optie = onderwerp.opties.find((o) => o.uitleg && vraag.toLowerCase().includes(o.label.toLowerCase().split(" (")[0]!));
+      if (optie) return { antwoord: `${optie.label}: ${optie.uitleg} Kies zelf het antwoord dat het best bij je idee past.` };
+      const uitleg = onderwerp.uitleg.length ? ` ${onderwerp.uitleg.join(" ")}` : "";
+      const metUitleg = onderwerp.opties.some((o) => o.uitleg) ? " Klik op de i naast een antwoord voor de uitleg, of vraag naar een antwoord." : "";
+      return { antwoord: `Bij "${onderwerp.vraag}" (${onderwerp.naam}):${uitleg}${metUitleg} Kies zelf het antwoord dat het best bij je idee past.`.slice(0, 2900) };
+    }
+    const genoemd = expliciet ?? tool;
     const regels = genoemd ? this.content.spelregels[genoemd] : undefined;
     if (regels) {
       const naam = this.content.tools.tools.find((t) => t.id === genoemd)!.naam;

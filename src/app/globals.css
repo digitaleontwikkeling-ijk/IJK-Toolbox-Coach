@@ -355,3 +355,14 @@ fieldset.keuze legend + * { clear: both; }
 .gesprek__wijzig { background: none; border: 0; padding: 0; color: var(--wit); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.875rem; }
 .gesprek__wijzig:focus-visible { outline: 3px solid var(--zon); outline-offset: 2px; }
 .extra-regelen h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.wizard--enkel { grid-template-columns: minmax(0, 1fr) !important; }
+.gesprek__chatberichten { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
+.gesprek__bericht--chat { white-space: pre-wrap; max-width: 85%; padding: 0.5rem 0.75rem; }
+.gesprek__chat { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--rand); }
+.gesprek__chat .gesprek__chatberichten:not(:empty) { margin-bottom: 0.75rem; }
+.gesprek__chat label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.gesprek__chatinvoer { display: flex; gap: 0.5rem; }
+.gesprek__chatinvoer input { flex: 1; min-width: 0; }
+.gesprek__paar > .gesprek__chatberichten { padding-left: 1rem; }
+.gesprek__eerder { margin-bottom: 1rem; }
+.gesprek__eerder summary { cursor: pointer; color: var(--water); text-decoration: underline; margin-bottom: 0.5rem; }

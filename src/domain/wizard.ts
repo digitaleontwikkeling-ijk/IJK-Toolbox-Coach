@@ -12,6 +12,8 @@ export const MAX_VERDUIDELIJKENDE_VRAGEN = 2;
 export const chatBerichtSchema = z.object({
   rol: z.enum(["coach", "medewerker"]),
   tekst: z.string().trim().min(1).max(2000),
+  /** In het gesprek (stap 3): bij welke vraag (veld-id) het bericht hoort, of "klaar" na de laatste vraag. */
+  bij: z.string().regex(/^[a-z0-9_-]+$/).max(130).optional(),
 });
 export type ChatBericht = z.infer<typeof chatBerichtSchema>;
 

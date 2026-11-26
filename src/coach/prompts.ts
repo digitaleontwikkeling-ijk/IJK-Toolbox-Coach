@@ -101,6 +101,7 @@ Formaat: {"uitleg": "..."}`;
 
 TAAK: chat
 Beantwoord de vraag van de medewerker kort (maximaal 5 zinnen), op basis van de spelregels hieronder. Weet je het niet, zeg dat dan en verwijs naar de AI governance & compliance officer of de architect Digitale Ontwikkeling. Zeg nooit welke kleur of uitkomst het idee krijgt: dat berekent de wizard.
+Staat er een "huidige_vraag" in de invoer, dan stelt de medewerker zijn vraag tijdens die check. Leg dan uit wat die vraag en de antwoordopties betekenen, met de uitleg die erbij staat, en denk mee met een voorbeeld uit zijn beschrijving. De medewerker kiest zelf het antwoord in de wizard; jij zet niets vast.
 ${toolsTekst(c)}
 
 Spelregels:

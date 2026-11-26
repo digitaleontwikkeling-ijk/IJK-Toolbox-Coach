@@ -181,6 +181,12 @@ gesprek:
   al_bekend: "Dit hoef ik niet meer te vragen, want het volgt uit je antwoorden:"
   wat_bedoel_je: Wat bedoel je hiermee?
   vraag_coach: Stel de coach een vraag
+  chat_label: Iets niet duidelijk? Vraag het de coach
+  chat_label_klaar: Nog een vraag voordat je het advies bekijkt?
+  chat_plaatshouder: "Bijvoorbeeld: wat bedoel je met lezen?"
+  chat_stuur: Stuur
+  denkt: Even denken…
+  eerdere_berichten: "Eerdere berichten met de coach ({aantal})"
   bevestig: Ja, klopt
   volgende: Volgende
   wijzig: Wijzig

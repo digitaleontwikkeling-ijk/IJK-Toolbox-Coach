@@ -9,6 +9,7 @@
  * Privacy: er gaat nooit een naam of e-mailadres naar de coach, alleen het
  * pseudoniem gebruikers-ID en de inhoud die nodig is voor de taak.
  */
+import type { Onderwerp } from "@/domain/onderwerp";
 import type { BeslisUitkomst } from "../domain/beslisregels";
 
 export interface CoachContext {
@@ -57,6 +58,8 @@ export interface ChatInvoer {
   tool?: string;
   /** Laatste berichten, voor context. */
   geschiedenis: { rol: "coach" | "medewerker"; tekst: string }[];
+  /** In het gesprek (stap 3): de vraag waar de medewerker het over heeft, uit de regelset. */
+  onderwerp?: Onderwerp;
 }
 
 export interface CoachClient {
