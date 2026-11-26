@@ -10,7 +10,8 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
 - Gesprek, uitleg vóór fase 2: nieuwe tekst van IJK (`gesprek.fase2`): intro, "Hoe werkt het?", "Wat gebeurt er
   daarna?" per uitkomst, "Wat is verder goed om te weten?" en de knop "Vervolg de vragen". De lijst met de zes checks
-  staat niet meer in deze uitleg (wel in het formulier).
+  staat niet meer in deze uitleg (wel in het formulier). Bij *Direct aan de slag*: "…dan kun je met één klik een
+  aanvraag versturen" (de medewerker verstuurt de aanvraag zelf).
 - Vragen van de coach: zonder de zin "Beantwoorden is niet verplicht…" (gesprek en formulier); in de oefencoach heet
   de optie nu "Persoonsgegevens".
 - Gesprek, tooladvies: "Op basis van wat je vertelt, past deze tool het best bij jouw use case:" en geen knop
