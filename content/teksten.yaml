@@ -140,7 +140,7 @@ beheer:
   titel: Beheer
   intro: Alle adviezen en de inhoud van de coach. De inhoud (tools, spelregels, beslisregels) wijzig je via Git in de map content/; elke wijziging krijgt een nieuw versienummer. Je inzage wordt vastgelegd in de audit-log.
 
-# Bij check 6: lijst met wat je extra moet regelen per antwoord.
+# Op de adviescard: wat je extra moet regelen bij het gekozen antwoord (bijvoorbeeld bij Afhankelijkheid).
 extra_regelen_titel: Wat moet je extra regelen?
 
 # Rode uitkomst zonder alternatief: Team DO kon (nog) niet worden ingelicht.
