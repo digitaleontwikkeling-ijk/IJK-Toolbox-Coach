@@ -121,9 +121,9 @@ export async function naarStap3(page: Page, beschrijving: string) {
   await page.getByLabel("Jouw probleem of idee").fill(beschrijving);
   await page.getByRole("button", { name: "Volgende →" }).click();
   // De coach kan verduidelijkende vragen stellen; die zijn niet verplicht.
-  const h = page.getByRole("heading", { name: /Welke tool past|De coach heeft nog/ });
+  const h = page.getByRole("heading", { name: /Welke tool past|De coach heeft nog|Ik heb nog/ });
   await h.first().waitFor();
-  if (await page.getByRole("heading", { name: /De coach heeft nog/ }).isVisible()) {
+  if (await page.getByRole("heading", { name: /De coach heeft nog|Ik heb nog/ }).isVisible()) {
     await page.getByRole("button", { name: "Volgende →" }).click();
   }
   await expect(page.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();

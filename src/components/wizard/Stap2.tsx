@@ -11,9 +11,12 @@ import type { StapProps } from "./types";
 interface Props extends StapProps {
   coachNietBeschikbaar: boolean;
   onAnderAdvies: () => void;
+  /** In het gesprek: de coach praat zelf (ik-vorm). */
+  ikVorm?: boolean;
 }
 
-export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onAnderAdvies }: Props) {
+export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onAnderAdvies, ikVorm = false }: Props) {
+  const g = content.teksten.gesprek;
   const [zelfKiezen, setZelfKiezen] = useState(false);
   const advies = data.tooladvies;
   const buiten = advies?.tool === ANDERE_TOOL;
@@ -23,7 +26,7 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
   const linkFout = buiten && !geldigeLink(andere.link);
 
   if (coachBezig === "tooladvies") {
-    return <p role="status">De coach zoekt een passende tool…</p>;
+    return <p role="status">{ikVorm ? g.zoekt_tool : "De coach zoekt een passende tool…"}</p>;
   }
 
   const zetAndere = (veld: "naam" | "link", waarde: string) =>
@@ -42,13 +45,13 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
   return (
     <>
       {coachNietBeschikbaar && !advies && (
-        <p className="info" role="status">{content.teksten.coach_niet_beschikbaar}</p>
+        <p className="info" role="status">{ikVorm ? g.niet_beschikbaar : content.teksten.coach_niet_beschikbaar}</p>
       )}
 
       {advies && !buiten && (
         <div className="tool-kaart">
           <p className="hulptekst" style={{ margin: 0 }}>
-            {advies.bron === "coach" ? "Advies van de coach" : "Door jou gekozen"}
+            {advies.bron === "coach" ? (ikVorm ? g.tool_label : "Advies van de coach") : "Door jou gekozen"}
           </p>
           <h3 className="tool-naam"><ToolIcoon content={content} tool={advies.tool} groot />{toolNaam(content, advies.tool)}</h3>
           {advies.motivatie && <p>{advies.motivatie}</p>}
@@ -59,7 +62,7 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
       {advies && !kiesHandmatig && (
         <div className="knoppen">
           <button type="button" className="knop knop--secundair" onClick={onAnderAdvies}>
-            Vraag de coach om een andere tool
+            {ikVorm ? g.andere_tool_knop : "Vraag de coach om een andere tool"}
           </button>
           <button type="button" className="knop knop--tekst" onClick={() => setZelfKiezen(true)}>
             Zelf een tool kiezen

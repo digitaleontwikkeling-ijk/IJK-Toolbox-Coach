@@ -168,7 +168,7 @@ export function GesprekFase1(props: Props) {
       <li key="verduidelijking" className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>
-          De coach heeft nog {vragen.length === 1 ? "een vraag" : "twee vragen"}
+          {vragen.length === 1 ? t.verduidelijking_kop_een : t.verduidelijking_kop_twee}
         </h2>
         <p>{t.verduidelijking_intro}</p>
         {vragen.map((v, i) => (
@@ -212,7 +212,7 @@ export function GesprekFase1(props: Props) {
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{t.kop_tool}</h2>
         {coachBezig !== "tooladvies" && advies?.bron === "coach" && advies.tool !== ANDERE_TOOL && <p>{t.tooladvies_intro}</p>}
-        <Stap2 {...props} coachNietBeschikbaar={props.tooladviesNietBeschikbaar} onAnderAdvies={props.onAnderAdvies} />
+        <Stap2 {...props} coachNietBeschikbaar={props.tooladviesNietBeschikbaar} onAnderAdvies={props.onAnderAdvies} ikVorm />
         {coachBezig !== "tooladvies" && chat("tooladvies")}
         {coachBezig !== "tooladvies" && (
           <div className="knoppen">
@@ -236,7 +236,7 @@ export function GesprekFase1(props: Props) {
       <li key="fase2" className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{t.kop_fase2}</h2>
-        <Fase2Uitleg content={content} />
+        <Fase2Uitleg content={content} ikVorm />
         <div className="knoppen">
           <button type="button" className="knop" onClick={props.onBeginChecks}>{f2.knop} →</button>
         </div>
@@ -250,7 +250,7 @@ export function GesprekFase1(props: Props) {
         <p>{f2.intro}</p>
         <details className="gesprek__hulp">
           <summary>{f2.opnieuw_lezen}</summary>
-          <Fase2Uitleg content={content} />
+          <Fase2Uitleg content={content} ikVorm />
         </details>
       </li>,
     );

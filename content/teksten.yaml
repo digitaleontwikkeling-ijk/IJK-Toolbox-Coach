@@ -166,7 +166,7 @@ verdieping:
 # Stap 3 als gesprek: de coach stelt de vragen één voor één. De vragen zelf komen uit de regelset.
 # TODO: valideren (concepttekst)
 gesprek:
-  instructie: De coach loopt de checks met je door, één vraag tegelijk.
+  instructie: Ik loop de checks met je door, één vraag tegelijk.
   intro: >-
     Ik loop zes checks met je door, één vraag tegelijk. Bij de meeste vragen heb ik op basis van je beschrijving al
     een antwoord voorgesteld. Klopt het? Dan bevestig je het met één klik. Klopt het niet? Kies dan zelf.
@@ -180,17 +180,16 @@ gesprek:
   twijfel: "Ik twijfel nog: {vraag}"
   al_bekend: "Dit hoef ik niet meer te vragen, want het volgt uit je antwoorden:"
   wat_bedoel_je: Wat bedoel je hiermee?
-  vraag_coach: Stel de coach een vraag
-  chat_label: Iets niet duidelijk? Vraag het de coach
+  chat_label: Iets niet duidelijk? Vraag het mij
   chat_label_klaar: Nog een vraag voordat je het advies bekijkt?
-  chat_label_advies: Vragen over het advies? Vraag het de coach
+  chat_label_advies: Vragen over het advies? Stel ze aan mij
   chat_plaatshouder_advies: "Bijvoorbeeld: wat moet ik nu regelen?"
   terugkijken: Lees het gesprek terug
   advies_intro: Dit is mijn advies. De uitkomst is berekend met de vaste spelregels van IJK, niet door mij.
   chat_plaatshouder: "Bijvoorbeeld: wat bedoel je met lezen?"
   chat_stuur: Stuur
   denkt: Even denken…
-  eerdere_berichten: "Eerdere berichten met de coach ({aantal})"
+  eerdere_berichten: "Eerdere berichten in ons gesprek ({aantal})"
   bevestig: Ja, klopt
   volgende: Volgende
   wijzig: Wijzig
@@ -214,7 +213,22 @@ gesprek:
   beschrijving_hulp: >-
     Bijvoorbeeld: "Ik wil elke week een overzicht van openstaande facturen, zodat mijn team weet wat er openstaat."
     Gebruik geen echte namen of gegevens van personen.
-  leest: De coach leest je beschrijving…
+  leest: Ik lees je beschrijving…
+  # In het gesprek praat de coach zelf (ik-vorm); het formulier gebruikt de teksten elders in dit bestand.
+  verduidelijking_kop_een: Ik heb nog een vraag
+  verduidelijking_kop_twee: Ik heb nog twee vragen
+  zoekt_tool: Ik zoek een passende tool voor je…
+  vult_checks: Ik vul de checks alvast voor je in…
+  tool_label: Dit adviseer ik
+  andere_tool_knop: Stel een andere tool voor
+  niet_beschikbaar: Ik kan je nu even niet helpen. Je kunt gewoon verder door zelf te kiezen.
+  # Op de adviescard in het gesprek.
+  kleur_hint: Deze kleur is berekend met de vaste spelregels van IJK, niet door mij.
+  geen_vervolgactie: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan mij.
+  fase2_hoe:
+    - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.
+    - Jij controleert de antwoorden en past ze aan waar nodig. Twijfel ik, dan vraag ik het je.
+    - Daarna berekent de tool je advies met de vaste spelregels van IJK. Ik bepaal de uitkomst niet.
   verduidelijking_intro: Beantwoorden is niet verplicht, maar helpt me om je beter te adviseren.
   niet_beantwoord: (niet beantwoord)
   tooladvies_intro: "Op basis van wat je vertelt, past deze tool het best:"
