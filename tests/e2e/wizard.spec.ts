@@ -161,7 +161,8 @@ test("meerdere antwoorden: collega's én klanten bij Gebruikers → de hoogste k
   const card = page.locator(".adviescard");
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
   await expect(card).toContainText("Extern/klanten (Gebruikers).");
-  // Beide gekozen antwoorden staan op de adviescard.
+  // Beide gekozen antwoorden staan op de adviescard (onder "Meer over dit advies").
+  await card.getByText(/^Meer over dit advies/).click();
   const rij = card.getByRole("row", { name: /3\. Gebruikers/ });
   await expect(rij).toContainText("Collega's");
   await expect(rij).toContainText("Extern/klanten");

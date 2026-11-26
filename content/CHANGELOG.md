@@ -8,6 +8,9 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Adviescard voor de medewerker compacter: privacy en AI als korte regel; de toelichting, je antwoorden en de
+  disclaimer onder "Meer over dit advies" (ingeklapt). In het gesprek niet nog eens "Deze kleur volgt uit de vaste
+  spelregels …". Toetsers en beheerders zien de kaart volledig.
 - "Wat moet je extra regelen?" staat niet meer bij de vraag (gesprek en formulier), maar op de adviescard, alleen voor
   het gekozen antwoord. Geen nieuwe regels: dezelfde teksten (`extra_regelen` in de regelset).
 - Gesprek: geen zinnen meer over waarom een vraag komt ("Je gaf aan dat je persoonsgegevens gebruikt. Daarom …",

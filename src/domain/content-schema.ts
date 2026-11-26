@@ -390,6 +390,8 @@ export const tekstenSchema = z.object({
     ter_informatie_uitleg: tekst,
   }),
   extra_regelen_titel: tekst,
+  /** Adviescard voor de medewerker (compact; details onder "Meer over dit advies"). */
+  adviescard: z.object({ beoordelingen_titel: tekst, meer_over_advies: tekst }),
   contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
   verdieping: z.object({

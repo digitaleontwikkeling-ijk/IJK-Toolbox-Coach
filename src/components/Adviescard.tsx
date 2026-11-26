@@ -10,7 +10,7 @@ import { HoeWerktHetLink } from "./HoeWerktHet";
 import { hoeWerktHetHref } from "@/lib/paden";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
-import { Beoordelingen } from "./Beoordelingen";
+import { Beoordelingen, BeoordelingenKort } from "./Beoordelingen";
 import { ToolIcoon } from "./ToolIcoon";
 import { datum, kleurVan, toetserNaam, toolWeergave, type AdviesDto, type ContentDto } from "./client";
 
@@ -58,69 +58,10 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const actieKanNog = advies.status === "advies_gegeven" && (actie?.knop || contactOpnieuw);
   // Klaar = geen vervolgactie meer open: al uitgevoerd, of bij deze uitkomst hoort er geen.
   const klaar = !actieKanNog;
+  // Medewerker: compact (less is more); details onder "Meer over dit advies". Toetsers en beheerders: alles open.
+  const compact = weergave === "medewerker";
 
-  return (
-    <article className="adviescard" aria-labelledby="advies-kop">
-      <div className="adviescard__kop" style={{ background: kleur.hex, color: kleur.tekstkleur }}>
-        <span className="adviescard__hex" aria-hidden="true" />
-        <div>
-          <div className="adviescard__kleur">Uitkomst: {kleur.id}</div>
-          <h2 id="advies-kop" ref={kopRef} tabIndex={-1}>{kleur.uitkomst}</h2>
-        </div>
-      </div>
-
-      <div className="adviescard__inhoud">
-        <section>
-          <h3>Tooladvies</h3>
-          <p><ToolIcoon content={content} tool={advies.tooladvies.tool} /><strong>{tool}</strong>{advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
-          {link && (
-            <p className="hulptekst" style={{ margin: 0, overflowWrap: "anywhere" }}>
-              Link: <a href={link} rel="noopener noreferrer nofollow" target="_blank">{link}</a>
-            </p>
-          )}
-        </section>
-
-        <section>
-          <h3>Waarom deze kleur?</h3>
-          <p>{advies.motivatie}</p>
-          <p className="hulptekst" style={{ margin: 0 }}>
-            {ikVorm ? t.gesprek.kleur_hint : t.hoe_werkt_het.kleur_hint}{" "}
-            <HoeWerktHetLink tekst={t.hoe_werkt_het.link} href={hoeWerktHetHref()} />
-          </p>
-        </section>
-
-        {advies.voorwaarden.length > 0 && (
-          <section>
-            <h3>Voorwaarden</h3>
-            <ul>{advies.voorwaarden.map((v) => <li key={v}>{v}</li>)}</ul>
-          </section>
-        )}
-
-        {extraRegelen.length > 0 && (
-          <section>
-            <h3>{t.extra_regelen_titel}</h3>
-            <ul>{extraRegelen.map((e) => <li key={e.id}>{e.naam}: {e.tekst}</li>)}</ul>
-          </section>
-        )}
-
-        {advies.alternatieven.length > 0 && (
-          <section>
-            <h3>Zo kan het wel</h3>
-            <ul>{advies.alternatieven.map((a) => <li key={a}>{a}</li>)}</ul>
-          </section>
-        )}
-
-        <Beoordelingen advies={advies} content={content} />
-
-        {toetserNamen.length > 0 && (
-          <section>
-            <h3>{kleur.vervolgactie === "toetsing" ? "Wie toetst?" : "Wie kijkt mee?"}</h3>
-            <ul>{toetserNamen.map((n) => <li key={n}>{n}</li>)}</ul>
-          </section>
-        )}
-
-        <p className="disclaimer">{t.disclaimer}</p>
-
+  const antwoordenTabel = (
         <section>
           <h3>{weergave === "inzage" ? "Antwoorden" : "Je antwoorden"}</h3>
           <table className="antwoorden">
@@ -188,6 +129,84 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             </tbody>
           </table>
         </section>
+  );
+
+  return (
+    <article className="adviescard" aria-labelledby="advies-kop">
+      <div className="adviescard__kop" style={{ background: kleur.hex, color: kleur.tekstkleur }}>
+        <span className="adviescard__hex" aria-hidden="true" />
+        <div>
+          <div className="adviescard__kleur">Uitkomst: {kleur.id}</div>
+          <h2 id="advies-kop" ref={kopRef} tabIndex={-1}>{kleur.uitkomst}</h2>
+        </div>
+      </div>
+
+      <div className="adviescard__inhoud">
+        <section>
+          <h3>Tooladvies</h3>
+          <p><ToolIcoon content={content} tool={advies.tooladvies.tool} /><strong>{tool}</strong>{!compact && advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
+          {link && (
+            <p className="hulptekst" style={{ margin: 0, overflowWrap: "anywhere" }}>
+              Link: <a href={link} rel="noopener noreferrer nofollow" target="_blank">{link}</a>
+            </p>
+          )}
+        </section>
+
+        <section>
+          <h3>Waarom deze kleur?</h3>
+          <p>{advies.motivatie}</p>
+          {/* In het gesprek zei de coach dit al ("Het volgt uit de vaste spelregels van IJK …"). */}
+          {!ikVorm && (
+            <p className="hulptekst" style={{ margin: 0 }}>
+              {t.hoe_werkt_het.kleur_hint} <HoeWerktHetLink tekst={t.hoe_werkt_het.link} href={hoeWerktHetHref()} />
+            </p>
+          )}
+        </section>
+
+        {advies.voorwaarden.length > 0 && (
+          <section>
+            <h3>Voorwaarden</h3>
+            <ul>{advies.voorwaarden.map((v) => <li key={v}>{v}</li>)}</ul>
+          </section>
+        )}
+
+        {extraRegelen.length > 0 && (
+          <section>
+            <h3>{t.extra_regelen_titel}</h3>
+            <ul>{extraRegelen.map((e) => <li key={e.id}>{e.naam}: {e.tekst}</li>)}</ul>
+          </section>
+        )}
+
+        {advies.alternatieven.length > 0 && (
+          <section>
+            <h3>Zo kan het wel</h3>
+            <ul>{advies.alternatieven.map((a) => <li key={a}>{a}</li>)}</ul>
+          </section>
+        )}
+
+        {compact ? (
+          <section>
+            <h3>{t.adviescard.beoordelingen_titel}</h3>
+            <BeoordelingenKort advies={advies} content={content} />
+          </section>
+        ) : (
+  <Beoordelingen advies={advies} content={content} />
+        )}
+
+        {toetserNamen.length > 0 && (
+          <section>
+            <h3>{kleur.vervolgactie === "toetsing" ? "Wie toetst?" : "Wie kijkt mee?"}</h3>
+            <ul>{toetserNamen.map((n) => <li key={n}>{n}</li>)}</ul>
+          </section>
+        )}
+
+        {!compact && (
+          <>
+  <p className="disclaimer">{t.disclaimer}</p>
+
+        {antwoordenTabel}
+          </>
+        )}
 
         {advies.besluiten && advies.besluiten.length > 0 && (
           <section>
@@ -247,6 +266,17 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             )}
           </div>
         </section>
+        )}
+
+        {compact && (
+          <details className="adviescard__meer">
+            <summary>{t.adviescard.meer_over_advies}</summary>
+            <div className="adviescard__meer-inhoud">
+              <Beoordelingen advies={advies} content={content} />
+              {antwoordenTabel}
+              <p className="disclaimer">{t.disclaimer}</p>
+            </div>
+          </details>
         )}
       </div>
 

@@ -389,3 +389,11 @@ fieldset.keuze legend + * { clear: both; }
   .antwoorden th, .antwoorden td { padding: 0; border: 0; }
   .antwoorden th { margin-bottom: 0.25rem; }
 }
+
+/* Adviescard voor de medewerker: kort, met de details inklapbaar. */
+.beoordeling-kort { list-style: none; margin: 0; padding: 0; }
+.beoordeling-kort li { margin-bottom: 0.3rem; }
+.adviescard__meer { border-top: 1px solid var(--wolk); padding-top: 1.25rem; }
+.adviescard__meer > summary { cursor: pointer; color: var(--water); text-decoration: underline; font-weight: 600; }
+.adviescard__meer[open] > summary { margin-bottom: 1.25rem; }
+.adviescard__meer-inhoud { display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); }

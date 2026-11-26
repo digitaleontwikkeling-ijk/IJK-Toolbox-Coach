@@ -51,6 +51,9 @@ test("AI-risico: AI keurt zelfstandig facturen goed (scenario 11, regelset 0.8)"
   await expect(card).toContainText("AI: Beperkt risico");
   await expect(card).toContainText("Uitlegbaarheid: Beperkt uitlegbaar (jouw antwoord)");
   await expect(card).toContainText("Privacy: niet van toepassing");
+  // De toelichting en je antwoorden staan ingeklapt onder "Meer over dit advies".
+  await expect(card.getByRole("row", { name: /5\. Impact/ })).toHaveCount(0);
+  await card.getByText(/^Meer over dit advies/).click();
   await expect(card.getByRole("row", { name: /5\. Impact/ })).toContainText("Integriteit: Serieus");
   // Op de adviescard: wat je extra moet regelen, alleen bij het gekozen antwoord.
   await expect(card).toContainText("Wat moet je extra regelen?");

@@ -140,6 +140,12 @@ beheer:
   titel: Beheer
   intro: Alle adviezen en de inhoud van de coach. De inhoud (tools, spelregels, beslisregels) wijzig je via Git in de map content/; elke wijziging krijgt een nieuw versienummer. Je inzage wordt vastgelegd in de audit-log.
 
+# Adviescard voor de medewerker: compact. Privacy en AI als korte regel; de toelichting, je antwoorden en de
+# disclaimer staan onder "Meer over dit advies". Toetsers en beheerders zien alles open.
+adviescard:
+  beoordelingen_titel: Privacy en AI
+  meer_over_advies: Meer over dit advies (toelichting en je antwoorden)
+
 # Op de adviescard: wat je extra moet regelen bij het gekozen antwoord (bijvoorbeeld bij Afhankelijkheid).
 extra_regelen_titel: Wat moet je extra regelen?
 
