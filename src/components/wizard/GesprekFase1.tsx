@@ -237,7 +237,7 @@ export function GesprekFase1(props: Props) {
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{t.kop_fase2}</h2>
         <Fase2Uitleg content={content} ikVorm />
         <div className="knoppen">
-          <button type="button" className="knop" onClick={props.onBeginChecks}>{f2.knop} →</button>
+          <button type="button" className="knop" onClick={props.onBeginChecks}>{t.fase2.knop} →</button>
         </div>
       </li>,
     );
@@ -246,7 +246,7 @@ export function GesprekFase1(props: Props) {
       <li key="fase2" className="gesprek__bericht gesprek__bericht--coach">
         <span className="gesprek__wie">Coach</span>
         <span className="gesprek__kop-klein">{f2.titel}</span>
-        <p>{f2.intro}</p>
+        <p>{t.fase2.intro}</p>
         <details className="gesprek__hulp">
           <summary>{f2.opnieuw_lezen}</summary>
           <Fase2Uitleg content={content} ikVorm />

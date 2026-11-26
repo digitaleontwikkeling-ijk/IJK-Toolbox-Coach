@@ -8,6 +8,9 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Gesprek, uitleg vóór fase 2: nieuwe tekst van IJK (`gesprek.fase2`): intro, "Hoe werkt het?", "Wat gebeurt er
+  daarna?" per uitkomst, "Wat is verder goed om te weten?" en de knop "Vervolg de vragen". De lijst met de zes checks
+  staat niet meer in deze uitleg (wel in het formulier).
 - Vragen van de coach: zonder de zin "Beantwoorden is niet verplicht…" (gesprek en formulier); in de oefencoach heet
   de optie nu "Persoonsgegevens".
 - Gesprek, tooladvies: "Op basis van wat je vertelt, past deze tool het best bij jouw use case:" en geen knop

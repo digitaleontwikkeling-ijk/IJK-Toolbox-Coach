@@ -135,7 +135,7 @@ export async function naarStap3(page: Page, beschrijving: string) {
  */
 export async function naarChecks(page: Page, knop: string | RegExp = /past, verder/, opties: { weergave?: "lijst" | "gesprek" } = {}) {
   await page.getByRole("button", { name: knop }).click();
-  const begin = page.getByRole("button", { name: "Begin met de checks →" });
+  const begin = page.getByRole("button", { name: /^(Begin met de checks|Vervolg de vragen) →$/ });
   await expect(begin.or(page.getByRole("heading", { name: /Zes checks/ })).first()).toBeVisible();
   if (await begin.isVisible()) await begin.click();
   await expect(page.getByRole("heading", { name: /Zes checks/ })).toBeVisible();
