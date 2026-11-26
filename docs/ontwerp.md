@@ -225,3 +225,9 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - De browser stuurt alleen het veld-id van de vraag mee (`veld`); de server zoekt de tekst van de vraag op in de
   regelset (`src/domain/onderwerp.ts`) en geeft die als `huidige_vraag` aan Hermes. Er gaan geen extra gegevens van de
   medewerker mee.
+
+## 18. Rust en witruimte
+
+- Meer regelafstand (1,6) en witruimte tussen en binnen blokken: alinea's, lijsten, keuzes, kaarten, het gesprek en de
+  adviescard. In de vraag van de coach geen kader meer om de keuzes (de beurt zelf is het kader).
+- Smal scherm: compactere binnenruimte en de antwoordentabel op de adviescard gestapeld (vraag boven antwoord).

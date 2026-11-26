@@ -37,7 +37,7 @@ body {
   margin: 0;
   font-family: var(--font-tekst);
   font-size: 1rem;
-  line-height: 1.5;
+  line-height: 1.6;
   color: var(--tekst);
   background: var(--wit);
   /* Alleen woorden die niet passen (zoals "gegevensbeschermingseffectbeoordeling") worden afgebroken. */
@@ -47,13 +47,17 @@ body {
 h1, h2, h3 {
   font-family: var(--font-titel);
   color: var(--lucht);
-  line-height: 1.2;
-  margin: 0 0 0.5em;
+  line-height: 1.25;
+  margin: 0 0 0.6em;
 }
 h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 0.02em; }
 h2 { font-size: 1.25rem; }
 h3 { font-size: 1.05rem; }
-p { margin: 0 0 0.75em; }
+p { margin: 0 0 1em; }
+/* Gewone tekstlijsten (zonder eigen class) iets meer lucht tussen de punten. */
+:where(ul, ol):not([class]) > li { margin-bottom: 0.4em; }
+:where(ul, ol):not([class]) > li:last-child { margin-bottom: 0; }
+.stappenbalk li { margin: 0; }
 
 a { color: var(--water); }
 a:hover { text-decoration-thickness: 2px; }
@@ -114,7 +118,7 @@ a:hover { text-decoration-thickness: 2px; }
   font-size: 0.875rem; padding: 0.4rem var(--ruimte); text-align: center;
 }
 
-main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.25rem var(--ruimte) 3rem; }
+main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.75rem var(--ruimte) 3.5rem; }
 
 /* ---------- Knoppen ---------- */
 .knop {
@@ -130,11 +134,11 @@ main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.25rem var(--rui
 .knop--tekst { background: none; border-color: transparent; color: var(--water); padding-inline: 0.25rem; }
 .knop--tekst:hover { background: none; text-decoration: underline; }
 .knop:disabled { opacity: 0.55; cursor: not-allowed; }
-.knoppen { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 1.25rem; align-items: center; }
+.knoppen { display: flex; flex-wrap: wrap; gap: 0.75rem 1rem; margin-top: 1.75rem; align-items: center; }
 .knoppen--tussen { justify-content: space-between; }
 
 /* ---------- Stappenbalk ---------- */
-.stappenbalk { margin: 0 0 1.5rem; }
+.stappenbalk { margin: 0 0 2rem; }
 .stappenbalk__fases { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
 .stappenbalk__fase { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--tekst-zacht); border-bottom: 2px solid var(--wolk); padding-bottom: 0.25rem; }
 .stappenbalk ol { list-style: none; margin: 0.5rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; }
@@ -159,9 +163,10 @@ main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.25rem var(--rui
   .wizard { grid-template-columns: minmax(0, 1fr) 20rem; align-items: start; }
   .chat { position: sticky; top: 1rem; }
 }
-.paneel { background: var(--wit); border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.25rem; }
+.paneel { background: var(--wit); border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.5rem; }
+@media (min-width: 600px) { .paneel { padding: 2rem; } }
 .paneel--vlak { background: var(--wolk); border-color: var(--wolk); }
-.instructie { color: var(--tekst-zacht); }
+.instructie { color: var(--tekst-zacht); margin-bottom: 1.25rem; }
 
 label, legend { font-weight: 600; }
 textarea, select, input[type="text"], input[type="url"] {
@@ -170,8 +175,9 @@ textarea, select, input[type="text"], input[type="url"] {
 }
 textarea { min-height: 9rem; resize: vertical; }
 textarea:focus, select:focus, input[type="text"]:focus, input[type="url"]:focus { border-color: var(--water); outline: none; box-shadow: 0 0 0 2px var(--water); }
-.hulptekst { font-size: 0.875rem; color: var(--tekst-zacht); margin-top: 0.25rem; }
-.veld { margin-bottom: 1rem; }
+.hulptekst { font-size: 0.875rem; line-height: 1.55; color: var(--tekst-zacht); margin-top: 0.4rem; }
+.veld { margin-bottom: 1.5rem; }
+.veld > label { display: block; margin-bottom: 0.4rem; }
 .veldfout { font-size: 0.875rem; color: var(--avondrood); font-weight: 600; margin-top: 0.25rem; }
 input[aria-invalid="true"] { border-color: var(--avondrood); }
 .andere-tool { margin-top: 0.75rem; }
@@ -183,18 +189,18 @@ input[aria-invalid="true"] { border-color: var(--avondrood); }
 }
 .foutmelding ul { margin: 0.25rem 0 0; padding-left: 1.25rem; }
 .info {
-  border-left: 4px solid var(--water); background: var(--wolk); padding: 0.75rem 1rem; margin: 1rem 0;
+  border-left: 4px solid var(--water); background: var(--wolk); padding: 1rem 1.25rem; margin: 1.25rem 0;
   border-radius: var(--radius);
 }
 
 /* ---------- Keuzeknoppen (checks) ---------- */
-fieldset.keuze { border: 1px solid var(--rand); border-radius: var(--radius); padding: 0.85rem 1rem 1rem; margin: 0 0 1rem; min-width: 0; }
+fieldset.keuze { border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.1rem 1.25rem 1.25rem; margin: 0 0 1.5rem; min-width: 0; }
 /* float zorgt dat de legend binnen het kader valt, ook als hij meerdere regels heeft */
-fieldset.keuze legend { float: left; width: 100%; padding: 0; margin-bottom: 0.25rem; }
+fieldset.keuze legend { float: left; width: 100%; padding: 0; margin-bottom: 0.5rem; }
 fieldset.keuze legend + * { clear: both; }
-.keuze__vraag { font-weight: 400; color: var(--tekst-zacht); display: block; font-size: 0.95rem; }
-.keuze__hint { display: block; font-size: 0.85rem; font-weight: 400; font-style: italic; color: var(--tekst-zacht); }
-.keuze__opties { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.keuze__vraag { font-weight: 400; color: var(--tekst-zacht); display: block; font-size: 0.95rem; margin-top: 0.3rem; }
+.keuze__hint { display: block; font-size: 0.85rem; font-weight: 400; font-style: italic; color: var(--tekst-zacht); margin-top: 0.3rem; }
+.keuze__opties { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 0.75rem; }
 .keuze__optie { position: relative; }
 .keuze__optie input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .keuze__optie label {
@@ -210,34 +216,34 @@ fieldset.keuze legend + * { clear: both; }
 .coach-label--laag { background: #fff3e0; }
 
 /* ---------- Tooladvies en spelregels ---------- */
-.tool-kaart { border: 2px solid var(--blad); border-radius: var(--radius); padding: 1rem 1.25rem; }
+.tool-kaart { border: 2px solid var(--blad); border-radius: var(--radius); padding: 1.25rem 1.5rem; }
 .tool-kaart h3 { font-size: 1.3rem; margin-bottom: 0.25rem; }
-.spelregels { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-top: 1rem; }
-.spelregels h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
+.spelregels { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-top: 1.25rem; }
+.spelregels h4 { margin: 0 0 0.5rem; font-size: 0.95rem; }
 .spelregels ul { margin: 0; padding-left: 1.1rem; }
 
 /* ---------- Adviescard ---------- */
 .adviescard { border: 1px solid var(--rand); border-radius: var(--radius); overflow: hidden; }
-.adviescard__kop { padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+.adviescard__kop { padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 0.75rem; }
 .adviescard__kop h2 { color: inherit; margin: 0; font-size: 1.4rem; }
 .adviescard__kleur { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; }
 .adviescard__hex { flex: none; width: 2rem; height: 2.3rem; background: currentColor; clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%); opacity: 0.85; }
-.adviescard__inhoud { padding: 1.25rem; display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
-.adviescard section h3 { margin-bottom: 0.35rem; }
+.adviescard__inhoud { padding: 1.5rem; display: grid; gap: 1.75rem; grid-template-columns: minmax(0, 1fr); }
+.adviescard section h3 { margin-bottom: 0.5rem; }
 .antwoorden { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
-.antwoorden th, .antwoorden td { text-align: left; padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--wolk); vertical-align: top; }
+.antwoorden th, .antwoorden td { text-align: left; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--wolk); vertical-align: top; }
 .antwoorden th { font-weight: 600; width: 40%; }
 .badge-kleur {
   display: inline-flex; align-items: center; gap: 0.35rem; font-size: 0.85rem; font-weight: 600;
   border-radius: 999px; padding: 0.15rem 0.6rem;
 }
-.adviescard__voet { background: var(--zand); padding: 0.85rem 1.25rem; font-size: 0.9rem; }
+.adviescard__voet { background: var(--zand); padding: 1rem 1.5rem; font-size: 0.9rem; }
 
 /* ---------- Chat ---------- */
 .chat { display: flex; flex-direction: column; max-height: 80vh; }
 .chat h2 { font-size: 1.05rem; }
-.chat__berichten { list-style: none; margin: 0 0 0.75rem; padding: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 0.5rem; min-height: 6rem; }
-.chat__bericht { padding: 0.5rem 0.75rem; border-radius: var(--radius); max-width: 95%; white-space: pre-wrap; }
+.chat__berichten { list-style: none; margin: 0 0 1rem; padding: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 0.75rem; min-height: 6rem; }
+.chat__bericht { margin: 0; padding: 0.65rem 0.9rem; border-radius: var(--radius); max-width: 95%; white-space: pre-wrap; }
 .chat__bericht--coach { background: var(--wolk); align-self: flex-start; }
 .chat__bericht--medewerker { background: var(--lucht); color: var(--wit); align-self: flex-end; }
 .chat__wie { display: block; font-size: 0.75rem; font-weight: 700; opacity: 0.85; }
@@ -245,8 +251,8 @@ fieldset.keuze legend + * { clear: both; }
 .chat form input { flex: 1; }
 
 /* ---------- Lijsten ---------- */
-.aanvragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.75rem; }
-.aanvraag { border: 1px solid var(--rand); border-radius: var(--radius); padding: 1rem; display: grid; gap: 0.5rem; }
+.aanvragen { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+.aanvraag { margin: 0; border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.25rem; display: grid; gap: 0.6rem; }
 .aanvraag__regel { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; align-items: center; }
 .aanvraag__ref { font-family: var(--font-titel); font-weight: 700; }
 .status { font-size: 0.85rem; border: 1px solid var(--rand-invoer); border-radius: 999px; padding: 0.1rem 0.6rem; }
@@ -281,15 +287,15 @@ fieldset.keuze legend + * { clear: both; }
 .uitleg__wie { display: inline-block; background: var(--wolk); border-radius: 999px; padding: 0.1rem 0.7rem; font-size: 0.85rem; font-weight: 600; }
 
 /* ---------- Keuzes met hulptekst (Impact) en toelichting bij checks ---------- */
-.keuze__toelichting { font-size: 0.9rem; color: var(--tekst-zacht); margin: 0.25rem 0 0.5rem; }
-.keuze__toelichting p { margin: 0 0 0.35rem; }
+.keuze__toelichting { font-size: 0.9rem; color: var(--tekst-zacht); margin: 0.4rem 0 0.75rem; }
+.keuze__toelichting p { margin: 0 0 0.5rem; }
 .keuze__opties--lijst { flex-direction: column; align-items: stretch; }
 .keuze__opties--lijst .keuze__optie label { border-radius: var(--radius); width: 100%; align-items: flex-start; }
 .keuze__label { display: block; font-weight: 600; }
 .keuze__optiehulp { display: block; font-size: 0.9rem; font-weight: 400; }
-.deelvragen { display: grid; gap: 0.75rem; margin-top: 0.5rem; }
+.deelvragen { display: grid; gap: 1rem; margin-top: 0.75rem; }
 .deelvragen fieldset.keuze { margin: 0; background: var(--wit); }
-.extra-regelen { margin-top: 0.75rem; font-size: 0.9rem; }
+.extra-regelen { margin-top: 1.25rem; font-size: 0.9rem; }
 .extra-regelen h4 { margin: 0 0 0.25rem; font-size: 0.95rem; }
 .extra-regelen ul { margin: 0; padding-left: 1.1rem; }
 
@@ -301,11 +307,11 @@ fieldset.keuze legend + * { clear: both; }
   font: italic 700 0.9rem/1 Georgia, "Times New Roman", serif; cursor: pointer; padding: 0;
 }
 .keuze__info:hover, .keuze__info[aria-expanded="true"] { background: var(--lucht); border-color: var(--lucht); color: var(--wit); }
-.keuze__uitleg { margin-top: 0.6rem; padding: 0.6rem 0.8rem; background: var(--wolk); border-left: 4px solid var(--water); border-radius: var(--radius); font-size: 0.95rem; }
+.keuze__uitleg { margin-top: 0.9rem; padding: 0.75rem 1rem; background: var(--wolk); border-left: 4px solid var(--water); border-radius: var(--radius); font-size: 0.95rem; }
 .keuze__uitleg[hidden] { display: none; }
 
 /* ---------- Uitleg vóór fase 2 ---------- */
-.fase-uitleg h3 { margin-top: 1.25rem; }
+.fase-uitleg h3 { margin-top: 1.75rem; }
 .fase-uitleg ol, .fase-uitleg ul { padding-left: 1.25rem; }
 .fase-uitleg li { margin-bottom: 0.4rem; }
 .fase-uitleg__waarom { display: block; color: var(--tekst-zacht); }
@@ -327,43 +333,60 @@ fieldset.keuze legend + * { clear: both; }
 .disclaimer { font-size: 0.875rem; color: var(--tekst-zacht); border-top: 1px solid var(--rand); padding-top: 0.75rem; margin: 0; }
 
 /* ---------- Verdieping in stap 3 ---------- */
-.verdieping { margin-top: 0.75rem; }
+.verdieping { margin-top: 1.25rem; }
 .verdieping__intro { margin: 0.75rem 0 0.5rem; }
 .verdieping__groep { border-left: 3px solid var(--water); padding-left: 0.75rem; margin-top: 0.75rem; }
 .verdieping__groep > h4 { margin: 0 0 0.25rem; }
 .verdieping__signaal { font-style: italic; }
-.voortgang { font-weight: 600; margin: 0.5rem 0 1rem; }
+.voortgang { font-weight: 600; margin: 0.5rem 0 1.5rem; }
 
 /* Stap 3 als gesprek: de coach stelt de vragen één voor één. Wie spreekt staat er altijd als tekst bij. */
 .knoppen--klein { margin-top: 0; gap: 0.25rem 1rem; }
-.gesprek { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
-.gesprek__paar { display: flex; flex-direction: column; gap: 0.5rem; }
-.gesprek__bericht { padding: 0.75rem 1rem; border-radius: var(--radius); max-width: 92%; }
+.gesprek { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.25rem; }
+.gesprek + .gesprek, .gesprek + .voortgang, .voortgang + .gesprek { margin-top: 1.25rem; }
+.gesprek__paar { display: flex; flex-direction: column; gap: 0.75rem; margin: 0; }
+.gesprek__bericht { margin: 0; padding: 1rem 1.25rem; border-radius: var(--radius); max-width: 92%; }
 .gesprek__bericht p:first-of-type { margin-top: 0; }
 .gesprek__bericht p:last-child { margin-bottom: 0; }
 .gesprek__bericht--coach { background: var(--wolk); align-self: flex-start; }
 .gesprek__bericht--jij { background: var(--lucht); color: var(--wit); align-self: flex-end; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.25rem 0.75rem; }
 .gesprek__bericht--jij .gesprek__wie { flex-basis: 100%; }
-.gesprek__bericht--actief { max-width: 100%; width: 100%; background: var(--wit); border: 2px solid var(--water); }
-.gesprek__bericht--actief .keuze { background: transparent; margin-bottom: 0; }
-.gesprek__wie { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.25rem; }
-.gesprek__kop { font-size: 1.05rem; margin: 0 0 0.5rem; }
-.gesprek__kop-klein { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.15rem; }
+.gesprek__bericht--actief { max-width: 100%; width: 100%; background: var(--wit); border: 2px solid var(--water); padding: 1.5rem; }
+@media (min-width: 600px) { .gesprek__bericht--actief { padding: 1.75rem 2rem; } }
+/* In de vraag van de coach geen kader om de keuzes: de beurt zelf is al het kader. */
+.gesprek__bericht--actief fieldset.keuze { background: transparent; border: 0; padding: 0; margin: 1.25rem 0 0; }
+.gesprek__wie { display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 0.4rem; }
+.gesprek__kop { font-size: 1.15rem; margin: 0 0 0.75rem; }
+.gesprek__kop-klein { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; }
 .gesprek__voorstel { font-style: italic; }
-.gesprek__hulp { margin-top: 0.75rem; }
+.gesprek__hulp { margin-top: 1.25rem; }
+.gesprek__hulp[open] > summary { margin-bottom: 0.75rem; }
 .gesprek__hulp summary { cursor: pointer; color: var(--water); text-decoration: underline; }
 .gesprek__wijzig { background: none; border: 0; padding: 0; color: var(--wit); text-decoration: underline; cursor: pointer; font: inherit; font-size: 0.875rem; }
 .gesprek__wijzig:focus-visible { outline: 3px solid var(--zon); outline-offset: 2px; }
 .extra-regelen h3 { margin: 0 0 0.25rem; font-size: 0.95rem; }
 .wizard--enkel { grid-template-columns: minmax(0, 1fr) !important; }
-.gesprek__chatberichten { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
-.gesprek__bericht--chat { white-space: pre-wrap; max-width: 85%; padding: 0.5rem 0.75rem; }
-.gesprek__chat { margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--rand); }
-.gesprek__chat .gesprek__chatberichten:not(:empty) { margin-bottom: 0.75rem; }
-.gesprek__chat label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.25rem; }
+.gesprek__chatberichten { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+.gesprek__bericht--chat { white-space: pre-wrap; max-width: 85%; padding: 0.75rem 1rem; }
+.gesprek__chat { margin-top: 1.75rem; padding-top: 1.5rem; border-top: 1px solid var(--rand); }
+.gesprek__chat .gesprek__chatberichten:not(:empty) { margin-bottom: 1.25rem; }
+.gesprek__chat label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
 .gesprek__chatinvoer { display: flex; gap: 0.5rem; }
 .gesprek__chatinvoer input { flex: 1; min-width: 0; }
 .gesprek__paar > .gesprek__chatberichten { padding-left: 1rem; }
-.gesprek__eerder { margin-bottom: 1rem; }
+.gesprek__eerder { margin-bottom: 1.5rem; }
 .gesprek__terug[open] summary { margin-bottom: 1rem; }
 .gesprek__eerder summary { cursor: pointer; color: var(--water); text-decoration: underline; margin-bottom: 0.5rem; }
+
+/* Smal scherm (telefoon, smal Teams-tabblad): compactere binnenruimte en de antwoordentabel gestapeld. */
+@media (max-width: 599px) {
+  .paneel { padding: 1.25rem 1rem; }
+  .gesprek__bericht--actief { padding: 1.25rem 1rem; }
+  .gesprek__bericht { max-width: 100%; }
+  .adviescard__inhoud { padding: 1.25rem 1rem; }
+  .adviescard__kop, .adviescard__voet { padding-left: 1rem; padding-right: 1rem; }
+  .antwoorden, .antwoorden tbody, .antwoorden tr, .antwoorden th, .antwoorden td { display: block; width: auto; }
+  .antwoorden tr { padding: 0.6rem 0; border-bottom: 1px solid var(--wolk); }
+  .antwoorden th, .antwoorden td { padding: 0; border: 0; }
+  .antwoorden th { margin-bottom: 0.25rem; }
+}
