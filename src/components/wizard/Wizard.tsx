@@ -397,7 +397,8 @@ export function Wizard() {
       antwoord = null;
     }
     setChatBezig(false);
-    const bericht = { rol: "coach" as const, tekst: antwoord ?? content!.teksten.coach_niet_beschikbaar, ...(bij ? { bij } : {}) };
+    const nietBeschikbaar = weergaveRef.current === "gesprek" ? content!.teksten.gesprek.niet_beschikbaar : content!.teksten.coach_niet_beschikbaar;
+    const bericht = { rol: "coach" as const, tekst: antwoord ?? nietBeschikbaar, ...(bij ? { bij } : {}) };
     if (!afgerond) wijzig((x) => ({ ...x, chat: [...x.chat, bericht] }));
     else setData((x) => x && { ...x, chat: [...x.chat, bericht] });
   }
@@ -539,6 +540,7 @@ export function Wizard() {
                   actieBezig={actieBezig}
                   actieFout={actieFout}
                   onVraag={() => document.getElementById("gesprek-chat-advies")?.focus()}
+                  ikVorm
                   onOpnieuw={opnieuwBeginnen}
                   onAfronden={afronden}
                 />

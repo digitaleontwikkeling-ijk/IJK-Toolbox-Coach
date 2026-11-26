@@ -41,11 +41,11 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
 
   // De chat zit in het gesprek (geen chatvenster ernaast): een vraag stellen bij de huidige vraag.
   await expect(page.locator("aside.chat")).toHaveCount(0);
-  await actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach").fill("Wat bedoel je hiermee?");
+  await actief(page).getByLabel("Iets niet duidelijk? Vraag het mij").fill("Wat bedoel je hiermee?");
   await actief(page).getByRole("button", { name: "Stuur" }).click();
   const antwoord = actief(page).locator(".gesprek__bericht--chat.gesprek__bericht--coach");
   await expect(antwoord).toContainText(eersteVraag.split("\n")[0]!);
-  await expect(actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach")).toHaveValue("");
+  await expect(actief(page).getByLabel("Iets niet duidelijk? Vraag het mij")).toHaveValue("");
 
   // Eerste vraag beantwoorden: de vraag schuift naar de geschiedenis, de focus gaat naar de volgende vraag.
   const knoppen = [await beantwoord(page)];
@@ -100,7 +100,7 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   // De uitleg van de coach komt in het gesprek, bij het advies.
   await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach").first()).toBeVisible();
   await advies.getByRole("button", { name: "Vraag stellen" }).click();
-  await expect(advies.getByLabel("Vragen over het advies? Vraag het de coach")).toBeFocused();
+  await expect(advies.getByLabel("Vragen over het advies? Stel ze aan mij")).toBeFocused();
   await page.keyboard.type("Wat moet ik nu doen?");
   await page.keyboard.press("Enter");
   await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--jij")).toContainText("Wat moet ik nu doen?");
@@ -150,21 +150,23 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   await actief(page).getByLabel("Jouw probleem of idee").fill("Een overzicht van verlof voor mijn team (testscenario).");
   await actief(page).getByRole("button", { name: "Volgende →" }).click();
   // Eventuele vragen van de coach zijn niet verplicht.
-  await expect(actief(page).getByRole("heading", { name: /De coach heeft nog|Mijn advies/ })).toBeVisible();
-  if (await actief(page).getByRole("heading", { name: /De coach heeft nog/ }).isVisible()) {
-    await expect(actief(page).getByRole("heading", { name: /De coach heeft nog/ })).toBeFocused();
+  await expect(actief(page).getByRole("heading", { name: /Ik heb nog|Mijn advies/ })).toBeVisible();
+  if (await actief(page).getByRole("heading", { name: /Ik heb nog/ }).isVisible()) {
+    await expect(actief(page).getByRole("heading", { name: /Ik heb nog/ })).toBeFocused();
     await actief(page).getByRole("button", { name: "Volgende →" }).click();
   }
 
   // Het tooladvies als vraag van de coach, met de beschrijving als antwoord erboven.
   await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeFocused();
   await expect(page.locator(".gesprek--fase1, .gesprek").first()).toContainText("Een overzicht van verlof voor mijn team");
+  await expect(actief(page)).not.toContainText(/de coach/i);
+  await expect(actief(page)).toContainText("Dit adviseer ik");
   const toolKnop = actief(page).getByRole("button", { name: /past, verder →$/ });
   await expect(toolKnop).toBeVisible();
   const tool = (await toolKnop.innerText()).replace(/ past, verder →$/, "");
 
   // Een vraag aan de coach bij het tooladvies.
-  await actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach").fill(`Wat mag ik met ${tool}?`);
+  await actief(page).getByLabel("Iets niet duidelijk? Vraag het mij").fill(`Wat mag ik met ${tool}?`);
   await actief(page).getByRole("button", { name: "Stuur" }).click();
   await expect(actief(page).locator(".gesprek__bericht--chat.gesprek__bericht--coach")).toContainText(tool);
   const r2 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
@@ -180,6 +182,9 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   // Verder: de uitleg over fase 2 in het gesprek, daarna de eerste check.
   await actief(page).getByRole("button", { name: /past, verder →$/ }).click();
   await expect(actief(page).getByRole("heading", { name: "Hoe gaat fase 2 in zijn werk?" })).toBeFocused();
+  // De coach praat zelf: geen "de coach" in zijn beurt.
+  await expect(actief(page)).not.toContainText(/de coach/i);
+  await expect(actief(page)).toContainText("Ik ben een AI agent.");
   await actief(page).getByRole("button", { name: "Begin met de checks →" }).click();
   await expect(actief(page).locator("h2")).toContainText("Check 1 van 6");
   await expect(actief(page).locator("h2")).toBeFocused();

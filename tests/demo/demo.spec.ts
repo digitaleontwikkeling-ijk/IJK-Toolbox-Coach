@@ -23,7 +23,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page).toHaveURL(new RegExp(`${B}/wizard/(\\?concept=.*)?$`));
   await page.getByLabel("Jouw probleem of idee").fill("HR-gegevens van mijn afdeling wekelijks automatisch in AFAS verwerken.");
   await page.getByRole("button", { name: "Volgende →" }).click();
-  if (await page.getByRole("heading", { name: /De coach heeft nog/ }).isVisible().catch(() => false)) {
+  if (await page.getByRole("heading", { name: /De coach heeft nog|Ik heb nog/ }).isVisible().catch(() => false)) {
     await page.getByRole("button", { name: "Volgende →" }).click();
   }
   await expect(page.getByRole("heading", { name: "HubBI", level: 3 })).toBeVisible();

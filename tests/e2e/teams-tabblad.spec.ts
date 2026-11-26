@@ -43,7 +43,7 @@ for (const breedte of [1000, 360]) {
     // Sessiecookie werkt cross-site (SameSite=None; Secure; Partitioned): de API's zijn bereikbaar.
     await tab.getByLabel("Jouw probleem of idee").fill("Ik wil voor mezelf een prototype bouwen met testdata.");
     await tab.getByRole("button", { name: "Volgende →" }).click();
-    if (await tab.getByRole("heading", { name: /De coach heeft nog/ }).isVisible().catch(() => false)) {
+    if (await tab.getByRole("heading", { name: /De coach heeft nog|Ik heb nog/ }).isVisible().catch(() => false)) {
       await tab.getByRole("button", { name: "Volgende →" }).click();
     }
     await expect(tab.getByRole("heading", { name: /Welke tool past/ })).toBeVisible();

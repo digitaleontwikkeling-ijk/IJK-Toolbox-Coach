@@ -5,7 +5,8 @@
  */
 import { kleurVan, type ContentDto } from "../client";
 
-export function Fase2Uitleg({ content }: { content: ContentDto }) {
+/** Met `ikVorm` (in het gesprek) vertelt de coach zelf hoe het werkt. */
+export function Fase2Uitleg({ content, ikVorm = false }: { content: ContentDto; ikVorm?: boolean }) {
   const t = content.teksten.fase2_uitleg;
   const r = content.regelset;
   return (
@@ -13,7 +14,7 @@ export function Fase2Uitleg({ content }: { content: ContentDto }) {
       <p>{t.intro}</p>
 
       <h3>{t.hoe_titel}</h3>
-      <ol>{t.hoe.map((h) => <li key={h}>{h}</li>)}</ol>
+      <ol>{(ikVorm ? content.teksten.gesprek.fase2_hoe : t.hoe).map((h) => <li key={h}>{h}</li>)}</ol>
 
       <h3>{t.vragen_titel}</h3>
       <p>{t.vragen_intro}</p>

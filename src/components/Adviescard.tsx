@@ -24,12 +24,14 @@ interface Props {
   /** Wizard afronden; alleen getoond als er geen vervolgactie meer openstaat. */
   onAfronden?: () => void;
   actieFout?: string | null;
+  /** In het gesprek: de coach praat zelf (ik-vorm). */
+  ikVorm?: boolean;
   /** "medewerker" (standaard) toont de vervolgactie; "inzage" is voor toetsers en beheerders. */
   weergave?: "medewerker" | "inzage";
 }
 
 export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviescard(
-  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, onAfronden, actieFout, weergave = "medewerker" },
+  { advies, content, onActie, actieBezig, onVraag, onOpnieuw, onAfronden, actieFout, weergave = "medewerker", ikVorm = false },
   kopRef,
 ) {
   const kleur = kleurVan(content, advies.uitkomst)!;
@@ -74,7 +76,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           <h3>Waarom deze kleur?</h3>
           <p>{advies.motivatie}</p>
           <p className="hulptekst" style={{ margin: 0 }}>
-            {t.hoe_werkt_het.kleur_hint}{" "}
+            {ikVorm ? t.gesprek.kleur_hint : t.hoe_werkt_het.kleur_hint}{" "}
             <HoeWerktHetLink tekst={t.hoe_werkt_het.link} href={hoeWerktHetHref()} />
           </p>
         </section>
@@ -198,7 +200,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           <div aria-live="polite">
             {advies.status === "advies_gegeven" ? (
               <>
-                <p>{actie?.uitleg}</p>
+                <p>{ikVorm && kleur.vervolgactie === "alleen_vastleggen" ? t.gesprek.geen_vervolgactie : actie?.uitleg}</p>
                 {contactOpnieuw && <p className="foutmelding">{t.contact_opnieuw.melding}</p>}
               </>
             ) : (

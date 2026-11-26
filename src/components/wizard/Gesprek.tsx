@@ -111,7 +111,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
   }, [huidigId, alleenLezen]);
 
   if (coachBezig === "checks") {
-    return <p role="status">De coach vult de checks alvast voor je in…</p>;
+    return <p role="status">{t.vult_checks}</p>;
   }
 
   const berichtenBij = (bij: string) => data.chat.filter((m) => m.bij === bij);
