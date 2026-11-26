@@ -271,7 +271,10 @@ export function Wizard() {
       }));
       if (vragen.length) {
         // Naar de eerste vraag: het tekstveld, of de eerste keuzeknop.
-        setTimeout(() => (document.querySelector("#verduidelijking-0, #veld-verduidelijking-0 input") as HTMLElement | null)?.focus(), 50);
+        // Formulier: naar de eerste vraag. Gesprek: de focus gaat naar de kop van de beurt (GesprekFase1).
+        if (weergaveRef.current === "lijst") {
+          setTimeout(() => (document.querySelector("#verduidelijking-0, #veld-verduidelijking-0 input") as HTMLElement | null)?.focus(), 50);
+        }
         return;
       }
     }
@@ -495,10 +498,12 @@ export function Wizard() {
               )}
             </>
           )}
-          {(data.stap < 4 || opAdvies) && (
+          {/* Alleen in het formulier (voorkeur uit een eerdere versie of de tests): terug naar het gesprek.
+              In het gesprek is er geen knop meer naar het formulier. */}
+          {!gesprek && (data.stap < 4 || opAdvies) && (
             <>
               <p className="knoppen knoppen--klein">
-                {data.stap === 3 && !toonFase2Uitleg && !gesprek && (
+                {data.stap === 3 && !toonFase2Uitleg && (
                   <button
                     type="button"
                     className="knop knop--tekst"
@@ -517,11 +522,11 @@ export function Wizard() {
                     setFout(null);
                     setFoutDetails(null);
                     setOntbrekend(new Set());
-                    if (!gesprek) wijzig((d) => bevestigEigenAntwoorden(content, d));
-                    kiesWeergave(gesprek ? "lijst" : "gesprek");
+                    wijzig((d) => bevestigEigenAntwoorden(content, d));
+                    kiesWeergave("gesprek");
                   }}
                 >
-                  {!gesprek ? t.gesprek.naar_gesprek : data.stap === 3 && !toonFase2Uitleg ? t.gesprek.naar_lijst : t.gesprek.naar_formulier}
+                  {t.gesprek.naar_gesprek}
                 </button>
               </p>
             </>

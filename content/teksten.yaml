@@ -200,9 +200,7 @@ gesprek:
   klaar: >-
     Dat waren alle vragen. Kijk je antwoorden hierboven nog even na; met Wijzig pas je er een aan. Klopt alles? Dan
     zoek ik met de vaste spelregels van IJK uit welk advies bij je antwoorden past.
-  naar_lijst: Toon alle vragen op één pagina
   naar_gesprek: Terug naar het gesprek
-  naar_formulier: Toon als formulier
   # Fase 1 als gesprek (wat wil je bereiken, vragen van de coach, tooladvies).
   # Eén alinea per regel.
   fase1_intro:
