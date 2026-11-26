@@ -201,6 +201,9 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Stap 1 t/m 3 zijn één doorlopend gesprek (`GesprekFase1.tsx` en `Gesprek.tsx`): wat wil je bereiken, de vragen van de
   coach, het tooladvies, de uitleg over fase 2 en daarna de checks. Eerdere antwoorden staan erboven, met *Wijzig*.
   Dezelfde gegevens, coach-taken en knoppen als het formulier; alleen de weergave verschilt.
+- Ook het advies (stap 4) staat in het gesprek: de adviescard als laatste beurt van de coach, met de uitleg van de
+  coach en de chat eronder. Het gesprek tot dan staat erboven, ingeklapt ("Lees het gesprek terug") en zonder *Wijzig*;
+  aanpassen gaat met "← Terug".
 - Gesprek of formulier is een voorkeur per browser (localStorage `toolbox-coach.weergave`, standaard het gesprek),
   te wisselen met "Toon als formulier" / "Toon alle vragen op één pagina" en "Terug naar het gesprek".
   Geen opslag (bijvoorbeeld in een afgeschermd iframe): altijd het gesprek.

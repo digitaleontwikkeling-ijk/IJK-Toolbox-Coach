@@ -183,6 +183,10 @@ gesprek:
   vraag_coach: Stel de coach een vraag
   chat_label: Iets niet duidelijk? Vraag het de coach
   chat_label_klaar: Nog een vraag voordat je het advies bekijkt?
+  chat_label_advies: Vragen over het advies? Vraag het de coach
+  chat_plaatshouder_advies: "Bijvoorbeeld: wat moet ik nu regelen?"
+  terugkijken: Lees het gesprek terug
+  advies_intro: Dit is mijn advies. De uitkomst is berekend met de vaste spelregels van IJK, niet door mij.
   chat_plaatshouder: "Bijvoorbeeld: wat bedoel je met lezen?"
   chat_stuur: Stuur
   denkt: Even denken…
