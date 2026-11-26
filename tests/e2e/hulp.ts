@@ -4,7 +4,17 @@ import { expect, type Page } from "@playwright/test";
  * Inloggen. Standaard daarna naar de wizard met een nieuw, leeg idee (tests delen één database).
  * Met { nieuwIdee: false } blijf je op de startpagina die bij de rol hoort.
  */
-export async function login(page: Page, naam: string, opties: { nieuwIdee?: boolean } = {}) {
+export async function login(page: Page, naam: string, opties: { nieuwIdee?: boolean; weergave?: "lijst" | "gesprek" } = {}) {
+  // De wizard opent standaard als gesprek. De meeste tests gebruiken het formulier (een voorkeur per browser).
+  if ((opties.weergave ?? "lijst") === "lijst") {
+    await page.addInitScript(() => {
+      try {
+        window.localStorage.setItem("toolbox-coach.weergave", "lijst");
+      } catch {
+        // geen opslag
+      }
+    });
+  }
   await page.goto("/login");
   await page.getByRole("button", { name: new RegExp(naam) }).click();
   await page.waitForURL((url) => !url.pathname.startsWith("/login"));

@@ -196,7 +196,14 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Toetsers en beheerders dienen zelf geen aanvragen in (keuze IJK): zij krijgen de rol medewerker niet,
   ook niet automatisch bij Entra ID. Vangnet: wie toch beide rollen heeft, kan zijn eigen aanvraag niet toetsen.
 
-## 17. Stap 3 als gesprek (prototype)
+## 17. De wizard als gesprek (prototype)
+
+- Stap 1 t/m 3 zijn één doorlopend gesprek (`GesprekFase1.tsx` en `Gesprek.tsx`): wat wil je bereiken, de vragen van de
+  coach, het tooladvies, de uitleg over fase 2 en daarna de checks. Eerdere antwoorden staan erboven, met *Wijzig*.
+  Dezelfde gegevens, coach-taken en knoppen als het formulier; alleen de weergave verschilt.
+- Gesprek of formulier is een voorkeur per browser (localStorage `toolbox-coach.weergave`, standaard het gesprek),
+  te wisselen met "Toon als formulier" / "Toon alle vragen op één pagina" en "Terug naar het gesprek".
+  Geen opslag (bijvoorbeeld in een afgeschermd iframe): altijd het gesprek.
 
 - De checks verschijnen standaard als gesprek: de coach stelt de vragen één voor één (`src/components/wizard/Gesprek.tsx`).
   Eerdere vragen en antwoorden staan erboven, met *Wijzig*. De lijst met alle vragen blijft beschikbaar via
