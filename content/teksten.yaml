@@ -204,11 +204,16 @@ gesprek:
   naar_gesprek: Terug naar het gesprek
   naar_formulier: Toon als formulier
   # Fase 1 als gesprek (wat wil je bereiken, vragen van de coach, tooladvies).
-  fase1_intro: >-
-    Hoi! Ik ben de coach. Ik help je eerst een passende tool uit de IJK Toolbox te kiezen. Daarna kijken we samen of
-    en hoe je ermee aan de slag kunt. Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt,
-    zonder al aan een tool te denken.
-  fase1_vraag: Welk probleem wil je oplossen, of welk idee heb je?
+  # Eén alinea per regel.
+  fase1_intro:
+    - >-
+      Hoi! Ik ben de IJK Toolbox Coach. Ik help je bij jouw use case een passende tool uit de IJK Toolbox te kiezen.
+      Daarna kijken we samen óf en zo ja, hoe je ermee aan de slag kunt.
+    - >-
+      Beschrijf in eigen woorden welke uitdaging je wilt oplossen of welk idee je hebt, zonder al meteen aan een tool te
+      denken.
+  beschrijving_label: Jouw use case
+  fase1_vraag: Welke uitdaging wil je oplossen, of welk idee heb je?
   # Koppen van de vraag van de coach (anders dan de kop van de stap erboven).
   kop_beschrijving: Waar kan ik je mee helpen?
   kop_tool: Mijn advies

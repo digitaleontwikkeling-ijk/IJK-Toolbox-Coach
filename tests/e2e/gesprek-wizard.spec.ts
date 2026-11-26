@@ -149,7 +149,7 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   const r1 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r1.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 
-  await actief(page).getByLabel("Jouw probleem of idee").fill("Een overzicht van verlof voor mijn team (testscenario).");
+  await actief(page).getByLabel("Jouw use case").fill("Een overzicht van verlof voor mijn team (testscenario).");
   await actief(page).getByRole("button", { name: "Volgende →" }).click();
   // Eventuele vragen van de coach zijn niet verplicht.
   await expect(actief(page).getByRole("heading", { name: /Ik heb nog|Mijn advies/ })).toBeVisible();
@@ -177,7 +177,7 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   // De beschrijving wijzigen: terug naar die vraag, daarna verder naar het tooladvies.
   await page.getByRole("button", { name: "Wijzig: Wat wil je bereiken?" }).click();
   await expect(actief(page).getByRole("heading", { name: "Waar kan ik je mee helpen?" })).toBeFocused();
-  await actief(page).getByLabel("Jouw probleem of idee").fill("Een overzicht van verlof voor mijn team, aangepast (testscenario).");
+  await actief(page).getByLabel("Jouw use case").fill("Een overzicht van verlof voor mijn team, aangepast (testscenario).");
   await actief(page).getByRole("button", { name: "Volgende →" }).click();
   await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeVisible();
 
