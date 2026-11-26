@@ -112,8 +112,6 @@ export interface Beurt {
   uitleg?: string;
   /** Inleiding van de coach vóór de vraag (bijvoorbeeld waarom er privacyvragen komen). */
   intro?: string;
-  /** Langere toelichting, achter "Wat bedoel je hiermee?". */
-  hulp: { kop?: string; tekst: string }[];
   opties: { id: string; label: string; uitleg?: string }[];
   meerdere: boolean;
   gekozen: string[];
@@ -150,7 +148,6 @@ export function beurten(content: Content, data: Data): Beurt[] {
           kop: `${kopCheck(c)} – ${d.naam}`,
           vraag: d.vraag,
           uitleg: i === 0 ? c.vraag : undefined,
-          hulp: c.hulp,
           opties: c.antwoorden.map((a) => ({ id: a.id, label: a.label })),
           meerdere: false,
           gekozen: perDeel[d.id] ? [perDeel[d.id]!] : [],
@@ -164,7 +161,6 @@ export function beurten(content: Content, data: Data): Beurt[] {
         check: c,
         kop: kopCheck(c),
         vraag: c.vraag,
-        hulp: c.hulp,
         opties: c.antwoorden.map((a) => ({ id: a.id, label: a.label, uitleg: a.uitleg })),
         meerdere: c.meerdere,
         gekozen: alsLijst(huidig),
@@ -181,7 +177,6 @@ export function beurten(content: Content, data: Data): Beurt[] {
         kop: kopCheck(c),
         vraag: e.vraag,
         uitleg: e.uitleg,
-        hulp: [],
         opties: e.onzeker_mogelijk ? [...JA_NEE, ONZEKER] : JA_NEE,
         meerdere: false,
         gekozen: w ? [w] : [],
@@ -208,7 +203,6 @@ export function beurten(content: Content, data: Data): Beurt[] {
         vraag: g.vraag,
         uitleg: v.signaal && g.signaal ? g.signaal : g.uitleg,
         intro,
-        hulp: [],
         opties: g.antwoorden,
         meerdere: false,
         gekozen: v.antwoord ? [v.antwoord] : [],
@@ -226,7 +220,6 @@ export function beurten(content: Content, data: Data): Beurt[] {
       kop: t.gesprek.kop_aanvullend.replace("{nummer}", String(nummer)),
       vraag: v.vraag,
       intro: nummer === 1 ? t.aanvullende_vragen.intro : undefined,
-      hulp: v.uitleg ? [{ tekst: v.uitleg }] : [],
       opties: [...JA_NEE, ONZEKER],
       meerdere: false,
       gekozen: w ? [w] : [],
