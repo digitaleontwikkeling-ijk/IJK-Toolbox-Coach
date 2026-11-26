@@ -64,7 +64,7 @@ test("toetsenbord: een verdiepingsvraag beantwoorden met pijltjes, en de voortga
 
 test("verduidelijkende vragen: meerdere antwoorden kiezen, en 'Iets anders' met een eigen antwoord", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
-  await page.getByLabel("Jouw probleem of idee").fill("Vergaderingen moeten automatisch worden uitgeschreven");
+  await page.getByLabel("Jouw use case").fill("Vergaderingen moeten automatisch worden uitgeschreven");
   await page.getByRole("button", { name: "Volgende →" }).click();
   const gegevens = page.getByRole("group", { name: /Met welke gegevens ga je werken\?/ });
   // De focus staat op de eerste keuze van de eerste vraag.

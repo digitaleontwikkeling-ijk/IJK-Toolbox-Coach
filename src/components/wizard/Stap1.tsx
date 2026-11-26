@@ -66,11 +66,11 @@ export function Verduidelijking({ i, v, zet }: { i: number; v: VerduidelijkingDa
   );
 }
 
-export function Stap1({ data, wijzig, fout }: StapProps & { fout: string | null }) {
+export function Stap1({ content, data, wijzig, fout }: StapProps & { fout: string | null }) {
   return (
     <>
       <div className="veld">
-        <label htmlFor="beschrijving">Jouw probleem of idee</label>
+        <label htmlFor="beschrijving">{content.teksten.gesprek.beschrijving_label}</label>
         <textarea
           id="beschrijving"
           value={data.beschrijving}

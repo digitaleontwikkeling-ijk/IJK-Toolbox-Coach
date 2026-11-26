@@ -8,6 +8,7 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Formulier, "Wat wil je bereiken?": ook "Jouw use case" en de instructie "welke uitdaging … zonder al meteen aan een tool te denken".
 - Gesprek, "Wat wil je bereiken?": nieuwe introductie van de IJK Toolbox Coach (twee alinea's), veld "Jouw use case".
 - Gesprek, adviescard: bij elke uitkomst "Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!".
 - Melding "Je hebt nog een onafgemaakt idee": ook een knop "Verwijder dat idee" (met bevestiging).

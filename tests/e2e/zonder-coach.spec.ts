@@ -4,7 +4,7 @@ import { geenRodeVlaggen, kies, kiesImpact, login, naarChecks } from "./hulp";
 
 test("zonder coach: alles handmatig invullen geeft een advies", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
-  await page.getByLabel("Jouw probleem of idee").fill("Notulen van het teamoverleg automatisch laten maken.");
+  await page.getByLabel("Jouw use case").fill("Notulen van het teamoverleg automatisch laten maken.");
   await page.getByRole("button", { name: "Volgende →" }).click();
 
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();

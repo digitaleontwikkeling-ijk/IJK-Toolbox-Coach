@@ -15,7 +15,7 @@ fases:
 stappen:
   - nummer: 1
     titel: Wat wil je bereiken?
-    instructie: Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt, zonder al aan een tool te denken.
+    instructie: Beschrijf in eigen woorden welke uitdaging je wilt oplossen of welk idee je hebt, zonder al meteen aan een tool te denken.
   - nummer: 2
     titel: Welke tool past?
     instructie: Op basis van je beschrijving adviseert de coach een tool uit de IJK Toolbox.
@@ -212,6 +212,7 @@ gesprek:
     - >-
       Beschrijf in eigen woorden welke uitdaging je wilt oplossen of welk idee je hebt, zonder al meteen aan een tool te
       denken.
+  # Label van het tekstveld, in het gesprek én in het formulier.
   beschrijving_label: Jouw use case
   fase1_vraag: Welke uitdaging wil je oplossen, of welk idee heb je?
   # Koppen van de vraag van de coach (anders dan de kop van de stap erboven).
