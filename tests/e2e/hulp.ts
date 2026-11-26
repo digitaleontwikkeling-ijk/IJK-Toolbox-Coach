@@ -118,7 +118,7 @@ export async function geenRodeVlaggen(page: Page) {
 }
 
 export async function naarStap3(page: Page, beschrijving: string) {
-  await page.getByLabel("Jouw probleem of idee").fill(beschrijving);
+  await page.getByLabel(/^(Jouw probleem of idee|Jouw use case)$/).fill(beschrijving);
   await page.getByRole("button", { name: "Volgende →" }).click();
   // De coach kan verduidelijkende vragen stellen; die zijn niet verplicht.
   const h = page.getByRole("heading", { name: /Welke tool past|De coach heeft nog|Ik heb nog/ });

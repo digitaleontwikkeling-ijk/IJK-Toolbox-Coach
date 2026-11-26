@@ -109,9 +109,9 @@ export function GesprekFase1(props: Props) {
       <li key="beschrijving" className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{t.kop_beschrijving}</h2>
-        <p>{t.fase1_intro}</p>
+        {t.fase1_intro.map((alinea) => <p key={alinea}>{alinea}</p>)}
         <div className="veld">
-          <label htmlFor="beschrijving">Jouw probleem of idee</label>
+          <label htmlFor="beschrijving">{t.beschrijving_label}</label>
           <textarea
             id="beschrijving"
             value={data.beschrijving}
