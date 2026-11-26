@@ -35,6 +35,14 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   await expect(actief(page).locator("h2")).toContainText("Check 1 van 6");
   await expect(page.getByRole("button", { name: "Bekijk het advies →" })).toHaveCount(0);
   const eersteVraag = await actief(page).locator("legend").first().innerText();
+  // Volgorde: eerst de vraag, dan het voorstel van de coach, dan de antwoorden.
+  await expect(actief(page).locator(".gesprek__voorstel").first()).toBeVisible();
+  const volgorde = await actief(page).evaluate((el) => {
+    const [vraag, voorstel, antwoorden] = ["legend", ".gesprek__voorstel", ".keuze__opties"].map((s) => el.querySelector(s)!);
+    const na = (a: Node, b: Node) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    return na(vraag!, voorstel!) && na(voorstel!, antwoorden!);
+  });
+  expect(volgorde).toBe(true);
 
   const r1 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r1.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);

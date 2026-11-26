@@ -358,7 +358,7 @@ fieldset.keuze legend + * { clear: both; }
 .gesprek__wie { display: block; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; margin-bottom: 0.4rem; }
 .gesprek__kop { font-size: 1.15rem; margin: 0 0 0.75rem; }
 .gesprek__kop-klein { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.3rem; }
-.gesprek__voorstel { font-style: italic; }
+.gesprek__voorstel { font-style: italic; margin: 0.75rem 0 0; }
 .gesprek__hulp { margin-top: 1.25rem; }
 .gesprek__hulp[open] > summary { margin-bottom: 0.75rem; }
 .gesprek__hulp summary { cursor: pointer; color: var(--water); text-decoration: underline; }

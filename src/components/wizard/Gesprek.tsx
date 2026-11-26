@@ -167,11 +167,22 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{b.kop}</h2>
         {b.intro && <p>{b.intro}</p>}
-        {voorstelTekst(b)}
-        {b.voorstel?.vervolgvraag && b.voorstel.zekerheid !== "hoog" && isVoorstel(b) && (
-          <p className="gesprek__voorstel">{t.twijfel.replace("{vraag}", b.voorstel.vervolgvraag)}</p>
-        )}
-        <Keuze {...keuzeProps} naam={b.id} legend={b.vraag} vraag={b.uitleg} opties={b.opties} />
+        {/* Eerst de vraag, dan het voorstel van de coach, dan de antwoorden. */}
+        <Keuze
+          {...keuzeProps}
+          naam={b.id}
+          legend={b.vraag}
+          vraag={b.uitleg}
+          opties={b.opties}
+          voorOpties={
+            <>
+              {voorstelTekst(b)}
+              {b.voorstel?.vervolgvraag && b.voorstel.zekerheid !== "hoog" && isVoorstel(b) && (
+                <p className="gesprek__voorstel">{t.twijfel.replace("{vraag}", b.voorstel.vervolgvraag)}</p>
+              )}
+            </>
+          }
+        />
         {extraRegelen.length > 0 && (
           <div className="extra-regelen">
             <h3>{content.teksten.extra_regelen_titel}</h3>
