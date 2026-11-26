@@ -14,6 +14,8 @@ interface Basis {
   /** Opties; met `hulp` staat er een voorbeeld bij de knop, met `uitleg` een "i"-knopje met toelichting. */
   opties: { id: string; label: string; hulp?: string; uitleg?: string; icoon?: ReactNode }[];
   extra?: ReactNode;
+  /** Direct na de vraag en vóór de antwoorden (bijvoorbeeld het voorstel van de coach). */
+  voorOpties?: ReactNode;
   fout?: boolean;
 }
 
@@ -22,7 +24,7 @@ type Props =
   | (Basis & { meerdere: true; waarde: string[]; onKies: (ids: string[]) => void });
 
 export function Keuze(props: Props) {
-  const { naam, legend, vraag, toelichting, opties, extra, fout } = props;
+  const { naam, legend, vraag, toelichting, opties, extra, fout, voorOpties } = props;
   const metHulp = opties.some((o) => o.hulp);
   // Toelichting achter het "i"-knopje: één tegelijk open, onder de keuzes van deze vraag.
   const [open, setOpen] = useState<string | null>(null);
@@ -62,6 +64,7 @@ export function Keuze(props: Props) {
         {props.meerdere && <span className="keuze__hint">Je kunt meerdere antwoorden kiezen.</span>}
       </legend>
       {toelichting && <div className="keuze__toelichting">{toelichting}</div>}
+      {voorOpties}
       <div className={`keuze__opties${metHulp ? " keuze__opties--lijst" : ""}`}>
         {opties.map((o) => {
           const id = `${naam}-${o.id}`;
