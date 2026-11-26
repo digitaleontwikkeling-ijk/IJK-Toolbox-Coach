@@ -21,6 +21,7 @@ import type { AiUitkomst, DpiaUitkomst, Feit } from "../domain/verdieping";
 import { legeWizard, wizardDataSchema, type WizardData } from "../domain/wizard";
 import { ApiFoutClient } from "../components/client";
 import contentJson from "./content.generated.json";
+import { onderwerpVanVeld } from "../domain/onderwerp";
 
 const content = contentJson as unknown as Content;
 const SLEUTEL = "ijk-toolbox-coach-demo";
@@ -218,7 +219,11 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       case "checks":
         return r({ resultaat: await coach.checksVoorinvullen({ verduidelijking: [], ...(body as object) } as never, ctx) });
       case "chat":
-        return r({ resultaat: await coach.chat({ geschiedenis: [], ...(body as object) } as never, ctx) });
+      {
+        const { veld, ...rest } = (body ?? {}) as { veld?: string };
+        const onderwerp = typeof veld === "string" ? onderwerpVanVeld(content.regelset, veld) : undefined;
+        return r({ resultaat: await coach.chat({ geschiedenis: [], ...rest, onderwerp } as never, ctx) });
+      }
       case "uitleg": {
         const a = s.adviezen.find((x) => x.id === body?.adviesId && x.pseudoniemId === g.pseudoniemId);
         if (!a) throw fout(404, "Niet gevonden.");

@@ -7,6 +7,7 @@ import { haalEigenAdvies } from "@/db/adviezen";
 import { body, nietGevonden, route, vereisUuid } from "@/lib/api";
 import { coachService, content } from "@/lib/app";
 import { antwoordLabels } from "@/domain/weergave";
+import { onderwerpVanVeld } from "@/domain/onderwerp";
 
 const beschrijving = z.string().trim().min(1).max(4000);
 const verduidelijking = z.array(z.object({ vraag: z.string().max(500), antwoord: z.string().max(1000) })).max(2).default([]);
@@ -69,9 +70,13 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
           beschrijving: z.string().max(4000).default(""),
           tool: toolId.optional(),
           geschiedenis: z.array(z.object({ rol: z.enum(["coach", "medewerker"]), tekst: z.string().max(2000) })).max(20).default([]),
+          /** In het gesprek: het veld-id van de vraag; de tekst ervan komt uit de regelset. */
+          veld: z.string().regex(/^[a-z0-9_-]+$/).max(130).optional(),
         }),
       );
-      return { resultaat: await coach.chat(b, ctx) };
+      const { veld, ...rest } = b;
+      const onderwerp = veld ? onderwerpVanVeld(content().regelset, veld) : undefined;
+      return { resultaat: await coach.chat({ ...rest, onderwerp }, ctx) };
     }
     default:
       throw nietGevonden();

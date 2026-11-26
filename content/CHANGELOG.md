@@ -7,6 +7,8 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
+- Teksten voor de chat in het gesprek (`chat_label`, `chat_label_klaar`, `chat_plaatshouder`, `chat_stuur`, `denkt`,
+  `eerdere_berichten`). Ook geen nieuwe regelset.
 
 ## regelset 0.9 (concept)
 

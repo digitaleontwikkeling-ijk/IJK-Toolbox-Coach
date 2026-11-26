@@ -86,3 +86,46 @@ describe("gesprek", () => {
     expect(Object.keys(eind.checks[impact.id] as Record<string, string>).sort()).toEqual(impact.deelvragen.map((x) => x.id).sort());
   });
 });
+
+describe("chat in het gesprek", () => {
+  it("vindt bij elk veld uit het gesprek de vraag in de regelset", async () => {
+    const { onderwerpVanVeld } = await import("@/domain/onderwerp");
+    const keuzes: Record<string, string> = { data: "persoonsgegevens", ai_gebruik: "ja", autonomie: "beslissen" };
+    const eind = loopDoor(legeWizard(), (id) => keuzes[id]);
+    for (const b of beurten(content, eind)) {
+      const o = onderwerpVanVeld(content.regelset, b.id);
+      expect(o, b.id).toBeDefined();
+      expect(o!.vraag).toBe(b.vraag);
+      expect(o!.opties.map((x) => x.label)).toEqual(b.opties.map((x) => x.label));
+    }
+    expect(onderwerpVanVeld(content.regelset, "bestaat_niet")).toBeUndefined();
+  });
+
+  it("de oefencoach legt de huidige vraag uit, tenzij je naar een tool vraagt", async () => {
+    const { onderwerpVanVeld } = await import("@/domain/onderwerp");
+    const { MockCoachClient } = await import("@/coach/MockCoachClient");
+    const coach = new MockCoachClient(geladen);
+    const autonomie = content.regelset.checks.find((c) => c.id === "autonomie")!;
+    const onderwerp = onderwerpVanVeld(content.regelset, "autonomie");
+    const basis = { stap: 3, beschrijving: "", tool: "claude_code", geschiedenis: [] };
+    const uitleg = await coach.chat({ ...basis, vraag: "Wat bedoel je hiermee?", onderwerp });
+    expect(uitleg.antwoord).toContain(autonomie.vraag);
+    const tool = geladen.tools.tools.find((x) => x.id !== "claude_code")!;
+    const overTool = await coach.chat({ ...basis, vraag: `Mag dit ook met ${tool.naam}?`, onderwerp });
+    expect(overTool.antwoord).toContain(tool.naam);
+  });
+});
+
+describe("oefencoach in het gesprek", () => {
+  it("noem je een antwoord, dan legt hij alleen dat antwoord uit", async () => {
+    const { onderwerpVanVeld } = await import("@/domain/onderwerp");
+    const { MockCoachClient } = await import("@/coach/MockCoachClient");
+    const lezen = content.regelset.checks.find((c) => c.id === "autonomie")!.antwoorden.find((a) => a.id === "lezen")!;
+    const r = await new MockCoachClient(geladen).chat({
+      stap: 3, beschrijving: "", geschiedenis: [], vraag: "Wat bedoel je met lezen?",
+      onderwerp: onderwerpVanVeld(content.regelset, "autonomie"),
+    });
+    expect(r.antwoord).toContain(lezen.uitleg!);
+    expect(r.antwoord).not.toContain("Schrijven");
+  });
+});

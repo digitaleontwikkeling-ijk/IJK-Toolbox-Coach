@@ -134,7 +134,7 @@ export class HermesCoachClient implements CoachClient {
     );
   }
 
-  chat({ vraag, stap, beschrijving, tool, geschiedenis }: ChatInvoer, ctx: CoachContext) {
+  chat({ vraag, stap, beschrijving, tool, geschiedenis, onderwerp }: ChatInvoer, ctx: CoachContext) {
     return this.vraag(
       "chat",
       ctx,
@@ -144,6 +144,7 @@ export class HermesCoachClient implements CoachClient {
         beschrijving: schoon(beschrijving),
         tool,
         geschiedenis: geschiedenis.map((b) => ({ rol: b.rol, tekst: schoon(b.tekst) })),
+        ...(onderwerp ? { huidige_vraag: onderwerp } : {}),
       },
       { tool },
     );

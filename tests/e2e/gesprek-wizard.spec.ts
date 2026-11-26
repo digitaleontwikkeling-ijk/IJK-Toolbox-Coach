@@ -36,8 +36,18 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   const r1 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r1.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 
+  // De chat zit in het gesprek (geen chatvenster ernaast): een vraag stellen bij de huidige vraag.
+  await expect(page.locator("aside.chat")).toHaveCount(0);
+  await actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach").fill("Wat bedoel je hiermee?");
+  await actief(page).getByRole("button", { name: "Stuur" }).click();
+  const antwoord = actief(page).locator(".gesprek__bericht--chat.gesprek__bericht--coach");
+  await expect(antwoord).toContainText(eersteVraag.split("\n")[0]!);
+  await expect(actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach")).toHaveValue("");
+
   // Eerste vraag beantwoorden: de vraag schuift naar de geschiedenis, de focus gaat naar de volgende vraag.
   const knoppen = [await beantwoord(page)];
+  // De vraag aan de coach en zijn antwoord blijven in de geschiedenis staan, bij die vraag.
+  await expect(page.locator(".gesprek__paar").first()).toContainText("Wat bedoel je hiermee?");
   await expect(actief(page).locator("h2")).toBeFocused();
   await expect(page.locator(".gesprek__paar")).toHaveCount(1);
   await expect(page.locator(".gesprek__bericht--jij").first()).toContainText("Jij");
@@ -66,6 +76,8 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   // De lijst laat dezelfde antwoorden zien; terug naar het gesprek verandert niets.
   await page.getByRole("button", { name: "Toon alle vragen op één pagina" }).click();
   await expect(page.getByRole("heading", { name: "De zes checks" })).toBeVisible();
+  // In de lijst staat het chatvenster weer naast de vragen, met het hele gesprek.
+  await expect(page.locator("aside.chat")).toContainText("Wat bedoel je hiermee?");
   await expect(page.locator(".voortgang")).toContainText(/Alle \d+ vragen zijn beantwoord/);
   await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
   await expect(page.getByText("Dat waren alle vragen.")).toBeVisible();

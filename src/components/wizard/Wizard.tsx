@@ -334,23 +334,25 @@ export function Wizard() {
     setTimeout(() => kopRef.current?.focus(), 30);
   }
 
-  async function chat(tekst: string) {
+  /** Vrije vraag aan de coach; `bij` = de vraag in het gesprek waar het bericht bij hoort. */
+  async function chat(tekst: string, bij?: string) {
     const d = dataRef.current!;
-    const geschiedenis = d.chat.slice(-10);
-    if (!afgerond) wijzig((x) => ({ ...x, chat: [...x.chat, { rol: "medewerker", tekst }] }));
-    else setData((x) => x && { ...x, chat: [...x.chat, { rol: "medewerker", tekst }] });
+    const geschiedenis = d.chat.slice(-10).map(({ rol, tekst }) => ({ rol, tekst }));
+    const vraag = { rol: "medewerker" as const, tekst, ...(bij ? { bij } : {}) };
+    if (!afgerond) wijzig((x) => ({ ...x, chat: [...x.chat, vraag] }));
+    else setData((x) => x && { ...x, chat: [...x.chat, vraag] });
     setChatBezig(true);
     let antwoord: string | null = null;
     try {
       const r = await api<{ resultaat: string | null }>("/api/coach/chat", {
-        body: { vraag: tekst, stap: d.stap, beschrijving: d.beschrijving, tool: d.tooladvies?.tool, geschiedenis },
+        body: { vraag: tekst, stap: d.stap, beschrijving: d.beschrijving, tool: d.tooladvies?.tool, geschiedenis, ...(bij && bij !== "klaar" ? { veld: bij } : {}) },
       });
       antwoord = r.resultaat;
     } catch {
       antwoord = null;
     }
     setChatBezig(false);
-    const bericht = { rol: "coach" as const, tekst: antwoord ?? content!.teksten.coach_niet_beschikbaar };
+    const bericht = { rol: "coach" as const, tekst: antwoord ?? content!.teksten.coach_niet_beschikbaar, ...(bij ? { bij } : {}) };
     if (!afgerond) wijzig((x) => ({ ...x, chat: [...x.chat, bericht] }));
     else setData((x) => x && { ...x, chat: [...x.chat, bericht] });
   }
@@ -365,6 +367,8 @@ export function Wizard() {
   const props = { content, data, wijzig, coachBezig };
   // Vóór de checks: eerst uitleg over fase 2 (één keer per idee).
   const toonFase2Uitleg = data.stap === 3 && !data.fase2UitlegGezien;
+  // In het gesprek zit de chat bij de vragen zelf; het chatvenster ernaast is dan niet nodig.
+  const chatInGesprek = data.stap === 3 && !toonFase2Uitleg && data.weergave === "gesprek";
 
   return (
     <>
@@ -383,7 +387,7 @@ export function Wizard() {
       {data.vorigAdviesId && data.stap < 4 && (
         <p className="info">Je past een eerder advies aan. Je vorige antwoorden zijn alvast ingevuld.</p>
       )}
-      <div className="wizard">
+      <div className={`wizard${chatInGesprek ? " wizard--enkel" : ""}`}>
         <div className="paneel">
           {data.stap < 4 && (
             <>
@@ -447,7 +451,7 @@ export function Wizard() {
           )}
           {data.stap === 3 && toonFase2Uitleg && <Fase2Uitleg content={content} />}
           {data.stap === 3 && !toonFase2Uitleg && data.weergave === "gesprek" && (
-            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onVraagCoach={() => document.getElementById(CHAT_INVOER_ID)?.focus()} />
+            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onChat={chat} chatBezig={chatBezig} />
           )}
           {data.stap === 3 && !toonFase2Uitleg && data.weergave === "lijst" && (
             <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />
@@ -506,7 +510,7 @@ export function Wizard() {
           </div>
         </div>
 
-        <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} uitlegLink={t.hoe_werkt_het.link} />
+        {!chatInGesprek && <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} uitlegLink={t.hoe_werkt_het.link} />}
       </div>
     </>
   );

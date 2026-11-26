@@ -6,19 +6,80 @@
  * Dit is alleen een andere weergave. De vragen, de antwoorden en de volgorde komen uit `beurten` (velden.ts),
  * dezelfde bron als de lijst; de uitkomst wordt daarna gewoon met de vaste beslisregels berekend.
  * Voorstellen van de coach worden niet stilzwijgend overgenomen: de medewerker bevestigt elk antwoord.
+ *
+ * De vrije chat zit in het gesprek: bij elke vraag kun je de coach iets vragen. Het bericht onthoudt bij welke
+ * vraag het hoort (`bij`), zodat het in de geschiedenis op de goede plek blijft staan.
  */
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
+import type { ChatBericht } from "@/domain/wizard";
 import { Keuze } from "../Keuze";
 import type { StapProps } from "./types";
 import { afgeleidBij, beurten, isAfgerond, isVoorstel, type Beurt } from "./velden";
 
 interface Props extends StapProps {
   coachNietBeschikbaar: boolean;
-  /** Focus naar het chatvenster (een eigen vraag aan de coach). */
-  onVraagCoach: () => void;
+  /** Een eigen vraag aan de coach, bij een vraag uit het gesprek (veld-id) of "klaar". */
+  onChat: (tekst: string, bij: string) => void;
+  chatBezig: boolean;
 }
 
-export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onVraagCoach }: Props) {
+type Teksten = StapProps["content"]["teksten"]["gesprek"];
+
+/** De berichten bij één vraag, als bubbels. */
+function Berichten({ berichten, bezig, t }: { berichten: ChatBericht[]; bezig?: boolean; t: Teksten }) {
+  return (
+    <>
+      {berichten.map((b, i) => (
+        <li key={i} className={`gesprek__bericht gesprek__bericht--chat gesprek__bericht--${b.rol === "coach" ? "coach" : "jij"}`}>
+          <span className="gesprek__wie">{b.rol === "coach" ? "Coach" : "Jij"}</span>
+          {b.tekst}
+        </li>
+      ))}
+      {bezig && (
+        <li className="gesprek__bericht gesprek__bericht--chat gesprek__bericht--coach">
+          <span className="gesprek__wie">Coach</span>
+          {t.denkt}
+        </li>
+      )}
+    </>
+  );
+}
+
+/** Vraag de coach iets, binnen de huidige vraag van het gesprek. */
+function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
+  bij: string;
+  berichten: ChatBericht[];
+  bezig: boolean;
+  label: string;
+  t: Teksten;
+  onVerstuur: (tekst: string, bij: string) => void;
+}) {
+  const [tekst, setTekst] = useState("");
+  const id = `gesprek-chat-${bij}`;
+  const verstuur = (e: FormEvent) => {
+    e.preventDefault();
+    const x = tekst.trim();
+    if (!x || bezig) return;
+    onVerstuur(x, bij);
+    setTekst("");
+  };
+  return (
+    <div className="gesprek__chat">
+      <ol className="gesprek__chatberichten" aria-live="polite" aria-relevant="additions">
+        <Berichten berichten={berichten} bezig={bezig} t={t} />
+      </ol>
+      <form onSubmit={verstuur}>
+        <label htmlFor={id}>{label}</label>
+        <div className="gesprek__chatinvoer">
+          <input id={id} type="text" value={tekst} maxLength={2000} autoComplete="off" placeholder={t.chat_plaatshouder} onChange={(e) => setTekst(e.target.value)} />
+          <button type="submit" className="knop knop--secundair" disabled={bezig || !tekst.trim()}>{t.chat_stuur}</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onChat, chatBezig }: Props) {
   const t = content.teksten.gesprek;
   const [bewerk, setBewerk] = useState<string | null>(null);
   const kopRef = useRef<HTMLHeadingElement>(null);
@@ -50,6 +111,8 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
     return <p role="status">De coach vult de checks alvast voor je in…</p>;
   }
 
+  const berichtenBij = (bij: string) => data.chat.filter((m) => m.bij === bij);
+  const eerder = data.chat.filter((m) => !m.bij);
   const labels = (b: Beurt) => b.gekozen.map((id) => b.opties.find((o) => o.id === id)?.label ?? id);
   const bevestig = (b: Beurt) => {
     wijzig((d) => ({ ...d, bevestigd: d.bevestigd.includes(b.id) ? d.bevestigd : [...d.bevestigd, b.id] }));
@@ -129,12 +192,10 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
             ))}
           </details>
         )}
+        <Chat bij={b.id} berichten={berichtenBij(b.id)} bezig={chatBezig} label={t.chat_label} t={t} onVerstuur={onChat} />
         <div className="knoppen">
           <button type="button" className="knop" disabled={b.gekozen.length === 0} onClick={() => bevestig(b)}>
             {isVoorstel(b) ? t.bevestig : t.volgende} →
-          </button>
-          <button type="button" className="knop knop--tekst" onClick={onVraagCoach}>
-            {t.vraag_coach}
           </button>
         </div>
       </li>
@@ -148,6 +209,11 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         <span className="gesprek__kop-klein">{b.kop}</span>
         {b.vraag}
       </div>
+      {berichtenBij(b.id).length > 0 && (
+        <ol className="gesprek__chatberichten">
+          <Berichten berichten={berichtenBij(b.id)} t={t} />
+        </ol>
+      )}
       <div className="gesprek__bericht gesprek__bericht--jij">
         <span className="gesprek__wie">Jij</span>
         <span className="sr-only">{t.jouw_antwoord} </span>
@@ -162,6 +228,14 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
   return (
     <>
       <p className="voortgang" role="status" aria-live="polite">{voortgang}</p>
+      {eerder.length > 0 && (
+        <details className="gesprek__eerder">
+          <summary>{t.eerdere_berichten.replace("{aantal}", String(eerder.length))}</summary>
+          <ol className="gesprek__chatberichten">
+            <Berichten berichten={eerder} t={t} />
+          </ol>
+        </details>
+      )}
       <ol className="gesprek">
         <li className="gesprek__bericht gesprek__bericht--coach">
           <span className="gesprek__wie">Coach</span>
@@ -176,6 +250,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
           <li className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
             <span className="gesprek__wie">Coach</span>
             <p ref={klaarRef} tabIndex={-1} style={{ margin: 0 }}>{t.klaar}</p>
+            <Chat bij="klaar" berichten={berichtenBij("klaar")} bezig={chatBezig} label={t.chat_label_klaar} t={t} onVerstuur={onChat} />
           </li>
         )}
       </ol>

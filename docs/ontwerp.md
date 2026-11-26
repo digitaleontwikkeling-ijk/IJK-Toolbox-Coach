@@ -208,3 +208,10 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - De overgangszinnen staan vast in `content/teksten.yaml` (`gesprek`), niet door Hermes geschreven: voorspelbaar en
   zonder wachttijd per vraag. Wat uit eerdere antwoorden volgt, noemt de coach ("Dit hoef ik niet meer te vragen…").
 - Toegankelijkheid: bij elke nieuwe vraag gaat de focus naar de kop ervan; wie spreekt staat er als tekst bij.
+- De vrije chat zit in het gesprek: bij elke vraag (en na de laatste) kun je de coach iets vragen. Het bericht onthoudt
+  bij welke vraag het hoort (`bij` in de chatberichten) en blijft daar in de geschiedenis staan. Het chatvenster ernaast
+  verschijnt dan niet; in de lijst en bij het advies wel, met alle berichten. Berichten van vóór stap 3 staan bovenaan
+  onder "Eerdere berichten met de coach".
+- De browser stuurt alleen het veld-id van de vraag mee (`veld`); de server zoekt de tekst van de vraag op in de
+  regelset (`src/domain/onderwerp.ts`) en geeft die als `huidige_vraag` aan Hermes. Er gaan geen extra gegevens van de
+  medewerker mee.
