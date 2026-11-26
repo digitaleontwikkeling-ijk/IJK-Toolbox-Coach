@@ -16,7 +16,9 @@ import { ANDERE_TOOL } from "@/domain/content-schema";
 import { afgerondPad, volledigPad, wizardPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
-import { ontbrekendeVelden, Stap3 } from "./Stap3";
+import { Stap3 } from "./Stap3";
+import { Gesprek, gesprekKlaar } from "./Gesprek";
+import { bevestigEigenAntwoorden, ontbrekendeVelden } from "./velden";
 import { Fase2Uitleg } from "./Fase2Uitleg";
 import type { Wijzig } from "./types";
 
@@ -196,7 +198,8 @@ export function Wizard() {
       const vragen = (voorstellen ?? [])
         .filter((v) => v.vervolgvraag && v.zekerheid !== "hoog")
         .map((v) => `Over ${naamVan(v)}: ${v.vervolgvraag}`);
-      const chat = vragen.length
+      // In het gesprek stelt de coach zijn twijfel bij de vraag zelf; in de lijst via de chat.
+      const chat = vragen.length && x.weergave === "lijst"
         ? [...x.chat, { rol: "coach" as const, tekst: `Ik heb de checks alvast ingevuld. Bij een paar twijfel ik:\n${vragen.join("\n")}` }]
         : x.chat;
       return { ...x, checks, coachVoorstellen, checksVoorgesteld: true, chat };
@@ -388,9 +391,11 @@ export function Wizard() {
                 <span className="sr-only">Stap {stap.nummer} van 4: </span>
                 {toonFase2Uitleg ? t.fase2_uitleg.titel : stap.titel}
               </h1>
-              {!toonFase2Uitleg && <p className="instructie">{stap.instructie}</p>}
+              {!toonFase2Uitleg && (
+                <p className="instructie">{data.stap === 3 && data.weergave === "gesprek" ? t.gesprek.instructie : stap.instructie}</p>
+              )}
               {data.stap === 3 && !toonFase2Uitleg && (
-                <p>
+                <p className="knoppen knoppen--klein">
                   <button
                     type="button"
                     className="knop knop--tekst"
@@ -400,6 +405,18 @@ export function Wizard() {
                     }}
                   >
                     {t.fase2_uitleg.opnieuw_lezen}
+                  </button>
+                  <button
+                    type="button"
+                    className="knop knop--tekst"
+                    onClick={() => {
+                      setFout(null);
+                      setFoutDetails(null);
+                      setOntbrekend(new Set());
+                      wijzig((d) => (d.weergave === "gesprek" ? { ...d, weergave: "lijst" } : { ...bevestigEigenAntwoorden(content, d), weergave: "gesprek" }));
+                    }}
+                  >
+                    {data.weergave === "gesprek" ? t.gesprek.naar_lijst : t.gesprek.naar_gesprek}
                   </button>
                 </p>
               )}
@@ -429,7 +446,10 @@ export function Wizard() {
             />
           )}
           {data.stap === 3 && toonFase2Uitleg && <Fase2Uitleg content={content} />}
-          {data.stap === 3 && !toonFase2Uitleg && (
+          {data.stap === 3 && !toonFase2Uitleg && data.weergave === "gesprek" && (
+            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onVraagCoach={() => document.getElementById(CHAT_INVOER_ID)?.focus()} />
+          )}
+          {data.stap === 3 && !toonFase2Uitleg && data.weergave === "lijst" && (
             <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />
           )}
           {data.stap === 4 && advies && (
@@ -478,7 +498,7 @@ export function Wizard() {
                 {t.fase2_uitleg.knop} →
               </button>
             )}
-            {data.stap === 3 && !toonFase2Uitleg && (
+            {data.stap === 3 && !toonFase2Uitleg && (data.weergave === "lijst" || (!coachBezig && gesprekKlaar(content, data))) && (
               <button type="button" className="knop" onClick={bekijkAdvies} disabled={!!coachBezig}>
                 Bekijk het advies →
               </button>

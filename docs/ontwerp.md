@@ -195,3 +195,16 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
   "Gaat het advies over mensen?" zijn vervallen. Kolommen `dpia`, `ai_risico` en `feiten` (migratie 005).
 - Toetsers en beheerders dienen zelf geen aanvragen in (keuze IJK): zij krijgen de rol medewerker niet,
   ook niet automatisch bij Entra ID. Vangnet: wie toch beide rollen heeft, kan zijn eigen aanvraag niet toetsen.
+
+## 17. Stap 3 als gesprek (prototype)
+
+- De checks verschijnen standaard als gesprek: de coach stelt de vragen één voor één (`src/components/wizard/Gesprek.tsx`).
+  Eerdere vragen en antwoorden staan erboven, met *Wijzig*. De lijst met alle vragen blijft beschikbaar via
+  "Toon alle vragen op één pagina" (`weergave` in de wizardgegevens).
+- Alleen een andere weergave: lijst en gesprek gebruiken dezelfde vragen uit `src/components/wizard/velden.ts`
+  (die weer `analyseer` uit het domein gebruikt). De uitkomst blijft komen uit de beslisregels; de coach bepaalt niets.
+- Voorstellen van de coach tellen in het gesprek pas als de medewerker ze bevestigt ("Ja, klopt"; `bevestigd` in de
+  wizardgegevens). Terug van de lijst gelden eigen antwoorden als bevestigd; een onaangeroerd voorstel niet.
+- De overgangszinnen staan vast in `content/teksten.yaml` (`gesprek`), niet door Hermes geschreven: voorspelbaar en
+  zonder wachttijd per vraag. Wat uit eerdere antwoorden volgt, noemt de coach ("Dit hoef ik niet meer te vragen…").
+- Toegankelijkheid: bij elke nieuwe vraag gaat de focus naar de kop ervan; wie spreekt staat er als tekst bij.
