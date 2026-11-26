@@ -14,7 +14,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import type { ChatBericht } from "@/domain/wizard";
 import { Keuze } from "../Keuze";
 import type { StapProps } from "./types";
-import { afgeleidBij, beurten, isAfgerond, isVoorstel, type Beurt } from "./velden";
+import { afgeleidBij, beurten, isAfgerond, type Beurt } from "./velden";
 
 interface Props extends StapProps {
   coachNietBeschikbaar: boolean;
@@ -143,20 +143,6 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
     );
   };
 
-  const voorstelTekst = (b: Beurt) => {
-    if (!b.voorstel || !isVoorstel(b)) return null;
-    const label = labels(b)[0]!;
-    const sjabloon = b.voorstel.bron === "tool" ? t.voorstel_tool : b.voorstel.zekerheid === "laag" ? t.voorstel_onzeker : t.voorstel;
-    const [voor, na] = sjabloon.split("{antwoord}");
-    return (
-      <p className="gesprek__voorstel">
-        {voor}
-        <strong>{label}</strong>
-        {na}
-      </p>
-    );
-  };
-
   const actief = (b: Beurt) => {
     const extraRegelen = b.check && b.id === b.check.id ? b.check.antwoorden.filter((a) => a.extra_regelen) : [];
     const keuzeProps = b.meerdere
@@ -167,22 +153,8 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         <span className="gesprek__wie">Coach</span>
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>{b.kop}</h2>
         {b.intro && <p>{b.intro}</p>}
-        {/* Eerst de vraag, dan het voorstel van de coach, dan de antwoorden. */}
-        <Keuze
-          {...keuzeProps}
-          naam={b.id}
-          legend={b.vraag}
-          vraag={b.uitleg}
-          opties={b.opties}
-          voorOpties={
-            <>
-              {voorstelTekst(b)}
-              {b.voorstel?.vervolgvraag && b.voorstel.zekerheid !== "hoog" && isVoorstel(b) && (
-                <p className="gesprek__voorstel">{t.twijfel.replace("{vraag}", b.voorstel.vervolgvraag)}</p>
-              )}
-            </>
-          }
-        />
+        {/* Een voorstel van de coach staat alleen als vooraf gekozen antwoord; de medewerker bevestigt het met Volgende. */}
+        <Keuze {...keuzeProps} naam={b.id} legend={b.vraag} vraag={b.uitleg} opties={b.opties} />
         {extraRegelen.length > 0 && (
           <div className="extra-regelen">
             <h3>{content.teksten.extra_regelen_titel}</h3>
@@ -209,7 +181,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         <Chat bij={b.id} berichten={berichtenBij(b.id)} bezig={chatBezig} label={t.chat_label} t={t} onVerstuur={onChat} />
         <div className="knoppen">
           <button type="button" className="knop" disabled={b.gekozen.length === 0} onClick={() => bevestig(b)}>
-            {isVoorstel(b) ? t.bevestig : t.volgende} →
+            {t.volgende} →
           </button>
         </div>
       </li>

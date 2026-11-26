@@ -34,7 +34,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   // Het gesprek: de coach stelt de vragen één voor één; zijn voorstellen bevestig je, de rest op "Nee".
   const actief = page.locator(".gesprek__bericht--actief");
   await expect(actief.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
-  const verder = actief.getByRole("button", { name: /^(Ja, klopt|Volgende) →$/ });
+  const verder = actief.getByRole("button", { name: "Volgende →" });
   for (let i = 0; i < 60 && (await verder.count()); i++) {
     if ((await actief.locator(".keuze__opties input:checked").count()) === 0) {
       await actief.locator(".keuze__opties label").getByText("Nee", { exact: true }).first().click();

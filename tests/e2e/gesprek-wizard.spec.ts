@@ -11,7 +11,7 @@ const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const actief = (page: Page) => page.locator(".gesprek__bericht--actief");
 /** De beantwoorde vragen van de checks (niet die van fase 1). */
 const paren = (page: Page) => page.locator(".gesprek:not(.gesprek--fase1) .gesprek__paar");
-const verder = (page: Page) => actief(page).getByRole("button", { name: /^(Ja, klopt|Volgende) →$/ });
+const verder = (page: Page) => actief(page).getByRole("button", { name: "Volgende →" });
 
 /** Beantwoordt de huidige vraag (het voorstel, "Nee", of de eerste optie) en gaat verder. */
 async function beantwoord(page: Page): Promise<string> {
@@ -35,14 +35,9 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   await expect(actief(page).locator("h2")).toContainText("Check 1 van 6");
   await expect(page.getByRole("button", { name: "Bekijk het advies →" })).toHaveCount(0);
   const eersteVraag = await actief(page).locator("legend").first().innerText();
-  // Volgorde: eerst de vraag, dan het voorstel van de coach, dan de antwoorden.
-  await expect(actief(page).locator(".gesprek__voorstel").first()).toBeVisible();
-  const volgorde = await actief(page).evaluate((el) => {
-    const [vraag, voorstel, antwoorden] = ["legend", ".gesprek__voorstel", ".keuze__opties"].map((s) => el.querySelector(s)!);
-    const na = (a: Node, b: Node) => !!(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    return na(vraag!, voorstel!) && na(voorstel!, antwoorden!);
-  });
-  expect(volgorde).toBe(true);
+  // Het voorstel van de coach staat alleen als vooraf gekozen antwoord, zonder tekst erover.
+  await expect(actief(page).locator(".keuze__opties input:checked")).not.toHaveCount(0);
+  await expect(actief(page)).not.toContainText(/denk ik|Klopt dat\?|twijfel/);
 
   const r1 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r1.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
@@ -75,8 +70,7 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
 
   // Alle vragen doorlopen.
   for (let i = 0; i < 60 && (await verder(page).count()); i++) knoppen.push(await beantwoord(page));
-  // De coach deed voorstellen die met één klik te bevestigen waren.
-  expect(knoppen).toContain("Ja, klopt →");
+  expect(knoppen.every((k) => k === "Volgende →")).toBe(true);
 
   // Klaar: de samenvatting en de knop naar het advies.
   await expect(page.getByText("Dat waren alle vragen.")).toBeFocused();
