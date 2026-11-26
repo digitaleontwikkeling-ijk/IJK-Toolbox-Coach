@@ -80,8 +80,6 @@ export const wizardDataSchema = z.object({
   checksVoorgesteld: z.boolean().default(false),
   /** Heeft de medewerker de uitleg vóór fase 2 gezien? (één keer per idee) */
   fase2UitlegGezien: z.boolean().default(false),
-  /** Stap 3 als gesprek (één vraag tegelijk) of als lijst met alle vragen. */
-  weergave: z.enum(["gesprek", "lijst"]).default("gesprek"),
   /** Gesprek: velden (id's zoals in stap 3) die de medewerker heeft bevestigd. */
   bevestigd: z.array(z.string().regex(/^[a-z0-9_-]+$/).max(130)).max(200).default([]),
   /** Extra vragen: ja/nee, of "onzeker" als de vraag dat toestaat. */

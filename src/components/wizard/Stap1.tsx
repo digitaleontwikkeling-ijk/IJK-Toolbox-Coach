@@ -16,7 +16,7 @@ export function samengesteldAntwoord(gekozen: string[], eigen: string): string {
  * Antwoord op een verduidelijkende vraag van de coach. Met opties: aanvinkbare knoppen (meerdere antwoorden
  * mogelijk) plus "Iets anders", dat een tekstveld voor een eigen antwoord toont. Zonder opties: een tekstveld.
  */
-function Verduidelijking({ i, v, zet }: { i: number; v: VerduidelijkingData; zet: (w: Partial<VerduidelijkingData>) => void }) {
+export function Verduidelijking({ i, v, zet }: { i: number; v: VerduidelijkingData; zet: (w: Partial<VerduidelijkingData>) => void }) {
   const naam = `verduidelijking-${i}`;
   // "Iets anders" staat aan zodra er een eigen antwoord is, of zodra de medewerker erop klikt.
   const [anders, setAnders] = useState(v.eigen.trim() !== "");

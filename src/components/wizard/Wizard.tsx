@@ -18,6 +18,7 @@ import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
 import { Stap3 } from "./Stap3";
 import { Gesprek, gesprekKlaar } from "./Gesprek";
+import { GesprekFase1 } from "./GesprekFase1";
 import { bevestigEigenAntwoorden, ontbrekendeVelden } from "./velden";
 import { Fase2Uitleg } from "./Fase2Uitleg";
 import type { Wijzig } from "./types";
@@ -36,6 +37,15 @@ type CheckVoorstel = {
   vervolgvraag?: string;
 };
 
+type Weergave = "gesprek" | "lijst";
+const WEERGAVE_SLEUTEL = "toolbox-coach.weergave";
+
+/** Focus naar de kop van de huidige vraag in het gesprek; anders naar de kop van de stap. */
+function focusKop(terugval?: HTMLElement | null) {
+  const kop = document.querySelector<HTMLElement>(".gesprek__bericht--actief .gesprek__kop");
+  (kop ?? terugval)?.focus();
+}
+
 export function Wizard() {
   const content = useContent();
   const [conceptId, setConceptId] = useState<string | null>(null);
@@ -51,6 +61,9 @@ export function Wizard() {
   const [actieFout, setActieFout] = useState<string | null>(null);
   const [afgerond, setAfgerond] = useState(false);
   const [laadFout, setLaadFout] = useState<string | null>(null);
+  // Gesprek of formulier: een voorkeur per browser (standaard het gesprek).
+  const [weergave, setWeergave] = useState<Weergave>("gesprek");
+  const weergaveRef = useRef<Weergave>("gesprek");
 
   const dataRef = useRef<WizardData | null>(null);
   const bewaarTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -58,6 +71,29 @@ export function Wizard() {
   const adviesKopRef = useRef<HTMLHeadingElement>(null);
   const foutRef = useRef<HTMLDivElement>(null);
   const eersteRender = useRef(true);
+
+  useEffect(() => {
+    try {
+      const w = window.localStorage.getItem(WEERGAVE_SLEUTEL);
+      if (w === "lijst" || w === "gesprek") {
+        weergaveRef.current = w;
+        setWeergave(w);
+      }
+    } catch {
+      // Geen opslag (bijvoorbeeld in een afgeschermd iframe): standaard het gesprek.
+    }
+  }, []);
+
+  function kiesWeergave(w: Weergave) {
+    weergaveRef.current = w;
+    setWeergave(w);
+    try {
+      window.localStorage.setItem(WEERGAVE_SLEUTEL, w);
+    } catch {
+      // Niet bewaard; geldt dan alleen voor nu.
+    }
+    setTimeout(() => (w === "gesprek" ? focusKop(kopRef.current) : kopRef.current?.focus()), 30);
+  }
 
   // ---------- Laden ----------
   // Met ?concept=<id> ga je verder met dat idee (ook na herladen). Zonder: altijd een nieuw idee,
@@ -110,7 +146,7 @@ export function Wizard() {
   );
 
   const zegCoach = useCallback(
-    (tekst: string) => wijzig((d) => ({ ...d, chat: [...d.chat, { rol: "coach", tekst }] })),
+    (tekst: string, bij?: string) => wijzig((d) => ({ ...d, chat: [...d.chat, { rol: "coach", tekst, ...(bij ? { bij } : {}) }] })),
     [wijzig],
   );
 
@@ -121,7 +157,9 @@ export function Wizard() {
       eersteRender.current = false;
       return;
     }
-    (data.stap === 4 ? adviesKopRef.current : kopRef.current)?.focus();
+    if (data.stap === 4) adviesKopRef.current?.focus();
+    else if (weergaveRef.current === "gesprek") focusKop(kopRef.current);
+    else kopRef.current?.focus();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.stap, advies?.id]);
 
@@ -160,7 +198,7 @@ export function Wizard() {
     if (r) {
       wijzig((x) => ({ ...x, uitgeslotenTools: uitsluiten, tooladvies: { ...r, bron: "coach", geaccepteerd: false } }));
     } else if (uitsluiten.length) {
-      zegCoach("Ik heb geen ander advies. Kies hieronder zelf een tool.");
+      zegCoach("Ik heb geen ander advies. Kies hieronder zelf een tool.", weergaveRef.current === "gesprek" ? "tooladvies" : undefined);
     }
   }
 
@@ -199,7 +237,7 @@ export function Wizard() {
         .filter((v) => v.vervolgvraag && v.zekerheid !== "hoog")
         .map((v) => `Over ${naamVan(v)}: ${v.vervolgvraag}`);
       // In het gesprek stelt de coach zijn twijfel bij de vraag zelf; in de lijst via de chat.
-      const chat = vragen.length && x.weergave === "lijst"
+      const chat = vragen.length && weergaveRef.current === "lijst"
         ? [...x.chat, { rol: "coach" as const, tekst: `Ik heb de checks alvast ingevuld. Bij een paar twijfel ik:\n${vragen.join("\n")}` }]
         : x.chat;
       return { ...x, checks, coachVoorstellen, checksVoorgesteld: true, chat };
@@ -221,7 +259,8 @@ export function Wizard() {
         ...x,
         verduidelijkingGevraagd: true,
         verduidelijking: vragen.map((v) => ({ vraag: v.vraag, antwoord: "", opties: v.opties, gekozen: [], eigen: "" })),
-        chat: vragen.length ? [...x.chat, { rol: "coach", tekst: vragen.map((v) => v.vraag).join("\n") }] : x.chat,
+        // In het gesprek staan de vragen in het gesprek zelf; in het formulier ook in de chat.
+        chat: vragen.length && weergaveRef.current === "lijst" ? [...x.chat, { rol: "coach", tekst: vragen.map((v) => v.vraag).join("\n") }] : x.chat,
       }));
       if (vragen.length) {
         // Naar de eerste vraag: het tekstveld, of de eerste keuzeknop.
@@ -367,8 +406,14 @@ export function Wizard() {
   const props = { content, data, wijzig, coachBezig };
   // Vóór de checks: eerst uitleg over fase 2 (één keer per idee).
   const toonFase2Uitleg = data.stap === 3 && !data.fase2UitlegGezien;
-  // In het gesprek zit de chat bij de vragen zelf; het chatvenster ernaast is dan niet nodig.
-  const chatInGesprek = data.stap === 3 && !toonFase2Uitleg && data.weergave === "gesprek";
+  // Stap 1 t/m 3 als gesprek; de chat zit dan bij de vragen zelf en het chatvenster ernaast is niet nodig.
+  const gesprek = weergave === "gesprek" && data.stap < 4;
+  const toolKlaar =
+    !!data.tooladvies && !!gekozenToolNaam(content, data.tooladvies) && (data.tooladvies.tool !== ANDERE_TOOL || !!data.tooladvies.andereTool?.naam.trim());
+  const beginChecks = () => {
+    wijzig((d) => ({ ...d, fase2UitlegGezien: true }));
+    setTimeout(() => (weergaveRef.current === "gesprek" ? focusKop(kopRef.current) : kopRef.current?.focus()), 30);
+  };
 
   return (
     <>
@@ -387,7 +432,7 @@ export function Wizard() {
       {data.vorigAdviesId && data.stap < 4 && (
         <p className="info">Je past een eerder advies aan. Je vorige antwoorden zijn alvast ingevuld.</p>
       )}
-      <div className={`wizard${chatInGesprek ? " wizard--enkel" : ""}`}>
+      <div className={`wizard${gesprek ? " wizard--enkel" : ""}`}>
         <div className="paneel">
           {data.stap < 4 && (
             <>
@@ -395,11 +440,11 @@ export function Wizard() {
                 <span className="sr-only">Stap {stap.nummer} van 4: </span>
                 {toonFase2Uitleg ? t.fase2_uitleg.titel : stap.titel}
               </h1>
-              {!toonFase2Uitleg && (
-                <p className="instructie">{data.stap === 3 && data.weergave === "gesprek" ? t.gesprek.instructie : stap.instructie}</p>
+              {!toonFase2Uitleg && (!gesprek || data.stap === 3) && (
+                <p className="instructie">{gesprek ? t.gesprek.instructie : stap.instructie}</p>
               )}
-              {data.stap === 3 && !toonFase2Uitleg && (
-                <p className="knoppen knoppen--klein">
+              <p className="knoppen knoppen--klein">
+                {data.stap === 3 && !toonFase2Uitleg && !gesprek && (
                   <button
                     type="button"
                     className="knop knop--tekst"
@@ -410,20 +455,21 @@ export function Wizard() {
                   >
                     {t.fase2_uitleg.opnieuw_lezen}
                   </button>
-                  <button
-                    type="button"
-                    className="knop knop--tekst"
-                    onClick={() => {
-                      setFout(null);
-                      setFoutDetails(null);
-                      setOntbrekend(new Set());
-                      wijzig((d) => (d.weergave === "gesprek" ? { ...d, weergave: "lijst" } : { ...bevestigEigenAntwoorden(content, d), weergave: "gesprek" }));
-                    }}
-                  >
-                    {data.weergave === "gesprek" ? t.gesprek.naar_lijst : t.gesprek.naar_gesprek}
-                  </button>
-                </p>
-              )}
+                )}
+                <button
+                  type="button"
+                  className="knop knop--tekst"
+                  onClick={() => {
+                    setFout(null);
+                    setFoutDetails(null);
+                    setOntbrekend(new Set());
+                    if (!gesprek) wijzig((d) => bevestigEigenAntwoorden(content, d));
+                    kiesWeergave(gesprek ? "lijst" : "gesprek");
+                  }}
+                >
+                  {!gesprek ? t.gesprek.naar_gesprek : data.stap === 3 && !toonFase2Uitleg ? t.gesprek.naar_lijst : t.gesprek.naar_formulier}
+                </button>
+              </p>
             </>
           )}
 
@@ -441,19 +487,34 @@ export function Wizard() {
             </div>
           )}
 
-          {data.stap === 1 && <Stap1 {...props} fout={fout} />}
-          {data.stap === 2 && (
+          {gesprek && (
+            <GesprekFase1
+              {...props}
+              fout={fout}
+              tooladviesNietBeschikbaar={!!coachWeg.tooladvies}
+              onVolgende1={volgendeVanuit1}
+              onVolgende2={volgendeVanuit2}
+              onAnderAdvies={() => vraagTooladvies([...data.uitgeslotenTools, data.tooladvies!.tool])}
+              onBeginChecks={beginChecks}
+              gaNaar={gaNaar}
+              onChat={chat}
+              chatBezig={chatBezig}
+            />
+          )}
+          {gesprek && data.stap === 3 && !toonFase2Uitleg && (
+            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onChat={chat} chatBezig={chatBezig} />
+          )}
+
+          {!gesprek && data.stap === 1 && <Stap1 {...props} fout={fout} />}
+          {!gesprek && data.stap === 2 && (
             <Stap2
               {...props}
               coachNietBeschikbaar={!!coachWeg.tooladvies}
               onAnderAdvies={() => vraagTooladvies([...data.uitgeslotenTools, data.tooladvies!.tool])}
             />
           )}
-          {data.stap === 3 && toonFase2Uitleg && <Fase2Uitleg content={content} />}
-          {data.stap === 3 && !toonFase2Uitleg && data.weergave === "gesprek" && (
-            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onChat={chat} chatBezig={chatBezig} />
-          )}
-          {data.stap === 3 && !toonFase2Uitleg && data.weergave === "lijst" && (
+          {!gesprek && toonFase2Uitleg && <Fase2Uitleg content={content} />}
+          {!gesprek && data.stap === 3 && !toonFase2Uitleg && (
             <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />
           )}
           {data.stap === 4 && advies && (
@@ -478,31 +539,22 @@ export function Wizard() {
             ) : (
               <span />
             )}
-            {data.stap === 1 && (
+            {!gesprek && data.stap === 1 && (
               <button type="button" className="knop" onClick={volgendeVanuit1} disabled={!!coachBezig}>
                 {coachBezig === "verduidelijk" ? "Even geduld…" : "Volgende →"}
               </button>
             )}
-            {data.stap === 2 && (
+            {!gesprek && data.stap === 2 && (
               <button type="button" className="knop" onClick={volgendeVanuit2} disabled={!!coachBezig || !data.tooladvies}>
-                {data.tooladvies && gekozenToolNaam(content, data.tooladvies) && (data.tooladvies.tool !== ANDERE_TOOL || data.tooladvies.andereTool?.naam.trim())
-                  ? `${gekozenToolNaam(content, data.tooladvies)} past, verder →`
-                  : "Volgende →"}
+                {toolKlaar ? `${gekozenToolNaam(content, data.tooladvies!)} past, verder →` : "Volgende →"}
               </button>
             )}
-            {data.stap === 3 && toonFase2Uitleg && (
-              <button
-                type="button"
-                className="knop"
-                onClick={() => {
-                  wijzig((d) => ({ ...d, fase2UitlegGezien: true }));
-                  setTimeout(() => kopRef.current?.focus(), 30);
-                }}
-              >
+            {!gesprek && toonFase2Uitleg && (
+              <button type="button" className="knop" onClick={beginChecks}>
                 {t.fase2_uitleg.knop} →
               </button>
             )}
-            {data.stap === 3 && !toonFase2Uitleg && (data.weergave === "lijst" || (!coachBezig && gesprekKlaar(content, data))) && (
+            {data.stap === 3 && !toonFase2Uitleg && (!gesprek || (!coachBezig && gesprekKlaar(content, data))) && (
               <button type="button" className="knop" onClick={bekijkAdvies} disabled={!!coachBezig}>
                 Bekijk het advies →
               </button>
@@ -510,7 +562,7 @@ export function Wizard() {
           </div>
         </div>
 
-        {!chatInGesprek && <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} uitlegLink={t.hoe_werkt_het.link} />}
+        {!gesprek && <Chatvenster berichten={data.chat} bezig={chatBezig} onVerstuur={chat} uitlegLink={t.hoe_werkt_het.link} />}
       </div>
     </>
   );

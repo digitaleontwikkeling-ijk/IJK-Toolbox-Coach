@@ -196,6 +196,25 @@ gesprek:
     bereken ik het advies met de vaste spelregels van IJK.
   naar_lijst: Toon alle vragen op één pagina
   naar_gesprek: Terug naar het gesprek
+  naar_formulier: Toon als formulier
+  # Fase 1 als gesprek (wat wil je bereiken, vragen van de coach, tooladvies).
+  fase1_intro: >-
+    Hoi! Ik ben de coach. Ik help je eerst een passende tool uit de IJK Toolbox te kiezen. Daarna kijken we samen of
+    en hoe je ermee aan de slag kunt. Beschrijf in eigen woorden welk probleem je wilt oplossen of welk idee je hebt,
+    zonder al aan een tool te denken.
+  fase1_vraag: Welk probleem wil je oplossen, of welk idee heb je?
+  # Koppen van de vraag van de coach (anders dan de kop van de stap erboven).
+  kop_beschrijving: Waar kan ik je mee helpen?
+  kop_tool: Mijn advies
+  kop_fase2: Hoe gaat fase 2 in zijn werk?
+  beschrijving_hulp: >-
+    Bijvoorbeeld: "Ik wil elke week een overzicht van openstaande facturen, zodat mijn team weet wat er openstaat."
+    Gebruik geen echte namen of gegevens van personen.
+  leest: De coach leest je beschrijving…
+  verduidelijking_intro: Beantwoorden is niet verplicht, maar helpt me om je beter te adviseren.
+  niet_beantwoord: (niet beantwoord)
+  tooladvies_intro: "Op basis van wat je vertelt, past deze tool het best:"
+  tool_vraag: Welke tool wil je gebruiken?
 
 privacy:
   titel: Privacy

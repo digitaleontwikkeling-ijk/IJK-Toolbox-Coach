@@ -26,7 +26,7 @@ interface Props extends StapProps {
 type Teksten = StapProps["content"]["teksten"]["gesprek"];
 
 /** De berichten bij één vraag, als bubbels. */
-function Berichten({ berichten, bezig, t }: { berichten: ChatBericht[]; bezig?: boolean; t: Teksten }) {
+export function Berichten({ berichten, bezig, t }: { berichten: ChatBericht[]; bezig?: boolean; t: Teksten }) {
   return (
     <>
       {berichten.map((b, i) => (
@@ -46,7 +46,7 @@ function Berichten({ berichten, bezig, t }: { berichten: ChatBericht[]; bezig?: 
 }
 
 /** Vraag de coach iets, binnen de huidige vraag van het gesprek. */
-function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
+export function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
   bij: string;
   berichten: ChatBericht[];
   bezig: boolean;

@@ -6,8 +6,11 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { login, naarChecks, naarStap3 } from "./hulp";
 
+
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const actief = (page: Page) => page.locator(".gesprek__bericht--actief");
+/** De beantwoorde vragen van de checks (niet die van fase 1). */
+const paren = (page: Page) => page.locator(".gesprek:not(.gesprek--fase1) .gesprek__paar");
 const verder = (page: Page) => actief(page).getByRole("button", { name: /^(Ja, klopt|Volgende) →$/ });
 
 /** Beantwoordt de huidige vraag (het voorstel, "Nee", of de eerste optie) en gaat verder. */
@@ -23,7 +26,7 @@ async function beantwoord(page: Page): Promise<string> {
 }
 
 test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wijzigen en het advies bekijken", async ({ page }) => {
-  await login(page, "Testmedewerker Chris");
+  await login(page, "Testmedewerker Chris", { weergave: "gesprek" });
   await naarStap3(page, "Een overzicht van verlof voor mijn team, met namen van collega's (testscenario).");
   await naarChecks(page, /past, verder/, { weergave: "gesprek" });
 
@@ -47,9 +50,9 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   // Eerste vraag beantwoorden: de vraag schuift naar de geschiedenis, de focus gaat naar de volgende vraag.
   const knoppen = [await beantwoord(page)];
   // De vraag aan de coach en zijn antwoord blijven in de geschiedenis staan, bij die vraag.
-  await expect(page.locator(".gesprek__paar").first()).toContainText("Wat bedoel je hiermee?");
+  await expect(paren(page).first()).toContainText("Wat bedoel je hiermee?");
   await expect(actief(page).locator("h2")).toBeFocused();
-  await expect(page.locator(".gesprek__paar")).toHaveCount(1);
+  await expect(paren(page)).toHaveCount(1);
   await expect(page.locator(".gesprek__bericht--jij").first()).toContainText("Jij");
 
   // Een eerder antwoord wijzigen: de vraag gaat weer open, daarna verder waar je was.
@@ -91,20 +94,84 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
 });
 
 test("het gesprek onthoudt waar je was na herladen", async ({ page }) => {
-  await login(page, "Testmedewerker Chris");
+  await login(page, "Testmedewerker Chris", { weergave: "gesprek" });
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
   await naarChecks(page, /past, verder/, { weergave: "gesprek" });
   await beantwoord(page);
   await beantwoord(page);
   const kop = await actief(page).locator("h2").innerText();
-  await expect(page.locator(".gesprek__paar")).toHaveCount(2);
+  await expect(paren(page)).toHaveCount(2);
   // Het concept wordt kort na een wijziging opgeslagen.
   await page.waitForTimeout(1000);
   await page.reload();
-  await expect(page.locator(".gesprek__paar")).toHaveCount(2);
+  await expect(paren(page)).toHaveCount(2);
   await expect(actief(page).locator("h2")).toHaveText(kop);
 
   // Opruimen: geen onafgemaakt idee achterlaten voor de andere tests (die delen de database).
+  const concept = new URL(page.url()).searchParams.get("concept");
+  expect((await page.request.delete(`/api/concept/${concept}`)).ok()).toBe(true);
+});
+
+test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de uitleg over fase 2", async ({ page }) => {
+  await login(page, "Testmedewerker Chris", { weergave: "gesprek" });
+  // Het gesprek gebruikt de volle breedte; de chat zit in het gesprek.
+  await expect(page.locator("aside.chat")).toHaveCount(0);
+  await expect(actief(page).getByRole("heading", { name: "Waar kan ik je mee helpen?" })).toBeVisible();
+  const r1 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(r1.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
+
+  await actief(page).getByLabel("Jouw probleem of idee").fill("Een overzicht van verlof voor mijn team (testscenario).");
+  await actief(page).getByRole("button", { name: "Volgende →" }).click();
+  // Eventuele vragen van de coach zijn niet verplicht.
+  await expect(actief(page).getByRole("heading", { name: /De coach heeft nog|Mijn advies/ })).toBeVisible();
+  if (await actief(page).getByRole("heading", { name: /De coach heeft nog/ }).isVisible()) {
+    await expect(actief(page).getByRole("heading", { name: /De coach heeft nog/ })).toBeFocused();
+    await actief(page).getByRole("button", { name: "Volgende →" }).click();
+  }
+
+  // Het tooladvies als vraag van de coach, met de beschrijving als antwoord erboven.
+  await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeFocused();
+  await expect(page.locator(".gesprek--fase1, .gesprek").first()).toContainText("Een overzicht van verlof voor mijn team");
+  const toolKnop = actief(page).getByRole("button", { name: /past, verder →$/ });
+  await expect(toolKnop).toBeVisible();
+  const tool = (await toolKnop.innerText()).replace(/ past, verder →$/, "");
+
+  // Een vraag aan de coach bij het tooladvies.
+  await actief(page).getByLabel("Iets niet duidelijk? Vraag het de coach").fill(`Wat mag ik met ${tool}?`);
+  await actief(page).getByRole("button", { name: "Stuur" }).click();
+  await expect(actief(page).locator(".gesprek__bericht--chat.gesprek__bericht--coach")).toContainText(tool);
+  const r2 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(r2.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
+
+  // De beschrijving wijzigen: terug naar die vraag, daarna verder naar het tooladvies.
+  await page.getByRole("button", { name: "Wijzig: Wat wil je bereiken?" }).click();
+  await expect(actief(page).getByRole("heading", { name: "Waar kan ik je mee helpen?" })).toBeFocused();
+  await actief(page).getByLabel("Jouw probleem of idee").fill("Een overzicht van verlof voor mijn team, aangepast (testscenario).");
+  await actief(page).getByRole("button", { name: "Volgende →" }).click();
+  await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeVisible();
+
+  // Verder: de uitleg over fase 2 in het gesprek, daarna de eerste check.
+  await actief(page).getByRole("button", { name: /past, verder →$/ }).click();
+  await expect(actief(page).getByRole("heading", { name: "Hoe gaat fase 2 in zijn werk?" })).toBeFocused();
+  await actief(page).getByRole("button", { name: "Begin met de checks →" }).click();
+  await expect(actief(page).locator("h2")).toContainText("Check 1 van 6");
+  await expect(actief(page).locator("h2")).toBeFocused();
+  // Fase 1 staat erboven, met de gekozen tool en de vraag aan de coach.
+  const fase1 = page.locator(".gesprek--fase1");
+  await expect(fase1).toContainText("aangepast");
+  await expect(fase1).toContainText(`Wat mag ik met ${tool}?`);
+  await expect(fase1.locator(".gesprek__bericht--jij").last()).toContainText(tool);
+
+  // Naar het formulier en terug: de voorkeur geldt voor de hele wizard.
+  await page.getByRole("button", { name: "Toon alle vragen op één pagina" }).click();
+  await expect(page.locator("aside.chat")).toBeVisible();
+  await page.getByRole("button", { name: "← Terug" }).click();
+  await expect(page.getByRole("button", { name: "Terug naar het gesprek" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mijn advies" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
+  await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeVisible();
+
+  // Opruimen: geen onafgemaakt idee achterlaten voor de andere tests.
   const concept = new URL(page.url()).searchParams.get("concept");
   expect((await page.request.delete(`/api/concept/${concept}`)).ok()).toBe(true);
 });
