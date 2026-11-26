@@ -183,10 +183,10 @@ gesprek:
   chat_label: Iets niet duidelijk? Vraag het mij
   chat_label_klaar: Nog een vraag voordat je het advies bekijkt?
   chat_label_advies: Vragen over het advies? Stel ze aan mij
-  chat_plaatshouder_advies: "Bijvoorbeeld: wat moet ik nu regelen?"
+  chat_plaatshouder_advies: Typ hier je vraag
   terugkijken: Lees het gesprek terug
-  advies_intro: Dit is mijn advies. De uitkomst is berekend met de vaste spelregels van IJK, niet door mij.
-  chat_plaatshouder: "Bijvoorbeeld: wat bedoel je met lezen?"
+  advies_intro: Dit is mijn advies. Het volgt uit de vaste spelregels van IJK; de uitkomst bepaal ik niet zelf.
+  chat_plaatshouder: Typ hier je vraag
   chat_stuur: Stuur
   denkt: Even denken…
   eerdere_berichten: "Eerdere berichten in ons gesprek ({aantal})"
@@ -196,7 +196,7 @@ gesprek:
   jouw_antwoord: "Jouw antwoord:"
   klaar: >-
     Dat waren alle vragen. Kijk je antwoorden hierboven nog even na; met Wijzig pas je er een aan. Klopt alles? Dan
-    bereken ik het advies met de vaste spelregels van IJK.
+    zoek ik met de vaste spelregels van IJK uit welk advies bij je antwoorden past.
   naar_lijst: Toon alle vragen op één pagina
   naar_gesprek: Terug naar het gesprek
   naar_formulier: Toon als formulier
@@ -223,7 +223,7 @@ gesprek:
   andere_tool_knop: Stel een andere tool voor
   niet_beschikbaar: Ik kan je nu even niet helpen. Je kunt gewoon verder door zelf te kiezen.
   # Op de adviescard in het gesprek.
-  kleur_hint: Deze kleur is berekend met de vaste spelregels van IJK, niet door mij.
+  kleur_hint: Deze kleur volgt uit de vaste spelregels van IJK; ik bepaal hem niet zelf.
   geen_vervolgactie: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan mij.
   fase2_hoe:
     - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.

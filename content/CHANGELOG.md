@@ -7,6 +7,9 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
+- Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Gesprek: geen "berekenen" meer in de zinnen van de coach ("Dan zoek ik met de vaste spelregels van IJK uit welk
+  advies bij je antwoorden past", "Het volgt uit de vaste spelregels van IJK; de uitkomst bepaal ik niet zelf").
 - In het gesprek praat de coach zelf (ik-vorm): "Ik heb nog een vraag", "Ik zoek een passende tool voor je…",
   "Dit adviseer ik", "Vraag het mij", de uitleg over fase 2 en de adviescard ("niet door mij"). Nieuwe teksten onder
   `gesprek`; het formulier en de uitlegpagina "Hoe werkt de coach?" blijven ongewijzigd.
