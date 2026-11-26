@@ -39,3 +39,27 @@ test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet te
   await expect(beschrijving).toHaveValue("");
   await expect(page.getByText("Je hebt nog een onafgemaakt idee")).toHaveCount(0);
 });
+
+test("een onafgemaakt idee kun je ook verwijderen", async ({ page }) => {
+  await login(page, "Testmedewerker Chris");
+  const beschrijving = page.getByLabel("Jouw probleem of idee");
+  const opgeslagen = page.waitForResponse((r) => r.request().method() === "PUT" && r.url().includes("/api/concept/"));
+  await beschrijving.fill("Een idee dat ik niet afmaak (testscenario).");
+  await opgeslagen;
+
+  await page.getByRole("navigation", { name: "Hoofdmenu" }).getByRole("link", { name: "Nieuw idee" }).click();
+  await expect(page.locator(".info[role=status]")).toContainText("Je hebt nog een onafgemaakt idee");
+  // Eerst annuleren in de bevestiging: er gebeurt niets.
+  page.once("dialog", (d) => void d.dismiss());
+  await page.getByRole("button", { name: "Verwijder dat idee" }).click();
+  await expect(page.getByRole("link", { name: "Verder met dat idee" })).toBeVisible();
+  // Dan bevestigen: het idee is weg en de melding komt niet terug.
+  page.once("dialog", (d) => void d.accept());
+  await page.getByRole("button", { name: "Verwijder dat idee" }).click();
+  await expect(page.getByText("Je onafgemaakte idee is verwijderd.")).toBeVisible();
+  await expect(page.getByText("Je hebt nog een onafgemaakt idee")).toHaveCount(0);
+  await expect(beschrijving).toBeFocused();
+  await page.getByRole("navigation", { name: "Hoofdmenu" }).getByRole("link", { name: "Nieuw idee" }).click();
+  await expect(beschrijving).toHaveValue("");
+  await expect(page.getByText("Je hebt nog een onafgemaakt idee")).toHaveCount(0);
+});

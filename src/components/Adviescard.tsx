@@ -200,7 +200,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           <div aria-live="polite">
             {advies.status === "advies_gegeven" ? (
               <>
-                <p>{ikVorm && kleur.vervolgactie === "alleen_vastleggen" ? t.gesprek.geen_vervolgactie : actie?.uitleg}</p>
+                <p>{(ikVorm && t.gesprek.vervolgactie_uitleg[kleur.vervolgactie]) || actie?.uitleg}</p>
                 {contactOpnieuw && <p className="foutmelding">{t.contact_opnieuw.melding}</p>}
               </>
             ) : (

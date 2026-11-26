@@ -44,6 +44,9 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page.getByText("Dat waren alle vragen.")).toBeVisible();
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
   await expect(page.getByRole("heading", { name: "Eerst toetsen", level: 2 })).toBeVisible();
+  // In het gesprek: de tekst bij Eerst toetsen verwijst naar het chatveld eronder, zonder knop "Vraag stellen".
+  await expect(page.locator(".adviescard")).toContainText("Stel deze hieronder dan gerust!");
+  await expect(page.getByRole("button", { name: "Vraag stellen" })).toHaveCount(0);
   const ref = (await page.locator(".adviescard__voet strong").innerText()).trim();
   expect((await new AxeBuilder({ page }).withTags(["wcag2aa", "wcag21aa"]).analyze()).violations).toEqual([]);
   await page.getByRole("button", { name: "Aanvraag indienen voor toetsing" }).click();

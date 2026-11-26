@@ -105,6 +105,7 @@ export function Wizard() {
   // Met ?concept=<id> ga je verder met dat idee (ook na herladen). Zonder: altijd een nieuw idee,
   // met de vraag of je verder wilt met een onafgemaakt idee als dat er is.
   const [vorige, setVorige] = useState<ConceptDto | null>(null);
+  const [vorigeVerwijderd, setVorigeVerwijderd] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -363,6 +364,19 @@ export function Wizard() {
     window.location.href = volledigPad(afgerondPad(advies.referentie));
   }
 
+  /** Het onafgemaakte idee weggooien (na bevestiging); de melding komt daarna niet meer terug. */
+  async function verwijderVorige() {
+    if (!vorige || !window.confirm(content!.teksten.onafgemaakt.bevestig)) return;
+    try {
+      await api(`/api/concept/${vorige.id}`, { method: "DELETE" });
+      setVorige(null);
+      setVorigeVerwijderd(true);
+      setTimeout(() => document.getElementById("beschrijving")?.focus(), 30);
+    } catch {
+      setFout("Het onafgemaakte idee kon niet worden verwijderd. Probeer het opnieuw.");
+    }
+  }
+
   async function opnieuwBeginnen() {
     if (!afgerond && !window.confirm("Weet je zeker dat je opnieuw wilt beginnen? Je antwoorden en het gesprek worden gewist. Een gegeven advies blijft in het register.")) return;
     if (conceptId && !afgerond) await api(`/api/concept/${conceptId}`, { method: "DELETE" }).catch(() => undefined);
@@ -455,9 +469,13 @@ export function Wizard() {
               vorige.data.beschrijving.length > 80 ? `${vorige.data.beschrijving.slice(0, 80)}…` : vorige.data.beschrijving,
             )}
           </p>
-          <a className="knop knop--secundair" href={volledigPad(wizardPad(vorige.id))}>{t.onafgemaakt.knop}</a>
+          <p className="knoppen knoppen--klein" style={{ margin: 0 }}>
+            <a className="knop knop--secundair" href={volledigPad(wizardPad(vorige.id))}>{t.onafgemaakt.knop}</a>
+            <button type="button" className="knop knop--tekst" onClick={verwijderVorige}>{t.onafgemaakt.verwijderen}</button>
+          </p>
         </div>
       )}
+      {vorigeVerwijderd && data.stap === 1 && !data.beschrijving.trim() && <p className="info" role="status">{t.onafgemaakt.verwijderd}</p>}
       {data.vorigAdviesId && data.stap < 4 && (
         <p className="info">Je past een eerder advies aan. Je vorige antwoorden zijn alvast ingevuld.</p>
       )}
@@ -539,7 +557,6 @@ export function Wizard() {
                   onActie={voerActieUit}
                   actieBezig={actieBezig}
                   actieFout={actieFout}
-                  onVraag={() => document.getElementById("gesprek-chat-advies")?.focus()}
                   ikVorm
                   onOpnieuw={opnieuwBeginnen}
                   onAfronden={afronden}
