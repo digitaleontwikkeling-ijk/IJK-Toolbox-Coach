@@ -91,7 +91,8 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   const advies = actief(page);
   await expect(advies.locator(".adviescard")).toBeVisible();
   await expect(page.locator("#advies-kop")).toBeFocused();
-  await expect(advies).toContainText("berekend met de vaste spelregels van IJK");
+  await expect(advies).toContainText("Het volgt uit de vaste spelregels van IJK");
+  await expect(page.getByText("Dat waren alle vragen.")).toHaveCount(0);
   await expect(page.locator("aside.chat")).toHaveCount(0);
   await expect(paren(page).first()).toBeHidden();
   await page.getByText("Lees het gesprek terug").click();
