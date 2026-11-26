@@ -105,6 +105,9 @@ fase2_uitleg:
 onafgemaakt:
   melding: "Je hebt nog een onafgemaakt idee: \"{beschrijving}\""
   knop: Verder met dat idee
+  verwijderen: Verwijder dat idee
+  bevestig: "Weet je zeker dat je je onafgemaakte idee wilt verwijderen? Je antwoorden en het gesprek worden gewist."
+  verwijderd: Je onafgemaakte idee is verwijderd.
 
 # Knop en bevestiging om de wizard af te ronden als er niets meer te doen is.
 afronden:
@@ -224,7 +227,14 @@ gesprek:
   niet_beschikbaar: Ik kan je nu even niet helpen. Je kunt gewoon verder door zelf te kiezen.
   # Op de adviescard in het gesprek.
   kleur_hint: Deze kleur volgt uit de vaste spelregels van IJK; ik bepaal hem niet zelf.
-  geen_vervolgactie: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan mij.
+  # "Wat nu?" op de adviescard in het gesprek, per vervolgactie (anders de tekst onder vervolgacties).
+  # In het gesprek staat het chatveld onder de kaart, daarom geen knop "Vraag stellen".
+  vervolgactie_uitleg:
+    toetsing: >-
+      Laat je idee eerst toetsen. Je aanvraag gaat naar de juiste toetser(s). Zij krijgen hier een melding van.
+      Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
+    alleen_vastleggen: >-
+      Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan mij.
   fase2_hoe:
     - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.
     - Jij controleert de antwoorden en past ze aan waar nodig. Twijfel ik, dan vraag ik het je.

@@ -339,7 +339,7 @@ export const tekstenSchema = z.object({
   vervolgacties: z.record(z.enum(VERVOLGACTIES), z.object({ knop: z.string(), uitleg: tekst })),
   statussen: z.record(z.enum(STATUSSEN), tekst),
   afronden: z.object({ knop: tekst, bevestiging: tekst }),
-  onafgemaakt: z.object({ melding: tekst, knop: tekst }),
+  onafgemaakt: z.object({ melding: tekst, knop: tekst, verwijderen: tekst, bevestig: tekst, verwijderd: tekst }),
   fase2_uitleg: z.object({
     titel: tekst,
     intro: tekst,
@@ -444,7 +444,7 @@ export const tekstenSchema = z.object({
     niet_beschikbaar: tekst,
     fase2_hoe: z.array(tekst).min(1),
     kleur_hint: tekst,
-    geen_vervolgactie: tekst,
+    vervolgactie_uitleg: z.record(id, tekst).default({}),
     kop_beschrijving: tekst,
     kop_tool: tekst,
     kop_fase2: tekst,
