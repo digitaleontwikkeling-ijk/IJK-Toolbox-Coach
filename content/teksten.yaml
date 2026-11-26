@@ -177,10 +177,6 @@ gesprek:
     Ik loop zes checks met je door, één vraag tegelijk. Ik kon nu geen antwoorden voorstellen, dus je kiest zelf.
   kop_check: "Check {nummer} van {totaal} · {naam}"
   kop_aanvullend: "Aanvullende vraag {nummer}"
-  voorstel: "Op basis van je beschrijving denk ik: {antwoord}. Klopt dat?"
-  voorstel_onzeker: "Ik weet het niet zeker, maar ik denk: {antwoord}. Kijk je even mee?"
-  voorstel_tool: "Omdat de gekozen tool AI gebruikt, heb ik alvast gekozen: {antwoord}. Klopt dat?"
-  twijfel: "Ik twijfel nog: {vraag}"
   al_bekend: "Dit hoef ik niet meer te vragen, want het volgt uit je antwoorden:"
   wat_bedoel_je: Wat bedoel je hiermee?
   chat_label: Iets niet duidelijk? Vraag het mij
@@ -193,7 +189,6 @@ gesprek:
   chat_stuur: Stuur
   denkt: Even denken…
   eerdere_berichten: "Eerdere berichten in ons gesprek ({aantal})"
-  bevestig: Ja, klopt
   volgende: Volgende
   wijzig: Wijzig
   jouw_antwoord: "Jouw antwoord:"
