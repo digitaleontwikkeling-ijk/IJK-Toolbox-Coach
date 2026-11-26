@@ -8,6 +8,7 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Gesprek, adviescard: bij elke uitkomst "Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!".
 - Melding "Je hebt nog een onafgemaakt idee": ook een knop "Verwijder dat idee" (met bevestiging).
 - Gesprek, adviescard: geen knop "Vraag stellen" (het chatveld staat eronder); bij *Eerst toetsen* de tekst "Laat je
   idee eerst toetsen. Je aanvraag gaat naar de juiste toetser(s). Zij krijgen hier een melding van. Heb jij nog een

@@ -129,3 +129,12 @@ describe("oefencoach in het gesprek", () => {
     expect(r.antwoord).not.toContain("Schrijven");
   });
 });
+
+describe("adviescard in het gesprek", () => {
+  it("verwijst bij elke uitkomst naar het chatveld eronder", () => {
+    const vervolgacties = new Set(content.regelset.kleuren.map((k) => k.vervolgactie));
+    for (const v of vervolgacties) {
+      expect(content.teksten.gesprek.vervolgactie_uitleg[v], v).toContain("Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!");
+    }
+  });
+});

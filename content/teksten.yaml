@@ -230,11 +230,18 @@ gesprek:
   # "Wat nu?" op de adviescard in het gesprek, per vervolgactie (anders de tekst onder vervolgacties).
   # In het gesprek staat het chatveld onder de kaart, daarom geen knop "Vraag stellen".
   vervolgactie_uitleg:
+    accountaanvraag: >-
+      Je kunt direct aan de slag. Vraag een account aan voor de geadviseerde tool.
+      Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
+    accountaanvraag_met_voorwaarden: >-
+      Je kunt aan de slag als je je aan de voorwaarden houdt. De voorwaarden gaan mee met je aanvraag.
+      Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
     toetsing: >-
       Laat je idee eerst toetsen. Je aanvraag gaat naar de juiste toetser(s). Zij krijgen hier een melding van.
       Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
     alleen_vastleggen: >-
-      Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan mij.
+      Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan.
+      Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
   fase2_hoe:
     - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.
     - Jij controleert de antwoorden en past ze aan waar nodig. Twijfel ik, dan vraag ik het je.
