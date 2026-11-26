@@ -47,6 +47,8 @@ npx playwright test --trace off                  # e2e (draait op de build)
 NEXT_PUBLIC_BASE_PATH=/IJK-Toolbox-Coach npm run -s demo:build && npm run -s test:demo
 ```
 De statische demo (GitHub Pages) wordt bij elke push naar `main` gebouwd door `.github/workflows/demo-pages.yml`.
+Afspraak (IJK): is een wijziging klaar en slagen alle stappen hierboven, maak dan zonder te vragen een pull request
+naar `main` en voeg die samen (merge), zodat de demo wordt bijgewerkt. Controleer daarna of de Pages-workflow slaagt.
 
 ## Waar staat wat
 | Map | Inhoud |
