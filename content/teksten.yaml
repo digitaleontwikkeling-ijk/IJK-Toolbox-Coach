@@ -247,10 +247,41 @@ gesprek:
     alleen_vastleggen: >-
       Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan.
       Heb jij nog een aanvullende vraag? Stel deze hieronder dan gerust!
-  fase2_hoe:
-    - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.
-    - Jij controleert de antwoorden en past ze aan waar nodig. Twijfel ik, dan vraag ik het je.
-    - Daarna berekent de tool je advies met de vaste spelregels van IJK. Ik bepaal de uitkomst niet.
+  # Uitleg vóór fase 2 in het gesprek (de coach vertelt zelf). Het formulier gebruikt fase2_uitleg.
+  fase2:
+    intro: >-
+      Dan gaan we nu verder met de volgende stap: We toetsen jouw use case aan de compliance- en architectuurnormen
+      van IJK.
+    hoe_titel: Hoe werkt het?
+    hoe: >-
+      Ik stel je verschillende vragen. Voor sommige vragen vul ik de antwoorden alvast in op basis van de eerder door
+      jou gegeven informatie. Jij controleert de antwoorden en past ze aan waar nodig. Voor andere vragen geldt dat ik
+      geen suggestie doe en van jou een antwoord (of eventueel meerdere antwoorden) verwacht.
+    daarna_titel: Wat gebeurt er daarna?
+    daarna_intro: "Je krijgt een advies in één van vier kleuren:"
+    # Per vervolgactie (de naam van de uitkomst staat ervoor, uit de regelset).
+    per_vervolgactie:
+      accountaanvraag: >-
+        Als je een tool gaat gebruiken waar een licentie voor nodig is, dan verstuur ik direct een aanvraag voor je.
+      accountaanvraag_met_voorwaarden: Je vraagt een account aan. De voorwaarden stuur ik mee met het advies.
+      toetsing: >-
+        Je aanvraag gaat naar de juiste toetser(s). Zij beoordelen eerst jouw use case op de te toetsen onderdelen,
+        geven een advies (of nemen een besluit) en koppelen dit aan je terug.
+      alleen_vastleggen: >-
+        Op basis van de door jou gedeelde informatie wordt de use case niet geaccepteerd. Je krijgt een alternatief
+        voorgeschoteld door mij of Team Digitale Ontwikkeling neemt contact met je op.
+    verder_titel: Wat is verder goed om te weten?
+    verder:
+      - >-
+        Je advies krijgt een referentienummer en komt in het adviesregister, met je naam en e-mailadres, zodat de
+        toetsers weten wie ze kunnen benaderen bij vragen.
+      - >-
+        Bij 'Mijn aanvragen' kun je de status van jouw ingediende use case volgen en zie je het advies en/of besluit
+        van de toetsers.
+      - >-
+        Verandert er later iets aan je idee? Dan leg je dit weer voor aan de IJK Toolbox Coach. Dit geldt ook als jouw
+        use case voor een breder doeleinde of door een grotere groep collega's gaat worden ingezet.
+    knop: Vervolg de vragen
   niet_beantwoord: (niet beantwoord)
   tooladvies_intro: "Op basis van wat je vertelt, past deze tool het best bij jouw use case:"
   tool_vraag: Welke tool wil je gebruiken?

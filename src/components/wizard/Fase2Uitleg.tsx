@@ -7,6 +7,7 @@ import { kleurVan, type ContentDto } from "../client";
 
 /** Met `ikVorm` (in het gesprek) vertelt de coach zelf hoe het werkt. */
 export function Fase2Uitleg({ content, ikVorm = false }: { content: ContentDto; ikVorm?: boolean }) {
+  if (ikVorm) return <Fase2UitlegGesprek content={content} />;
   const t = content.teksten.fase2_uitleg;
   const r = content.regelset;
   return (
@@ -14,7 +15,7 @@ export function Fase2Uitleg({ content, ikVorm = false }: { content: ContentDto; 
       <p>{t.intro}</p>
 
       <h3>{t.hoe_titel}</h3>
-      <ol>{(ikVorm ? content.teksten.gesprek.fase2_hoe : t.hoe).map((h) => <li key={h}>{h}</li>)}</ol>
+      <ol>{t.hoe.map((h) => <li key={h}>{h}</li>)}</ol>
 
       <h3>{t.vragen_titel}</h3>
       <p>{t.vragen_intro}</p>
@@ -42,6 +43,36 @@ export function Fase2Uitleg({ content, ikVorm = false }: { content: ContentDto; 
         })}
       </ul>
       <p>{t.register}</p>
+    </div>
+  );
+}
+
+/** In het gesprek vertelt de coach zelf hoe fase 2 werkt (teksten: gesprek.fase2). */
+function Fase2UitlegGesprek({ content }: { content: ContentDto }) {
+  const t = content.teksten.gesprek.fase2;
+  return (
+    <div className="fase-uitleg">
+      <p>{t.intro}</p>
+
+      <h3>{t.hoe_titel}</h3>
+      <p>{t.hoe}</p>
+
+      <h3>{t.daarna_titel}</h3>
+      <p>{t.daarna_intro}</p>
+      <ul className="fase-uitleg__uitkomsten">
+        {content.regelset.kleuren.map((k) => {
+          const kleur = kleurVan(content, k.id)!;
+          return (
+            <li key={k.id}>
+              <span className="badge-kleur" style={{ background: kleur.hex, color: kleur.tekstkleur }}>{k.uitkomst}</span>{" "}
+              {t.per_vervolgactie[k.vervolgactie] ?? content.teksten.fase2_uitleg.per_vervolgactie[k.vervolgactie]}
+            </li>
+          );
+        })}
+      </ul>
+
+      <h3>{t.verder_titel}</h3>
+      {t.verder.map((alinea) => <p key={alinea}>{alinea}</p>)}
     </div>
   );
 }

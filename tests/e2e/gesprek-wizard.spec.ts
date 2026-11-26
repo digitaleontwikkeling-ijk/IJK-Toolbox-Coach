@@ -189,8 +189,9 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   await expect(actief(page).getByRole("heading", { name: "Hoe gaat fase 2 in zijn werk?" })).toBeFocused();
   // De coach praat zelf: geen "de coach" in zijn beurt.
   await expect(actief(page)).not.toContainText(/de coach/i);
-  await expect(actief(page)).toContainText("Ik ben een AI agent.");
-  await actief(page).getByRole("button", { name: "Begin met de checks →" }).click();
+  await expect(actief(page)).toContainText("We toetsen jouw use case aan de compliance- en architectuurnormen van IJK.");
+  await expect(actief(page).getByRole("heading", { name: "Wat is verder goed om te weten?" })).toBeVisible();
+  await actief(page).getByRole("button", { name: "Vervolg de vragen →" }).click();
   await expect(actief(page).locator("h2")).toContainText("Check 1 van 6");
   await expect(actief(page).locator("h2")).toBeFocused();
   // Fase 1 staat erboven, met de gekozen tool en de vraag aan de coach.

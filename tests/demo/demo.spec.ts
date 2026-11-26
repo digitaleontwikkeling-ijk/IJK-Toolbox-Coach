@@ -30,7 +30,7 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await page.getByRole("button", { name: "HubBI past, verder →" }).click();
   // Eerst de uitleg over fase 2.
   await expect(page.getByRole("heading", { name: "Fase 2 · Mag ik dit doen?" })).toBeVisible();
-  await page.getByRole("button", { name: "Begin met de checks →" }).click();
+  await page.getByRole("button", { name: "Vervolg de vragen →" }).click();
   // Het gesprek: de coach stelt de vragen één voor één; zijn voorstellen bevestig je, de rest op "Nee".
   const actief = page.locator(".gesprek__bericht--actief");
   await expect(actief.getByLabel("Persoonsgegevens", { exact: true })).toBeChecked();
