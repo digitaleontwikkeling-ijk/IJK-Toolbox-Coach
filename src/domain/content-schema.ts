@@ -411,7 +411,6 @@ export const tekstenSchema = z.object({
     kop_check: tekst,
     kop_aanvullend: tekst,
     al_bekend: tekst,
-    wat_bedoel_je: tekst,
     chat_label: tekst,
     chat_label_klaar: tekst,
     chat_label_advies: tekst,

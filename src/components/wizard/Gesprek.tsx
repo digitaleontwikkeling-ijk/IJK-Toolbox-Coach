@@ -167,17 +167,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
             </ul>
           </div>
         )}
-        {b.hulp.length > 0 && (
-          <details className="gesprek__hulp">
-            <summary>{t.wat_bedoel_je}</summary>
-            {b.hulp.map((h, i) => (
-              <p key={i}>
-                {h.kop && <strong>{h.kop}: </strong>}
-                {h.tekst}
-              </p>
-            ))}
-          </details>
-        )}
+        {/* Geen "Wat bedoel je hiermee?": de i bij een antwoord legt het uit, en anders vraag je het de coach. */}
         <Chat bij={b.id} berichten={berichtenBij(b.id)} bezig={chatBezig} label={t.chat_label} t={t} onVerstuur={onChat} />
         <div className="knoppen">
           <button type="button" className="knop" disabled={b.gekozen.length === 0} onClick={() => bevestig(b)}>

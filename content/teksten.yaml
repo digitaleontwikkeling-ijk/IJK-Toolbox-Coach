@@ -178,7 +178,6 @@ gesprek:
   kop_check: "Check {nummer} van {totaal} · {naam}"
   kop_aanvullend: "Aanvullende vraag {nummer}"
   al_bekend: "Dit hoef ik niet meer te vragen, want het volgt uit je antwoorden:"
-  wat_bedoel_je: Wat bedoel je hiermee?
   chat_label: Iets niet duidelijk? Vraag het mij
   chat_label_klaar: Nog een vraag voordat je het advies bekijkt?
   chat_label_advies: Vragen over het advies? Stel ze aan mij
