@@ -79,7 +79,7 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   await page.getByRole("button", { name: /Er is iets veranderd/ }).first().click();
   await page.waitForURL(/\/wizard\?concept=/);
   await expect(page.getByText("Je past een eerder advies aan")).toBeVisible();
-  await expect(page.getByLabel("Jouw probleem of idee")).toHaveValue(/verzuimdashboard/);
+  await expect(page.getByLabel("Jouw use case")).toHaveValue(/verzuimdashboard/);
 
   await page.getByRole("button", { name: "Volgende →" }).click();
   await naarChecks(page, "Claude Code past, verder →");

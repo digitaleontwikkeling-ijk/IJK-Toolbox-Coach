@@ -4,7 +4,7 @@ import { geenRodeVlaggen, kies, login, naarChecks } from "./hulp";
 
 test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet terug", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
-  const beschrijving = page.getByLabel("Jouw probleem of idee");
+  const beschrijving = page.getByLabel("Jouw use case");
   await expect(beschrijving).toHaveValue("");
   await expect(page).toHaveURL(/\/wizard\?concept=/);
 
@@ -42,7 +42,7 @@ test("Nieuw idee is leeg; onafgemaakt idee hervatten; afgerond idee komt niet te
 
 test("een onafgemaakt idee kun je ook verwijderen", async ({ page }) => {
   await login(page, "Testmedewerker Chris");
-  const beschrijving = page.getByLabel("Jouw probleem of idee");
+  const beschrijving = page.getByLabel("Jouw use case");
   const opgeslagen = page.waitForResponse((r) => r.request().method() === "PUT" && r.url().includes("/api/concept/"));
   await beschrijving.fill("Een idee dat ik niet afmaak (testscenario).");
   await opgeslagen;
