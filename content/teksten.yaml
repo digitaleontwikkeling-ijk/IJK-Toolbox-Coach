@@ -224,6 +224,14 @@ gesprek:
   vult_checks: Ik vul de checks alvast voor je in…
   tool_label: Dit adviseer ik
   niet_beschikbaar: Ik kan je nu even niet helpen. Je kunt gewoon verder door zelf te kiezen.
+  # Uitleg onder een vraag in het gesprek: alleen bij deze vragen (een definitie of voorbeeld van wat er bedoeld wordt).
+  # Zinnen over waarom een vraag komt ("Je gaf aan dat …") staan niet in het gesprek; de coach kent ze wel.
+  uitleg_bij:
+    - bijzondere_persoonsgegevens
+    - ai_invloed
+    - ai_doorslaggevend
+    - ai_toezicht
+    - ai_uitlegbaarheid
   # Op de adviescard in het gesprek.
   kleur_hint: Deze kleur volgt uit de vaste spelregels van IJK; ik bepaal hem niet zelf.
   # "Wat nu?" op de adviescard in het gesprek, per vervolgactie (anders de tekst onder vervolgacties).
