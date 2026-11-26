@@ -8,6 +8,8 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Gesprek: geen automatische uitleg van de coach onder de adviescard (herhaalde de kaart); de chat blijft. In het
+  formulier komt de uitleg nog in het chatvenster.
 - Adviescard voor de medewerker compacter: privacy en AI als korte regel; de toelichting, je antwoorden en de
   disclaimer onder "Meer over dit advies" (ingeklapt). In het gesprek niet nog eens "Deze kleur volgt uit de vaste
   spelregels …". Toetsers en beheerders zien de kaart volledig.
