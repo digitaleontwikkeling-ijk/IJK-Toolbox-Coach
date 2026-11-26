@@ -204,8 +204,9 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Ook het advies (stap 4) staat in het gesprek: de adviescard als laatste beurt van de coach, met de uitleg van de
   coach en de chat eronder. Het gesprek tot dan staat erboven, ingeklapt ("Lees het gesprek terug") en zonder *Wijzig*;
   aanpassen gaat met "← Terug".
-- Gesprek of formulier is een voorkeur per browser (localStorage `toolbox-coach.weergave`, standaard het gesprek),
-  te wisselen met "Toon als formulier" / "Toon alle vragen op één pagina" en "Terug naar het gesprek".
+- Het gesprek is de weergave voor medewerkers; er is geen knop meer naar het formulier (keuze IJK). Het formulier
+  bestaat nog (voorkeur in localStorage `toolbox-coach.weergave`, gebruikt door de tests); wie die voorkeur nog heeft,
+  ziet "Terug naar het gesprek".
   Geen opslag (bijvoorbeeld in een afgeschermd iframe): altijd het gesprek.
 
 - De checks verschijnen standaard als gesprek: de coach stelt de vragen één voor één (`src/components/wizard/Gesprek.tsx`).

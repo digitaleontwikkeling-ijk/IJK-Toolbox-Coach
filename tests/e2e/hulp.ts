@@ -143,9 +143,7 @@ export async function naarChecks(page: Page, knop: string | RegExp = /past, verd
   if ((opties.weergave ?? "lijst") === "lijst") await naarLijst(page);
 }
 
-/** Stap 3: van het gesprek naar de lijst met alle vragen (als het gesprek open staat). */
+/** Stap 3 in het formulier (voorkeur gezet door `login`): de lijst met alle vragen staat open. */
 export async function naarLijst(page: Page) {
-  const knop = page.getByRole("button", { name: "Toon alle vragen op één pagina" });
-  if (await knop.isVisible()) await knop.click();
   await expect(page.getByRole("button", { name: "Terug naar het gesprek" })).toBeVisible();
 }

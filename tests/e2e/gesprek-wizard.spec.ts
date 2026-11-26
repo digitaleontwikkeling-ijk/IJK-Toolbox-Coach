@@ -78,14 +78,8 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   const r2 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r2.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 
-  // De lijst laat dezelfde antwoorden zien; terug naar het gesprek verandert niets.
-  await page.getByRole("button", { name: "Toon alle vragen op één pagina" }).click();
-  await expect(page.getByRole("heading", { name: "De zes checks" })).toBeVisible();
-  // In de lijst staat het chatvenster weer naast de vragen, met het hele gesprek.
-  await expect(page.locator("aside.chat")).toContainText("Wat bedoel je hiermee?");
-  await expect(page.locator(".voortgang")).toContainText(/Alle \d+ vragen zijn beantwoord/);
-  await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
-  await expect(page.getByText("Dat waren alle vragen.")).toBeVisible();
+  // In het gesprek geen knop naar het formulier.
+  await expect(page.getByRole("button", { name: /Toon als formulier|Toon alle vragen/ })).toHaveCount(0);
 
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
 
@@ -116,12 +110,7 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   const r3 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(r3.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
 
-  // Ook bij het advies kun je naar het formulier (met het chatvenster ernaast) en terug.
-  await page.getByRole("button", { name: "Toon als formulier" }).click();
-  await expect(page.locator("aside.chat")).toContainText("Wat moet ik nu doen?");
-  await expect(page.locator(".adviescard")).toBeVisible();
-  await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
-  await expect(actief(page).locator(".adviescard")).toBeVisible();
+  await expect(page.getByRole("button", { name: /Toon als formulier/ })).toHaveCount(0);
 
   // Terug naar de checks: het gesprek staat er nog, met alle antwoorden.
   await page.getByRole("button", { name: "← Terug" }).click();
@@ -206,14 +195,16 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   await expect(fase1).toContainText(`Wat mag ik met ${tool}?`);
   await expect(fase1.locator(".gesprek__bericht--jij").last()).toContainText(tool);
 
-  // Naar het formulier en terug: de voorkeur geldt voor de hele wizard.
-  await page.getByRole("button", { name: "Toon alle vragen op één pagina" }).click();
+  // Geen knop naar het formulier. Staat de voorkeur nog op formulier (eerdere versie), dan kun je terug.
+  await expect(page.getByRole("button", { name: /Toon als formulier|Toon alle vragen/ })).toHaveCount(0);
+  await page.evaluate(() => window.localStorage.setItem("toolbox-coach.weergave", "lijst"));
+  // Het concept wordt kort na een wijziging opgeslagen.
+  await page.waitForTimeout(1000);
+  await page.reload();
   await expect(page.locator("aside.chat")).toBeVisible();
-  await page.getByRole("button", { name: "← Terug" }).click();
-  await expect(page.getByRole("button", { name: "Terug naar het gesprek" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Mijn advies" })).toHaveCount(0);
   await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
-  await expect(actief(page).getByRole("heading", { name: "Mijn advies" })).toBeVisible();
+  await expect(actief(page).locator("h2")).toContainText(/Check \d van 6/);
+  await expect(page.locator("aside.chat")).toHaveCount(0);
 
   // Opruimen: geen onafgemaakt idee achterlaten voor de andere tests.
   const concept = new URL(page.url()).searchParams.get("concept");
