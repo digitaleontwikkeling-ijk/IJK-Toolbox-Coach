@@ -21,6 +21,19 @@ function Herkomst({ feit }: { feit: Feit }) {
   return <span className="herkomst"> ({feit.herkomst === "afgeleid" ? feit.toelichting : "jouw antwoord"})</span>;
 }
 
+/** Kort: alleen de uitkomst van de privacy- en AI-beoordeling (de toelichting staat onder "Meer over dit advies"). */
+export function BeoordelingenKort({ advies, content }: { advies: AdviesDto; content: ContentDto }) {
+  const t = content.teksten;
+  const { dpia, aiRisico } = advies;
+  if (!dpia || !aiRisico) return null;
+  return (
+    <ul className="beoordeling-kort">
+      <li><strong>{t.privacy.titel}:</strong> {dpia.actief ? dpia.klasseNaam : "niet van toepassing"}</li>
+      <li><strong>{t.ai.titel}:</strong> {aiRisico.actief ? aiRisico.klasseNaam : "niet van toepassing"}</li>
+    </ul>
+  );
+}
+
 export function Beoordelingen({ advies, content }: { advies: AdviesDto; content: ContentDto }) {
   const t = content.teksten;
   const { dpia, aiRisico } = advies;

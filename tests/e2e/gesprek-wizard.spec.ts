@@ -94,6 +94,10 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   await expect(advies.locator(".adviescard")).toBeVisible();
   await expect(page.locator("#advies-kop")).toBeFocused();
   await expect(advies).toContainText("Het volgt uit de vaste spelregels van IJK");
+  // Less is more: niet nog eens dat de kleur uit de spelregels volgt; details ingeklapt.
+  await expect(advies.locator(".adviescard")).not.toContainText("ik bepaal hem niet zelf");
+  await expect(advies.locator(".adviescard__meer")).not.toHaveAttribute("open", "");
+  await expect(advies.locator(".adviescard").getByRole("table")).toHaveCount(0);
   await expect(page.getByText("Dat waren alle vragen.")).toHaveCount(0);
   await expect(page.locator("aside.chat")).toHaveCount(0);
   await expect(paren(page).first()).toBeHidden();
