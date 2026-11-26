@@ -138,3 +138,19 @@ describe("adviescard in het gesprek", () => {
     }
   });
 });
+
+describe("uitleg in het gesprek", () => {
+  it("geen zinnen over waarom een vraag komt; wel een definitie of voorbeeld bij de vragen in uitleg_bij", () => {
+    const keuzes: Record<string, string> = { data: "persoonsgegevens", ai_gebruik: "ja", autonomie: "adviseren" };
+    const eind = loopDoor(legeWizard(), (id) => keuzes[id]);
+    const lijst = beurten(content, eind);
+    const toegestaan = new Set(content.teksten.gesprek.uitleg_bij);
+    for (const b of lijst) {
+      expect(b.intro ?? "", b.id).not.toMatch(/Je gaf aan/);
+      expect(b.uitleg ?? "", b.id).not.toMatch(/Je gaf aan|Daarom/);
+      if (b.check && b.id !== b.check.id && !b.id.startsWith(`${b.check.id}-`) && b.uitleg) expect(toegestaan.has(b.id), b.id).toBe(true);
+    }
+    expect(lijst.find((b) => b.id === "kwetsbare_groepen")?.uitleg).toBeUndefined();
+    expect(lijst.find((b) => b.id === "bijzondere_persoonsgegevens")?.uitleg).toContain("gezondheid");
+  });
+});

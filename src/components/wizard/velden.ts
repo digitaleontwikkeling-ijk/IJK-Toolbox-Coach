@@ -132,10 +132,9 @@ export function beurten(content: Content, data: Data): Beurt[] {
     const v = data.coachVoorstellen[sleutel];
     return v && { antwoord: v.voorstel, zekerheid: v.zekerheid, bron: sleutel.startsWith("tool.") ? "tool" : "coach", vervolgvraag: v.vervolgvraag };
   };
-  const persoonsgegevens = verdieping.feiten.find((f) => f.id === "persoonsgegevens")?.waarde;
-  const aiGebruik = verdieping.feiten.find((f) => f.id === "ai_gebruik")?.waarde;
-  let privacyIntro = verdieping.dpiaActief;
-  let aiIntro = true;
+  // In het gesprek geen zinnen over waarom een vraag komt; alleen uitleg die zegt wat er bedoeld wordt (definitie of
+  // voorbeeld), voor de vragen in teksten.yaml (gesprek.uitleg_bij). De coach krijgt alle uitleg wel mee in de chat.
+  const uitlegBij = new Set(t.gesprek.uitleg_bij);
 
   for (const c of r.checks) {
     const huidig = data.checks[c.id];
@@ -176,7 +175,7 @@ export function beurten(content: Content, data: Data): Beurt[] {
         check: c,
         kop: kopCheck(c),
         vraag: e.vraag,
-        uitleg: e.uitleg,
+        uitleg: uitlegBij.has(e.id) ? e.uitleg : undefined,
         opties: e.onzeker_mogelijk ? [...JA_NEE, ONZEKER] : JA_NEE,
         meerdere: false,
         gekozen: w ? [w] : [],
@@ -188,21 +187,12 @@ export function beurten(content: Content, data: Data): Beurt[] {
     const hier = verdieping.vragen.filter((v) => v.gegeven.plek === c.id);
     for (const v of [...hier.filter((x) => x.gegeven.spoor !== "ai"), ...hier.filter((x) => x.gegeven.spoor === "ai")]) {
       const g = v.gegeven;
-      let intro: string | undefined;
-      if (g.spoor === "ai" && aiIntro) {
-        intro = aiGebruik === "weet_niet" ? t.verdieping.ai_intro_onzeker : t.verdieping.ai_intro;
-        aiIntro = false;
-      } else if (g.spoor !== "ai" && privacyIntro) {
-        intro = persoonsgegevens === "onzeker" ? t.verdieping.privacy_intro_onzeker : t.verdieping.privacy_intro;
-        privacyIntro = false;
-      }
       uit.push({
         id: g.id,
         check: c,
         kop: kopCheck(c),
         vraag: g.vraag,
-        uitleg: v.signaal && g.signaal ? g.signaal : g.uitleg,
-        intro,
+        uitleg: uitlegBij.has(g.id) ? g.uitleg : undefined,
         opties: g.antwoorden,
         meerdere: false,
         gekozen: v.antwoord ? [v.antwoord] : [],

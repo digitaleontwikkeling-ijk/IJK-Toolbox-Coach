@@ -8,6 +8,9 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Gesprek: geen zinnen meer over waarom een vraag komt ("Je gaf aan dat je persoonsgegevens gebruikt. Daarom …",
+  de inleidingen bij de privacy- en AI-vragen). Uitleg met een definitie of voorbeeld blijft bij de vragen in
+  `gesprek.uitleg_bij`. Het formulier en de regelset zijn niet veranderd.
 - Gesprek: geen "Wat bedoel je hiermee?" meer bij de vragen; de i bij een antwoord legt het uit, en anders vraag je
   het de coach (die krijgt de uitleg bij de vraag mee).
 - Gesprek: geen zinnen meer over het voorstel van de coach ("Op basis van je beschrijving denk ik: …", twijfel); het

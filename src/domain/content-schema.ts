@@ -447,6 +447,7 @@ export const tekstenSchema = z.object({
       verder: z.array(tekst).min(1),
       knop: tekst,
     }),
+    uitleg_bij: z.array(id).default([]),
     kleur_hint: tekst,
     vervolgactie_uitleg: z.record(id, tekst).default({}),
     kop_beschrijving: tekst,
