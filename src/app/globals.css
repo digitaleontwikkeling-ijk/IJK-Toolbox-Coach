@@ -365,4 +365,5 @@ fieldset.keuze legend + * { clear: both; }
 .gesprek__chatinvoer input { flex: 1; min-width: 0; }
 .gesprek__paar > .gesprek__chatberichten { padding-left: 1rem; }
 .gesprek__eerder { margin-bottom: 1rem; }
+.gesprek__terug[open] summary { margin-bottom: 1rem; }
 .gesprek__eerder summary { cursor: pointer; color: var(--water); text-decoration: underline; margin-bottom: 0.5rem; }

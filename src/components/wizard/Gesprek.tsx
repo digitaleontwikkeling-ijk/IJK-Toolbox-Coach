@@ -21,6 +21,8 @@ interface Props extends StapProps {
   /** Een eigen vraag aan de coach, bij een vraag uit het gesprek (veld-id) of "klaar". */
   onChat: (tekst: string, bij: string) => void;
   chatBezig: boolean;
+  /** Bij het advies: het gesprek terugkijken, zonder Wijzig en zonder huidige vraag. */
+  alleenLezen?: boolean;
 }
 
 type Teksten = StapProps["content"]["teksten"]["gesprek"];
@@ -46,7 +48,8 @@ export function Berichten({ berichten, bezig, t }: { berichten: ChatBericht[]; b
 }
 
 /** Vraag de coach iets, binnen de huidige vraag van het gesprek. */
-export function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
+export function Chat({ bij, berichten, bezig, label, t, onVerstuur, plaatshouder }: {
+  plaatshouder?: string;
   bij: string;
   berichten: ChatBericht[];
   bezig: boolean;
@@ -71,7 +74,7 @@ export function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
       <form onSubmit={verstuur}>
         <label htmlFor={id}>{label}</label>
         <div className="gesprek__chatinvoer">
-          <input id={id} type="text" value={tekst} maxLength={2000} autoComplete="off" placeholder={t.chat_plaatshouder} onChange={(e) => setTekst(e.target.value)} />
+          <input id={id} type="text" value={tekst} maxLength={2000} autoComplete="off" placeholder={plaatshouder ?? t.chat_plaatshouder} onChange={(e) => setTekst(e.target.value)} />
           <button type="submit" className="knop knop--secundair" disabled={bezig || !tekst.trim()}>{t.chat_stuur}</button>
         </div>
       </form>
@@ -79,7 +82,7 @@ export function Chat({ bij, berichten, bezig, label, t, onVerstuur }: {
   );
 }
 
-export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onChat, chatBezig }: Props) {
+export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaar, onChat, chatBezig, alleenLezen = false }: Props) {
   const t = content.teksten.gesprek;
   const [bewerk, setBewerk] = useState<string | null>(null);
   const kopRef = useRef<HTMLHeadingElement>(null);
@@ -97,7 +100,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
   // Nieuwe vraag: focus naar de kop ervan (niet bij het openen van de stap; dan zet de wizard de focus).
   const huidigId = coachBezig === "checks" ? undefined : huidige?.id ?? null;
   useEffect(() => {
-    if (huidigId === undefined) return;
+    if (huidigId === undefined || alleenLezen) return;
     if (vorige.current !== undefined && vorige.current !== huidigId) {
       const doel = huidigId ? kopRef.current : klaarRef.current;
       doel?.focus();
@@ -105,7 +108,7 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
       doel?.scrollIntoView?.({ block: "center", behavior: rustig ? "auto" : "smooth" });
     }
     vorige.current = huidigId;
-  }, [huidigId]);
+  }, [huidigId, alleenLezen]);
 
   if (coachBezig === "checks") {
     return <p role="status">De coach vult de checks alvast voor je in…</p>;
@@ -218,16 +221,18 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         <span className="gesprek__wie">Jij</span>
         <span className="sr-only">{t.jouw_antwoord} </span>
         {labels(b).join(", ")}
-        <button type="button" className="gesprek__wijzig" onClick={() => setBewerk(b.id)} aria-label={`${t.wijzig}: ${b.vraag}`}>
-          {t.wijzig}
-        </button>
+        {!alleenLezen && (
+          <button type="button" className="gesprek__wijzig" onClick={() => setBewerk(b.id)} aria-label={`${t.wijzig}: ${b.vraag}`}>
+            {t.wijzig}
+          </button>
+        )}
       </div>
     </li>
   );
 
   return (
     <>
-      <p className="voortgang" role="status" aria-live="polite">{voortgang}</p>
+      {!alleenLezen && <p className="voortgang" role="status" aria-live="polite">{voortgang}</p>}
       {eerder.length > 0 && (
         <details className="gesprek__eerder">
           <summary>{t.eerdere_berichten.replace("{aantal}", String(eerder.length))}</summary>
@@ -242,11 +247,12 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
           {coachNietBeschikbaar ? t.intro_zonder_coach : t.intro}
         </li>
         {lijst.flatMap((b, i) => {
+          if (alleenLezen) return b.gekozen.length > 0 ? [paar(b)] : [];
           if (b === huidige) return [actief(b)];
           if (!isAfgerond(b, data)) return [];
           return [paar(b), alBekend(b, i)].filter((x) => x !== null);
         })}
-        {!huidige && (
+        {!huidige && !alleenLezen && (
           <li className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
             <span className="gesprek__wie">Coach</span>
             <p ref={klaarRef} tabIndex={-1} style={{ margin: 0 }}>{t.klaar}</p>

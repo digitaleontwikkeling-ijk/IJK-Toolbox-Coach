@@ -86,7 +86,34 @@ test("het gesprek: één vraag tegelijk, voorstellen bevestigen, een antwoord wi
   await expect(page.getByText("Dat waren alle vragen.")).toBeVisible();
 
   await page.getByRole("button", { name: "Bekijk het advies →" }).click();
+
+  // Het advies als laatste beurt van de coach, met het gesprek erboven (alleen lezen) en de chat eronder.
+  const advies = actief(page);
+  await expect(advies.locator(".adviescard")).toBeVisible();
+  await expect(page.locator("#advies-kop")).toBeFocused();
+  await expect(advies).toContainText("berekend met de vaste spelregels van IJK");
+  await expect(page.locator("aside.chat")).toHaveCount(0);
+  await expect(paren(page).first()).toBeHidden();
+  await page.getByText("Lees het gesprek terug").click();
+  await expect(paren(page).first()).toBeVisible();
+  await expect(page.getByRole("button", { name: /^Wijzig/ })).toHaveCount(0);
+  // De uitleg van de coach komt in het gesprek, bij het advies.
+  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach").first()).toBeVisible();
+  await advies.getByRole("button", { name: "Vraag stellen" }).click();
+  await expect(advies.getByLabel("Vragen over het advies? Vraag het de coach")).toBeFocused();
+  await page.keyboard.type("Wat moet ik nu doen?");
+  await page.keyboard.press("Enter");
+  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--jij")).toContainText("Wat moet ik nu doen?");
+  await expect(advies.locator(".gesprek__bericht--chat.gesprek__bericht--coach")).toHaveCount(2);
+  const r3 = await new AxeBuilder({ page }).withTags(WCAG).analyze();
+  expect(r3.violations.map((v) => `${v.id} (${v.nodes.length}×) ${v.help}`)).toEqual([]);
+
+  // Ook bij het advies kun je naar het formulier (met het chatvenster ernaast) en terug.
+  await page.getByRole("button", { name: "Toon als formulier" }).click();
+  await expect(page.locator("aside.chat")).toContainText("Wat moet ik nu doen?");
   await expect(page.locator(".adviescard")).toBeVisible();
+  await page.getByRole("button", { name: "Terug naar het gesprek" }).click();
+  await expect(actief(page).locator(".adviescard")).toBeVisible();
 
   // Terug naar de checks: het gesprek staat er nog, met alle antwoorden.
   await page.getByRole("button", { name: "← Terug" }).click();

@@ -17,7 +17,7 @@ import { afgerondPad, volledigPad, wizardPad } from "@/lib/paden";
 import { Stap1 } from "./Stap1";
 import { Stap2 } from "./Stap2";
 import { Stap3 } from "./Stap3";
-import { Gesprek, gesprekKlaar } from "./Gesprek";
+import { Chat, Gesprek, gesprekKlaar } from "./Gesprek";
 import { GesprekFase1 } from "./GesprekFase1";
 import { bevestigEigenAntwoorden, ontbrekendeVelden } from "./velden";
 import { Fase2Uitleg } from "./Fase2Uitleg";
@@ -39,6 +39,8 @@ type CheckVoorstel = {
 
 type Weergave = "gesprek" | "lijst";
 const WEERGAVE_SLEUTEL = "toolbox-coach.weergave";
+/** Plekken in het gesprek die geen vraag uit de regelset zijn (geen veld-id voor de coach). */
+const GEEN_VELD = new Set(["beschrijving", "verduidelijking", "tooladvies", "klaar", "advies"]);
 
 /** Focus naar de kop van de huidige vraag in het gesprek; anders naar de kop van de stap. */
 function focusKop(terugval?: HTMLElement | null) {
@@ -92,7 +94,11 @@ export function Wizard() {
     } catch {
       // Niet bewaard; geldt dan alleen voor nu.
     }
-    setTimeout(() => (w === "gesprek" ? focusKop(kopRef.current) : kopRef.current?.focus()), 30);
+    setTimeout(() => {
+      const stapKop = kopRef.current ?? adviesKopRef.current;
+      if (w === "gesprek") focusKop(stapKop);
+      else stapKop?.focus();
+    }, 30);
   }
 
   // ---------- Laden ----------
@@ -326,7 +332,7 @@ export function Wizard() {
       setAdvies(r.advies);
       gaNaar(4);
       const uitleg = await coach<string>("uitleg", { adviesId: r.advies.id });
-      if (uitleg) zegCoach(uitleg);
+      if (uitleg) zegCoach(uitleg, weergaveRef.current === "gesprek" ? "advies" : undefined);
     } catch (e) {
       setFout(e instanceof ApiFoutClient ? e.message : "Het advies kon niet worden berekend.");
       setFoutDetails(e instanceof ApiFoutClient && e.details ? e.details.map((d) => `|${d}`) : null);
@@ -384,7 +390,7 @@ export function Wizard() {
     let antwoord: string | null = null;
     try {
       const r = await api<{ resultaat: string | null }>("/api/coach/chat", {
-        body: { vraag: tekst, stap: d.stap, beschrijving: d.beschrijving, tool: d.tooladvies?.tool, geschiedenis, ...(bij && bij !== "klaar" ? { veld: bij } : {}) },
+        body: { vraag: tekst, stap: d.stap, beschrijving: d.beschrijving, tool: d.tooladvies?.tool, geschiedenis, ...(bij && !GEEN_VELD.has(bij) ? { veld: bij } : {}) },
       });
       antwoord = r.resultaat;
     } catch {
@@ -407,13 +413,35 @@ export function Wizard() {
   // Vóór de checks: eerst uitleg over fase 2 (één keer per idee).
   const toonFase2Uitleg = data.stap === 3 && !data.fase2UitlegGezien;
   // Stap 1 t/m 3 als gesprek; de chat zit dan bij de vragen zelf en het chatvenster ernaast is niet nodig.
-  const gesprek = weergave === "gesprek" && data.stap < 4;
+  const gesprek = weergave === "gesprek";
+  const opAdvies = data.stap === 4 && !!advies;
   const toolKlaar =
     !!data.tooladvies && !!gekozenToolNaam(content, data.tooladvies) && (data.tooladvies.tool !== ANDERE_TOOL || !!data.tooladvies.andereTool?.naam.trim());
   const beginChecks = () => {
     wijzig((d) => ({ ...d, fase2UitlegGezien: true }));
     setTimeout(() => (weergaveRef.current === "gesprek" ? focusKop(kopRef.current) : kopRef.current?.focus()), 30);
   };
+  // Het gesprek tot nu toe: bij stap 1–3 met de huidige vraag, bij het advies om terug te lezen.
+  const gesprekTotNu = (
+    <>
+      <GesprekFase1
+        alleenLezen={data.stap === 4}
+        {...props}
+        fout={fout}
+        tooladviesNietBeschikbaar={!!coachWeg.tooladvies}
+        onVolgende1={volgendeVanuit1}
+        onVolgende2={volgendeVanuit2}
+        onAnderAdvies={() => vraagTooladvies([...data.uitgeslotenTools, data.tooladvies!.tool])}
+        onBeginChecks={beginChecks}
+        gaNaar={gaNaar}
+        onChat={chat}
+        chatBezig={chatBezig}
+      />
+      {((data.stap === 3 && !toonFase2Uitleg) || opAdvies) && (
+        <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onChat={chat} chatBezig={chatBezig} alleenLezen={data.stap === 4} />
+      )}
+    </>
+  );
 
   return (
     <>
@@ -443,6 +471,10 @@ export function Wizard() {
               {!toonFase2Uitleg && (!gesprek || data.stap === 3) && (
                 <p className="instructie">{gesprek ? t.gesprek.instructie : stap.instructie}</p>
               )}
+            </>
+          )}
+          {(data.stap < 4 || opAdvies) && (
+            <>
               <p className="knoppen knoppen--klein">
                 {data.stap === 3 && !toonFase2Uitleg && !gesprek && (
                   <button
@@ -487,22 +519,32 @@ export function Wizard() {
             </div>
           )}
 
-          {gesprek && (
-            <GesprekFase1
-              {...props}
-              fout={fout}
-              tooladviesNietBeschikbaar={!!coachWeg.tooladvies}
-              onVolgende1={volgendeVanuit1}
-              onVolgende2={volgendeVanuit2}
-              onAnderAdvies={() => vraagTooladvies([...data.uitgeslotenTools, data.tooladvies!.tool])}
-              onBeginChecks={beginChecks}
-              gaNaar={gaNaar}
-              onChat={chat}
-              chatBezig={chatBezig}
-            />
+          {gesprek && data.stap < 4 && gesprekTotNu}
+          {gesprek && opAdvies && (
+            <details className="gesprek__eerder gesprek__terug">
+              <summary>{t.gesprek.terugkijken}</summary>
+              {gesprekTotNu}
+            </details>
           )}
-          {gesprek && data.stap === 3 && !toonFase2Uitleg && (
-            <Gesprek {...props} coachNietBeschikbaar={!!coachWeg.checks} onChat={chat} chatBezig={chatBezig} />
+          {gesprek && opAdvies && (
+            <ol className="gesprek gesprek--advies">
+              <li className="gesprek__bericht gesprek__bericht--coach gesprek__bericht--actief">
+                <span className="gesprek__wie">Coach</span>
+                <p>{t.gesprek.advies_intro}</p>
+                <Adviescard
+                  ref={adviesKopRef}
+                  advies={advies!}
+                  content={content}
+                  onActie={voerActieUit}
+                  actieBezig={actieBezig}
+                  actieFout={actieFout}
+                  onVraag={() => document.getElementById("gesprek-chat-advies")?.focus()}
+                  onOpnieuw={opnieuwBeginnen}
+                  onAfronden={afronden}
+                />
+                <Chat bij="advies" berichten={data.chat.filter((m) => m.bij === "advies")} bezig={chatBezig} label={t.gesprek.chat_label_advies} plaatshouder={t.gesprek.chat_plaatshouder_advies} t={t.gesprek} onVerstuur={chat} />
+              </li>
+            </ol>
           )}
 
           {!gesprek && data.stap === 1 && <Stap1 {...props} fout={fout} />}
@@ -517,7 +559,7 @@ export function Wizard() {
           {!gesprek && data.stap === 3 && !toonFase2Uitleg && (
             <Stap3 {...props} coachNietBeschikbaar={!!coachWeg.checks} ontbrekend={ontbrekend} />
           )}
-          {data.stap === 4 && advies && (
+          {!gesprek && data.stap === 4 && advies && (
             <Adviescard
               ref={adviesKopRef}
               advies={advies}

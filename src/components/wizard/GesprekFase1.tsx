@@ -26,6 +26,8 @@ interface Props extends StapProps {
   gaNaar: (stap: number) => void;
   onChat: (tekst: string, bij: string) => void;
   chatBezig: boolean;
+  /** Bij het advies: het gesprek terugkijken, zonder Wijzig. */
+  alleenLezen?: boolean;
 }
 
 /** Een vraag van de coach en jouw antwoord, met Wijzig. */
@@ -35,7 +37,8 @@ function Paar({ kop, vraag, antwoord, wijzigLabel, onWijzig, t, berichten = [] }
   vraag: string;
   antwoord: string;
   wijzigLabel: string;
-  onWijzig: () => void;
+  /** Zonder: alleen lezen (bij het advies). */
+  onWijzig?: () => void;
   t: StapProps["content"]["teksten"]["gesprek"];
 }) {
   return (
@@ -54,9 +57,11 @@ function Paar({ kop, vraag, antwoord, wijzigLabel, onWijzig, t, berichten = [] }
         <span className="gesprek__wie">Jij</span>
         <span className="sr-only">{t.jouw_antwoord} </span>
         <span className="gesprek__antwoord">{antwoord}</span>
-        <button type="button" className="gesprek__wijzig" onClick={onWijzig} aria-label={`${t.wijzig}: ${wijzigLabel}`}>
-          {t.wijzig}
-        </button>
+        {onWijzig && (
+          <button type="button" className="gesprek__wijzig" onClick={onWijzig} aria-label={`${t.wijzig}: ${wijzigLabel}`}>
+            {t.wijzig}
+          </button>
+        )}
       </div>
     </li>
   );
@@ -65,6 +70,7 @@ function Paar({ kop, vraag, antwoord, wijzigLabel, onWijzig, t, berichten = [] }
 export function GesprekFase1(props: Props) {
   const { content, data, wijzig, coachBezig, fout, gaNaar } = props;
   const t = content.teksten.gesprek;
+  const lees = !!props.alleenLezen;
   const stappen = content.teksten.stappen;
   const titel = (n: number) => stappen.find((s) => s.nummer === n)!.titel;
   const [bewerkBeschrijving, setBewerkBeschrijving] = useState(false);
@@ -148,7 +154,7 @@ export function GesprekFase1(props: Props) {
       antwoord={data.beschrijving}
       berichten={bij("beschrijving")}
       wijzigLabel={titel(1)}
-      onWijzig={() => {
+      onWijzig={lees ? undefined : () => {
         setBewerkBeschrijving(true);
         if (data.stap !== 1) gaNaar(1);
         else setTimeout(() => kopRef.current?.focus(), 30);
@@ -192,7 +198,7 @@ export function GesprekFase1(props: Props) {
         antwoord={v.antwoord.trim() || t.niet_beantwoord}
         wijzigLabel={v.vraag}
         berichten={i === vragen.length - 1 ? bij("verduidelijking") : []}
-        onWijzig={() => gaNaar(1)}
+        onWijzig={lees ? undefined : () => gaNaar(1)}
       />,
     ),
   );
@@ -220,7 +226,7 @@ export function GesprekFase1(props: Props) {
     return <ol className="gesprek">{items}</ol>;
   }
   items.push(
-    <Paar key="tool" t={t} kop={titel(2)} vraag={t.tool_vraag} antwoord={toolNaam ?? ""} berichten={bij("tooladvies")} wijzigLabel={titel(2)} onWijzig={() => gaNaar(2)} />,
+    <Paar key="tool" t={t} kop={titel(2)} vraag={t.tool_vraag} antwoord={toolNaam ?? ""} berichten={bij("tooladvies")} wijzigLabel={titel(2)} onWijzig={lees ? undefined : () => gaNaar(2)} />,
   );
 
   // ---------- Fase 2: uitleg ----------
