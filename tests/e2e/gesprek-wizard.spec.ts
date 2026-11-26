@@ -163,6 +163,9 @@ test("fase 1 als gesprek: beschrijving, vragen van de coach, tooladvies en de ui
   await expect(page.locator(".gesprek--fase1, .gesprek").first()).toContainText("Een overzicht van verlof voor mijn team");
   await expect(actief(page)).not.toContainText(/de coach/i);
   await expect(actief(page)).toContainText("Dit adviseer ik");
+  await expect(actief(page)).toContainText("past deze tool het best bij jouw use case:");
+  await expect(actief(page).getByRole("button", { name: /andere tool/ })).toHaveCount(0);
+  await expect(actief(page).getByRole("button", { name: "Zelf een tool kiezen" })).toBeVisible();
   const toolKnop = actief(page).getByRole("button", { name: /past, verder →$/ });
   await expect(toolKnop).toBeVisible();
   const tool = (await toolKnop.innerText()).replace(/ past, verder →$/, "");

@@ -229,7 +229,6 @@ gesprek:
   zoekt_tool: Ik zoek een passende tool voor je…
   vult_checks: Ik vul de checks alvast voor je in…
   tool_label: Dit adviseer ik
-  andere_tool_knop: Stel een andere tool voor
   niet_beschikbaar: Ik kan je nu even niet helpen. Je kunt gewoon verder door zelf te kiezen.
   # Op de adviescard in het gesprek.
   kleur_hint: Deze kleur volgt uit de vaste spelregels van IJK; ik bepaal hem niet zelf.
@@ -252,9 +251,8 @@ gesprek:
     - Ik ben een AI agent. Ik vul de checks alvast in op basis van je beschrijving.
     - Jij controleert de antwoorden en past ze aan waar nodig. Twijfel ik, dan vraag ik het je.
     - Daarna berekent de tool je advies met de vaste spelregels van IJK. Ik bepaal de uitkomst niet.
-  verduidelijking_intro: Beantwoorden is niet verplicht, maar helpt me om je beter te adviseren.
   niet_beantwoord: (niet beantwoord)
-  tooladvies_intro: "Op basis van wat je vertelt, past deze tool het best:"
+  tooladvies_intro: "Op basis van wat je vertelt, past deze tool het best bij jouw use case:"
   tool_vraag: Welke tool wil je gebruiken?
 
 privacy:

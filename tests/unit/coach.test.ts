@@ -59,7 +59,7 @@ describe("coach: validatie en terugval", () => {
   it("K4c. de oefencoach geeft bij een vage beschrijving vragen met opties, en gebruikt het gekozen antwoord bij de checks", async () => {
     const s = new CoachService(new MockCoachClient(content), content);
     const r = await s.verduidelijk({ beschrijving: "Teams moet automatisch kunnen transcriberen" }, ctx);
-    expect(r!.vragen[0]!.opties).toContain("Gegevens over personen, zoals namen of e-mailadressen");
+    expect(r!.vragen[0]!.opties).toContain("Persoonsgegevens");
     const checks = await s.checksVoorinvullen(
       { beschrijving: "Teams transcriberen", verduidelijking: [{ vraag: r!.vragen[0]!.vraag, antwoord: "Weet ik niet zeker" }], tool: "m365_copilot" },
       ctx,

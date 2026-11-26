@@ -170,7 +170,6 @@ export function GesprekFase1(props: Props) {
         <h2 className="gesprek__kop" ref={kopRef} tabIndex={-1}>
           {vragen.length === 1 ? t.verduidelijking_kop_een : t.verduidelijking_kop_twee}
         </h2>
-        <p>{t.verduidelijking_intro}</p>
         {vragen.map((v, i) => (
           <Verduidelijking
             key={i}

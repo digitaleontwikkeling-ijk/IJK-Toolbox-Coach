@@ -34,7 +34,7 @@ export class MockCoachClient implements CoachClient {
       vragen.push({
         vraag: "Met welke gegevens ga je werken?",
         opties: [
-          "Gegevens over personen, zoals namen of e-mailadressen",
+          "Persoonsgegevens",
           "Klantgegevens of andere vertrouwelijke informatie",
           "Interne werkinformatie, zoals werkinstructies",
           "Openbare informatie",
