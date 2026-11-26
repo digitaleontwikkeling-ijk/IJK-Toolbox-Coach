@@ -144,7 +144,6 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
   };
 
   const actief = (b: Beurt) => {
-    const extraRegelen = b.check && b.id === b.check.id ? b.check.antwoorden.filter((a) => a.extra_regelen) : [];
     const keuzeProps = b.meerdere
       ? ({ meerdere: true, waarde: b.gekozen, onKies: (ids: string[]) => wijzig((d) => b.zet(d, ids)) } as const)
       : ({ waarde: b.gekozen[0], onKies: (id: string) => wijzig((d) => b.zet(d, [id])) } as const);
@@ -155,18 +154,6 @@ export function Gesprek({ content, data, wijzig, coachBezig, coachNietBeschikbaa
         {b.intro && <p>{b.intro}</p>}
         {/* Een voorstel van de coach staat alleen als vooraf gekozen antwoord; de medewerker bevestigt het met Volgende. */}
         <Keuze {...keuzeProps} naam={b.id} legend={b.vraag} vraag={b.uitleg} opties={b.opties} />
-        {extraRegelen.length > 0 && (
-          <div className="extra-regelen">
-            <h3>{content.teksten.extra_regelen_titel}</h3>
-            <ul>
-              {extraRegelen.map((a) => (
-                <li key={a.id}>
-                  {b.gekozen.includes(a.id) ? <strong>{a.kort ?? a.label}: {a.extra_regelen}</strong> : <>{a.kort ?? a.label}: {a.extra_regelen}</>}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
         {/* Geen "Wat bedoel je hiermee?": de i bij een antwoord legt het uit, en anders vraag je het de coach. */}
         <Chat bij={b.id} berichten={berichtenBij(b.id)} bezig={chatBezig} label={t.chat_label} t={t} onVerstuur={onChat} />
         <div className="knoppen">

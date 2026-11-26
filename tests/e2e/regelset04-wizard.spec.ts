@@ -5,7 +5,7 @@ import { geenRodeVlaggen, kies, kiesImpact, login, naarStap3, naarChecks } from 
 test.describe.configure({ mode: "serial" });
 let referentie = "";
 
-test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten en 'Wat moet je extra regelen?'", async ({ page }) => {
+test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden) en hulpteksten; 'Wat moet je extra regelen?' niet bij de vraag", async ({ page }) => {
   await login(page, "Testmedewerker Anna");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
   await naarChecks(page);
@@ -19,8 +19,8 @@ test("stap 3 toont Impact in drie deelvragen (zonder voorbeelden), hulpteksten e
   await expect(impact).toContainText("De hoogste score telt.");
   await expect(page.locator("#veld-data")).toContainText("Een kopie van echte gegevens of een testomgeving met productiegegevens is géén testdata.");
   await expect(page.locator("#veld-autonomie")).toContainText("Beslist de tool, of beslis jij op basis van wat de tool aangeeft?");
-  await expect(page.locator("#veld-afhankelijkheid")).toContainText("Wat moet je extra regelen?");
-  await expect(page.locator("#veld-afhankelijkheid")).toContainText("Bedrijfsoplossing: + monitoring, architectuur, continuïteit, lifecycle management");
+  // "Wat moet je extra regelen?" hoort bij het advies, niet bij de vraag.
+  await expect(page.locator("#veld-afhankelijkheid")).not.toContainText("Wat moet je extra regelen?");
   await expect(page.locator("#veld-persoonlijke_inlog_of_secrets")).toContainText("Copilot workflows draaien standaard op je eigen account");
   await expect(page.locator("#veld-proces_zonder_eigenaar")).toBeVisible();
 });
@@ -52,6 +52,10 @@ test("AI-risico: AI keurt zelfstandig facturen goed (scenario 11, regelset 0.8)"
   await expect(card).toContainText("Uitlegbaarheid: Beperkt uitlegbaar (jouw antwoord)");
   await expect(card).toContainText("Privacy: niet van toepassing");
   await expect(card.getByRole("row", { name: /5\. Impact/ })).toContainText("Integriteit: Serieus");
+  // Op de adviescard: wat je extra moet regelen, alleen bij het gekozen antwoord.
+  await expect(card).toContainText("Wat moet je extra regelen?");
+  await expect(card).toContainText("Persoonlijke oplossing: + documentatie, security");
+  await expect(card).not.toContainText("Bedrijfsoplossing: + monitoring");
 });
 
 test("rood zonder alternatief: status 'Contact volgt' (scenario 9)", async ({ page }) => {

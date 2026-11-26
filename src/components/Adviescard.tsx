@@ -42,6 +42,14 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const link = andere?.link?.trim() && geldigeLink(andere.link) ? andere.link.trim() : null;
   const actie = t.vervolgacties[kleur.vervolgactie];
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
+  // "Wat moet je extra regelen?" bij de gekozen antwoorden (bijvoorbeeld bij Afhankelijkheid). Hoort bij het advies,
+  // niet bij de vraag.
+  const extraRegelen = r.checks.flatMap((c) => {
+    const gekozen = alsLijst(advies.antwoorden.checks[c.id]);
+    return c.antwoorden
+      .filter((a) => a.extra_regelen && gekozen.includes(a.id))
+      .map((a) => ({ id: `${c.id}.${a.id}`, naam: a.kort ?? a.label, tekst: a.extra_regelen! }));
+  });
   const vlaggenJa = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id] === true);
   const vlaggenOnzeker = r.rode_vlaggen.filter((v) => advies.rodeVlaggen[v.id] === "onzeker");
   // Rood zonder alternatief: Team DO neemt contact op. Mislukte de melding, dan kan het opnieuw.
@@ -85,6 +93,13 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           <section>
             <h3>Voorwaarden</h3>
             <ul>{advies.voorwaarden.map((v) => <li key={v}>{v}</li>)}</ul>
+          </section>
+        )}
+
+        {extraRegelen.length > 0 && (
+          <section>
+            <h3>{t.extra_regelen_titel}</h3>
+            <ul>{extraRegelen.map((e) => <li key={e.id}>{e.naam}: {e.tekst}</li>)}</ul>
           </section>
         )}
 

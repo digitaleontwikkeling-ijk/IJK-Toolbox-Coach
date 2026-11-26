@@ -180,7 +180,6 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
     const keuzeProps = c.meerdere
       ? ({ meerdere: true, waarde: gekozen, onKies: (ids: string[]) => zetCheck(c.id, ids) } as const)
       : ({ waarde: gekozen[0], onKies: (id: string) => zetCheck(c.id, id) } as const);
-    const extraRegelen = c.antwoorden.filter((a) => a.extra_regelen);
     return (
       <div id={`veld-${c.id}`} key={c.id}>
         <Keuze
@@ -198,18 +197,6 @@ export function Stap3({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
           opties={c.antwoorden.map((a) => ({ id: a.id, label: a.label, uitleg: a.uitleg }))}
           extra={
             <>
-              {extraRegelen.length > 0 && (
-                <div className="extra-regelen">
-                  <h4>{t.extra_regelen_titel}</h4>
-                  <ul>
-                    {extraRegelen.map((a) => (
-                      <li key={a.id}>
-                        {gekozen.includes(a.id) ? <strong>{a.kort ?? a.label}: {a.extra_regelen}</strong> : <>{a.kort ?? a.label}: {a.extra_regelen}</>}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
               {extraVragen(c, gekozen)}
             </>
           }
