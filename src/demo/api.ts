@@ -50,6 +50,7 @@ interface DemoAdvies {
   dpia?: DpiaUitkomst | null;
   aiRisico?: AiUitkomst | null;
   feiten?: Feit[] | null;
+  coachVoorstellen?: Record<string, { voorstel: string; zekerheid: "hoog" | "middel" | "laag" }> | null;
   motivatie: string;
   voorwaarden: string[];
   alternatieven: string[];
@@ -273,6 +274,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       tooladvies: data.tooladvies,
       antwoorden: { checks: invoer.checks, extraVragen: invoer.extraVragen ?? {}, verdieping: invoer.verdieping ?? {} },
       dpia: u.dpia, aiRisico: u.aiRisico, feiten: u.feiten,
+      coachVoorstellen: Object.fromEntries(Object.entries(data.coachVoorstellen).map(([k, x]) => [k, { voorstel: x.voorstel, zekerheid: x.zekerheid }])),
       rodeVlaggen: invoer.rodeVlaggen,
       uitkomst: u.kleur, toetsers: u.toetsers, dpiaSignaal: u.dpiaSignaal, aiActSignaal: u.aiActSignaal, motivatie: u.motivatie,
       voorwaarden: u.voorwaarden, alternatieven: u.alternatieven, regelversie: u.regelversie,

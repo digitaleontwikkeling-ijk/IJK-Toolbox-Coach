@@ -50,6 +50,17 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await expect(page.getByRole("link", { name: "anna@voorbeeld.invalid" })).toHaveAttribute("href", "mailto:anna@voorbeeld.invalid");
   await expect(page.getByText("Een verzuimdashboard bouwen")).toBeVisible();
   await expect(page.locator(".adviescard")).toContainText("Privacy: Waarschijnlijk volledige DPIA nodig");
+
+  // Alle vragen en antwoorden: ingeklapt; open: per vraag het antwoord en de herkomst.
+  const overzicht = page.locator(".overzicht");
+  await expect(overzicht.getByRole("table")).toHaveCount(0);
+  await overzicht.getByText(/^Alle vragen en antwoorden \(\d+\)$/).click();
+  const data = overzicht.getByRole("row", { name: /Welke data gebruik je\?/ });
+  await expect(data).toContainText("Persoonsgegevens");
+  await expect(data).toContainText(/Zelf gekozen|Voorstel van de coach, bevestigd|Zelf aangepast/);
+  await expect(overzicht.getByRole("row", { name: /kwetsbare positie/ })).toContainText("Ja");
+  await expect(overzicht.getByRole("row", { name: /Welke tool past\?/ })).toBeVisible();
+  await expect(overzicht).toContainText("Aanvullende vragen");
   await geenOvertredingen(page);
 
   // Voorwaarden zijn verplicht bij "met voorwaarden".

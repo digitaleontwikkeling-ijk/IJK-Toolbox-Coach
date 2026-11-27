@@ -27,6 +27,11 @@ export function plusMaanden(datum: Date, maanden: number): Date {
   return d;
 }
 
+/** Alleen het voorgestelde antwoord en de zekerheid bewaren (geen vrije tekst van de coach). */
+export function voorstellenVan(v: WizardData["coachVoorstellen"]): NieuwAdvies["coachVoorstellen"] {
+  return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, { voorstel: x.voorstel, zekerheid: x.zekerheid }]));
+}
+
 /**
  * Berekent het advies voor een concept en legt het vast in het register.
  * - Nieuw concept → nieuw advies met nieuw referentienummer.
@@ -78,6 +83,7 @@ export async function registreerAdvies(opties: {
       dpia: uitkomst.dpia,
       aiRisico: uitkomst.aiRisico,
       feiten: uitkomst.feiten,
+      coachVoorstellen: voorstellenVan(data.coachVoorstellen),
       motivatie: uitkomst.motivatie,
       voorwaarden: uitkomst.voorwaarden,
       alternatieven: uitkomst.alternatieven,
