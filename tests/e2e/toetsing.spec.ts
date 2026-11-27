@@ -58,6 +58,8 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await expect(kaart.getByRole("heading", { name: /^Privacy:/, level: 4 })).toBeVisible();
   await expect(kaart).not.toContainText("niet door de AI agent");
   await expect(kaart).not.toContainText("eerste risico-indicatie");
+  await expect(kaart).toContainText("Mensen in een kwetsbare positie: Ja (antwoord van de medewerker)");
+  await expect(kaart).not.toContainText("jouw antwoord");
   // Het overzicht met alle vragen en antwoorden staat onder de adviescard.
   const onder = await page.evaluate(() => {
     const k = document.querySelector(".adviescard")!, o = document.querySelector(".overzicht")!;

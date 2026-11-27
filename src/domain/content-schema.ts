@@ -409,6 +409,8 @@ export const tekstenSchema = z.object({
     beoordelingen_toetser_intro: tekst,
     extra_regelen_toetser: tekst,
     usecase_titel: tekst,
+    herkomst_medewerker: tekst,
+    herkomst_toetser: tekst,
   }),
   contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
