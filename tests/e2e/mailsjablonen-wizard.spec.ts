@@ -7,7 +7,10 @@ test("beheerder past het mailsjabloon voor Claude Code aan en zet het terug", as
   await login(page, "Testbeheerder", { nieuwIdee: false });
   await page.goto("/beheer");
   await expect(page.getByRole("heading", { name: "Mailsjablonen voor licentieaanvragen", level: 2 })).toBeVisible();
-  const form = page.locator("form.mailsjabloon", { has: page.getByRole("heading", { name: /^Claude Code/ }) });
+  // Per tool inklapbaar: standaard dicht.
+  const form = page.locator("details.mailsjabloon", { has: page.getByRole("heading", { name: /^Claude Code/ }) });
+  await expect(form.getByLabel("Onderwerp")).toBeHidden();
+  await form.locator("summary").click();
   await expect(form).toContainText("Aan: digitaleontwikkeling@ijk.nl");
   await expect(form.getByLabel("Onderwerp")).toHaveValue("Aanvraag licentie {tool} - {naam}");
   await expect(form.getByLabel("Tekst")).toHaveValue(/licentie aanvragen voor de \{licentie\}/);
@@ -22,6 +25,7 @@ test("beheerder past het mailsjabloon voor Claude Code aan en zet het terug", as
 
   // Na herladen staat het er nog; de content geeft het eigen sjabloon.
   await page.reload();
+  await form.locator("summary").click();
   await expect(form.getByLabel("Onderwerp")).toHaveValue("Licentie {tool} voor {naam}");
   const c = await (await page.request.get("/api/content")).json();
   expect(c.mailsjablonen.claude_code.onderwerp).toBe("Licentie {tool} voor {naam}");

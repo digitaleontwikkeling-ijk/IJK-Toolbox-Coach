@@ -71,7 +71,7 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
   Copilot workflows), HubBI-licentie, AI Flows-add-on voor HubBI, Claude Code-licentie.
 - Mailsjablonen per tool aanpasbaar door een beheerder in het beheerscherm (database, migratie 007, audit-log);
   "Standaard herstellen" zet het terug naar `aanvraag_mail`. Keuze IJK: de mailsjablonen zijn geen beslisinhoud
-  en mogen daarom buiten Git worden aangepast. Geen wijziging in de regels.
+  en mogen daarom buiten Git worden aangepast. Geen wijziging in de regels. Per tool inklapbaar in het beheerscherm.
 
 ## teksten: e-mail bij de licentieaanvraag
 
