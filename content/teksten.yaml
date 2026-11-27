@@ -46,24 +46,38 @@ vervolgacties:
     uitleg: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan de coach.
 
 # Beheer van de tool (uit tools.yaml): bij het tooladvies en op de adviescard.
+# Beheerscherm: mailsjablonen voor de licentieaanvraag (per tool aan te passen; standaard = aanvraag_mail).
+mailsjablonen_beheer:
+  titel: Mailsjablonen voor licentieaanvragen
+  intro: >-
+    Bij "Account aanvragen" opent een e-mail in het mailprogramma van de medewerker. Hier stel je per tool het
+    onderwerp en de tekst in. Het adres staat in tools.yaml (wijzigen via Git). Elke wijziging komt in de audit-log.
+  velden_titel: Velden die je in een sjabloon kunt gebruiken
+  aan: "Aan: {email}"
+  onderwerp: Onderwerp
+  tekst: Tekst
+  opslaan: Opslaan
+  herstellen: Standaard herstellen
+  opgeslagen: Het sjabloon is opgeslagen.
+  hersteld: Het standaardsjabloon geldt weer.
+  fout: Het sjabloon kon niet worden opgeslagen. Probeer het opnieuw.
+  aangepast: eigen sjabloon
+  standaard: standaard
+
 beheer_tool: "Beheer: {naam}. Een licentie of account vraag je aan via {email}."
 aanvraag_naar: "Met de knop hieronder opent een e-mail aan {beheer} in je mailprogramma (bijvoorbeeld Outlook). Verstuur die om je licentie aan te vragen."
-# De e-mail voor de licentieaanvraag (mailto). {tool}, {naam}, {referentie}, {uitkomst}, {voorwaarden}, {link}.
+# De e-mail voor de licentieaanvraag (mailto): de standaard voor elke tool. Een beheerder kan per tool een eigen
+# sjabloon instellen in het beheerscherm (database). Velden: {naam}, {tool}, {licentie}, {referentie}, {uitkomst},
+# {voorwaarden}, {link}.
 aanvraag_mail:
   onderwerp: "Aanvraag licentie {tool} - {naam}"
   tekst: |-
-    Hallo,
+    Hallo collega's,
 
-    Graag vraag ik een licentie aan voor {tool}.
-
-    Referentie: {referentie}
-    Advies van de IJK Toolbox Coach: {uitkomst}
-    Voorwaarden:
-    {voorwaarden}
-
-    Het advies: {link}
+    Via deze mail wil ik graag een licentie aanvragen voor de {licentie}.
 
     Met vriendelijke groet,
+
     {naam}
   opnieuw: "Open de e-mail aan {beheer} opnieuw"
 beheer_onbekend: de beheerder van de tool

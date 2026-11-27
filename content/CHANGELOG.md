@@ -62,6 +62,17 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Teksten voor de chat in het gesprek (`chat_label`, `chat_label_klaar`, `chat_plaatshouder`, `chat_stuur`, `denkt`,
   `eerdere_berichten`). Ook geen nieuwe regelset.
 
+## tools 0.8 en mailsjablonen (concept)
+
+- Nieuwe standaardtekst van de aanvraagmail (`aanvraag_mail`): "Hallo collega's, Via deze mail wil ik graag een
+  licentie aanvragen voor de {licentie}. Met vriendelijke groet, {naam}". Onderwerp blijft
+  "Aanvraag licentie {tool} - {naam}".
+- `beheer.licentienaam` per tool in `tools.yaml` ({licentie}): Copilot for MS365 licentie (Microsoft 365 Copilot en
+  Copilot workflows), HubBI-licentie, AI Flows-add-on voor HubBI, Claude Code-licentie.
+- Mailsjablonen per tool aanpasbaar door een beheerder in het beheerscherm (database, migratie 007, audit-log);
+  "Standaard herstellen" zet het terug naar `aanvraag_mail`. Keuze IJK: de mailsjablonen zijn geen beslisinhoud
+  en mogen daarom buiten Git worden aangepast. Geen wijziging in de regels.
+
 ## teksten: e-mail bij de licentieaanvraag
 
 - "Account aanvragen voor …" opent een e-mail in het mailprogramma (Outlook) aan de beheerder van de tool, met het

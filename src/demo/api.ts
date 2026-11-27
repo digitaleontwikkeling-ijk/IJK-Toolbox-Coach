@@ -22,6 +22,7 @@ import { legeWizard, wizardDataSchema, type WizardData } from "../domain/wizard"
 import { ApiFoutClient } from "../components/client";
 import contentJson from "./content.generated.json";
 import { onderwerpVanVeld } from "../domain/onderwerp";
+import { mailsjabloonSchema, mailsjablonen, standaardSjabloon } from "../domain/mailsjablonen";
 
 const content = contentJson as unknown as Content;
 const SLEUTEL = "ijk-toolbox-coach-demo";
@@ -67,6 +68,8 @@ interface DemoStaat {
   besluiten: { adviesId: string; toetserRol: string; toetserPseudoniemId: string; besluit: Besluit; toelichting: string | null; datum: string }[];
   log: { tijd: string; tekst: string }[];
   teller: Record<string, number>;
+  /** Eigen mailsjablonen van de beheerder (per tool). */
+  mailsjablonen?: Record<string, { onderwerp: string; tekst: string }>;
 }
 
 function lees(): DemoStaat {
@@ -169,7 +172,7 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
 
   if (pad === "/api/content") {
     const g = vereis("medewerker", "toetser_compliance", "toetser_architect", "beheerder");
-    return r({ ...content, gebruiker: { naam: g.naam, rollen: g.rollen } });
+    return r({ ...content, mailsjablonen: mailsjablonen(content.tools, content.teksten, s.mailsjablonen ?? {}), gebruiker: { naam: g.naam, rollen: g.rollen } });
   }
 
   // Concept (de wizard)
@@ -367,6 +370,23 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       if (status) a.status = status;
       return r({ status: a.status });
     }
+  }
+
+  // Beheer: mailsjablonen voor de licentieaanvraag
+  if (deel[0] === "beheer" && deel[1] === "mailsjablonen") {
+    vereis("beheerder");
+    const eigen = (s.mailsjablonen ??= {});
+    if (methode === "PUT" || methode === "DELETE") {
+      const tool = String(body?.tool ?? "");
+      if (!content.tools.tools.find((t) => t.id === tool)?.beheer) throw fout(400, "Onbekende tool, of een tool zonder beheerder.");
+      if (methode === "PUT") {
+        const v = mailsjabloonSchema.safeParse(body);
+        if (!v.success) throw fout(400, v.error.issues[0]?.message ?? "Ongeldig sjabloon.");
+        eigen[tool] = v.data;
+      } else delete eigen[tool];
+      s.log.push({ tijd: nu(), tekst: `mailsjabloon ${tool} gewijzigd` });
+    }
+    return r({ sjablonen: mailsjablonen(content.tools, content.teksten, eigen), standaard: standaardSjabloon(content.teksten) });
   }
 
   // Beheer

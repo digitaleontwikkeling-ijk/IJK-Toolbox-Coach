@@ -39,8 +39,10 @@ licentie of account aanvraagt): Claude Code → digitaleontwikkeling@ijk.nl, Mic
 
 Bij "Account aanvragen voor …" opent de app een e-mail in het mailprogramma van de medewerker (mailto; bij IJK
 Outlook): **aan** `tool.beheer.email`, **onderwerp** "Aanvraag licentie <tool> - <voornaam en achternaam>", en een
-korte tekst met de referentie, de uitkomst, de voorwaarden en de link naar het advies (`src/lib/aanvraagMail.ts`,
-teksten `aanvraag_mail`). De medewerker verstuurt die mail zelf. Daarnaast gaat de webhook naar `ACTIE_ACCOUNT_URL`
+tekst volgens het mailsjabloon van die tool (`src/lib/aanvraagMail.ts`). De standaard staat in `teksten.yaml`
+(`aanvraag_mail`); een beheerder kan per tool een eigen onderwerp en tekst instellen in het beheerscherm
+("Mailsjablonen voor licentieaanvragen", tabel `mailsjabloon`, wijzigingen in de audit-log). Velden: {naam}, {tool},
+{licentie} (`beheer.licentienaam` in `tools.yaml`), {referentie}, {uitkomst}, {voorwaarden}, {link}. De medewerker verstuurt die mail zelf. Daarnaast gaat de webhook naar `ACTIE_ACCOUNT_URL`
 (registratie en status); laat de flow daarom zelf **geen** e-mail meer sturen, anders krijgt de beheerder hem dubbel.
 De webapp verstuurt zelf geen e-mail (geen mailserver of geheimen in de app). In Teams opent de mail in een nieuw
 venster; lukt dat niet, dan staat er na de aanvraag een link "Open de e-mail … opnieuw".

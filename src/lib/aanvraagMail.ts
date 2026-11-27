@@ -6,13 +6,14 @@
 export interface AanvraagMailInvoer {
   aan: string;
   tool: string;
+  licentie: string;
   naam: string;
   referentie: string;
   uitkomst: string;
   voorwaarden: string[];
   link: string;
   onderwerp: string; // sjabloon met {tool} en {naam}
-  tekst: string; // sjabloon met {tool}, {referentie}, {uitkomst}, {voorwaarden}, {link}, {naam}
+  tekst: string; // sjabloon met {tool}, {licentie}, {referentie}, {uitkomst}, {voorwaarden}, {link}, {naam}
 }
 
 export function aanvraagMailto(m: AanvraagMailInvoer): string {
@@ -20,6 +21,7 @@ export function aanvraagMailto(m: AanvraagMailInvoer): string {
     s
       .replaceAll("{tool}", m.tool)
       .replaceAll("{naam}", m.naam)
+      .replaceAll("{licentie}", m.licentie)
       .replaceAll("{referentie}", m.referentie)
       .replaceAll("{uitkomst}", m.uitkomst)
       .replaceAll("{voorwaarden}", m.voorwaarden.length ? m.voorwaarden.map((v) => `- ${v}`).join("\n") : "-")

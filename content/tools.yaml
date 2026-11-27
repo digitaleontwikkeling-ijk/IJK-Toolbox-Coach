@@ -3,12 +3,12 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.7"
+versie: "0.8"
 
 # ai: true = de tool gebruikt zelf AI. Dan staat de vraag "Gebruikt je oplossing AI?" vooraf op "Ja"
 # (een sterk signaal, de medewerker bevestigt). Bij andere tools hangt het af van wat je bouwt.
 # beheer: wie de tool beheert en waar je een licentie of account aanvraagt. Bij "Account aanvragen" gaat de
-# aanvraag (via de webhook, zie docs/acties.md) per e-mail naar dit adres.
+# aanvraag per e-mail naar dit adres. licentienaam: hoe de licentie heet in de aanvraagmail ({licentie}).
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
@@ -18,6 +18,7 @@ tools:
     beheer:
       naam: ICT Driessen Groep
       email: ict@driessengroep.nl
+      licentienaam: Copilot for MS365 licentie
       licentie: De uitgebreide licentie Copilot for Microsoft 365. Daarmee heb je ook Copilot workflows.
   - id: copilot_workflows
     naam: Copilot workflows
@@ -31,6 +32,7 @@ tools:
     beheer:
       naam: ICT Driessen Groep
       email: ict@driessengroep.nl
+      licentienaam: Copilot for MS365 licentie
       licentie: Onderdeel van de uitgebreide licentie Copilot for Microsoft 365.
   - id: hubbi
     naam: HubBI
@@ -41,6 +43,7 @@ tools:
     beheer:
       naam: HR tech (IJK)
       email: info@hubbi.nl # TODO: definitief adres voor licentieaanvragen bevestigen
+      licentienaam: HubBI-licentie
   - id: ai_flows
     naam: AI Flows
     omschrijving: >-
@@ -52,6 +55,7 @@ tools:
     beheer:
       naam: HR tech (IJK)
       email: info@hubbi.nl # TODO: definitief adres voor licentieaanvragen bevestigen
+      licentienaam: AI Flows-add-on voor HubBI
       licentie: Add-on binnen HubBI.
   - id: claude_code
     naam: Claude Code
@@ -60,6 +64,7 @@ tools:
     beheer:
       naam: Team Digitale Ontwikkeling
       email: digitaleontwikkeling@ijk.nl
+      licentienaam: Claude Code-licentie
   - id: azure_openai
     naam: Azure OpenAI
     omschrijving: >-

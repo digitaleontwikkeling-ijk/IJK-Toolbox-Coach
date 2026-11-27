@@ -240,7 +240,15 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
   beslisregels als de regelset gelijk is; anders de korte motivatie), de aandachtspunten voor privacy, AI en techniek
   onder één titel, "Wat moet de use case-eigenaar (extra) regelen?", zonder de uitleg over de coach en de disclaimer.
 
-## 19. Rust en witruimte
+## 19. Licentieaanvraag per e-mail en mailsjablonen
+
+- "Account aanvragen" opent een e-mail (mailto) aan de beheerder van de tool (`beheer` in `tools.yaml`), met onderwerp
+  en tekst uit het mailsjabloon van die tool. De medewerker verstuurt de mail zelf; de webhook registreert de aanvraag.
+- Mailsjablonen: standaard in `teksten.yaml` (`aanvraag_mail`); per tool aan te passen door een beheerder in het
+  beheerscherm (tabel `mailsjabloon`, migratie 007, audit-log, API `/api/beheer/mailsjablonen`). Keuze IJK: dit is
+  geen beslisinhoud, dus aanpassen buiten Git mag. Het adres zelf blijft in `tools.yaml` (via Git).
+
+## 20. Rust en witruimte
 
 - Meer regelafstand (1,6) en witruimte tussen en binnen blokken: alinea's, lijsten, keuzes, kaarten, het gesprek en de
   adviescard. In de vraag van de coach geen kader meer om de keuzes (de beurt zelf is het kader).
