@@ -8,6 +8,7 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Toetsers: "Jouw advies en/of besluit" in plaats van "Jouw besluit" bij het besluitformulier.
 - Toetsers en beheerders: bij de privacy- en AI-beoordeling "(antwoord van de medewerker)" in plaats van "(jouw antwoord)".
 - Toetsers en beheerders: kleurlabels bij de antwoorden op de checks in "Alle vragen en antwoorden"; de tabel
   "Antwoorden" op de kaart is daar weg (dubbel).
