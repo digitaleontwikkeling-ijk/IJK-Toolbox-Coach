@@ -133,6 +133,13 @@ toetsing:
   intro: Aanvragen die bij jouw rol als toetser horen. Bekijk de antwoorden en leg je besluit vast. Je inzage wordt vastgelegd in de audit-log.
   besluit_titel: Advies en/of besluit
   besluit_label: Jouw advies en/of besluit
+  besluit_rol: Namens welke rol geef je je advies en/of besluit?
+  besluit_als: "Je geeft je advies en/of besluit als {rol}."
+  besluit_knop: Advies en/of besluit vastleggen
+  besluit_kies: Kies je advies en/of besluit.
+  besluit_gelukt: "Je advies en/of besluit is vastgelegd. Status van de aanvraag: {status}."
+  besluit_fout: Je advies en/of besluit kon niet worden vastgelegd.
+  besluit_geen: Je hoeft voor deze aanvraag geen advies of besluit (meer) te geven.
   toelichting_voorwaarden: Welke voorwaarden gelden?
   toelichting_afwijzing: Waarom wijs je de aanvraag af?
   ter_informatie: Ter informatie (Niet op deze manier)

@@ -86,11 +86,11 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await expect(page.getByRole("group", { name: "Jouw advies en/of besluit" })).toBeVisible();
   // Voorwaarden zijn verplicht bij "met voorwaarden".
   await page.getByText("Goedgekeurd met voorwaarden", { exact: true }).click();
-  await page.getByRole("button", { name: "Besluit vastleggen" }).click();
+  await page.getByRole("button", { name: "Advies en/of besluit vastleggen" }).click();
   await expect(page.locator(".foutmelding")).toContainText("Welke voorwaarden gelden?");
   await page.getByLabel(/Welke voorwaarden gelden/).fill("Eerst een DPIA uitvoeren; alleen geanonimiseerde verzuimcijfers tonen.");
-  await page.getByRole("button", { name: "Besluit vastleggen" }).click();
-  await expect(page.getByText("Je besluit is vastgelegd. Status van de aanvraag: In toetsing.")).toBeVisible();
+  await page.getByRole("button", { name: "Advies en/of besluit vastleggen" }).click();
+  await expect(page.getByText("Je advies en/of besluit is vastgelegd. Status van de aanvraag: In toetsing.")).toBeVisible();
   await expect(page.locator(".adviescard")).toContainText("Eerst een DPIA uitvoeren");
 });
 
@@ -99,9 +99,9 @@ test("architect keurt goed; eindstatus wordt 'goedgekeurd met voorwaarden'", asy
   await page.goto("/toetsing");
   await page.getByRole("link", { name: referentie }).click();
   await page.getByText("Goedgekeurd", { exact: true }).click();
-  await page.getByRole("button", { name: "Besluit vastleggen" }).click();
+  await page.getByRole("button", { name: "Advies en/of besluit vastleggen" }).click();
   await expect(page.getByText("Status van de aanvraag: Goedgekeurd met voorwaarden.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Advies en/of besluit vastleggen" })).toHaveCount(0);
 });
 
 test("medewerker ziet het besluit bij Mijn aanvragen", async ({ page }) => {
@@ -125,7 +125,7 @@ test("beheerder ziet alle adviezen en de inhoud, zonder besluitformulier", async
   await expect(page.getByRole("heading", { name: `Aanvraag ${referentie}` })).toBeVisible();
   await expect(page.locator(".paneel").first()).toContainText("Ingediend door: Testmedewerker Anna");
   await expect(page.locator(".adviescard")).toContainText("Besluiten van de toetsers");
-  await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Advies en/of besluit vastleggen" })).toHaveCount(0);
 });
 
 test("na het inloggen begint iedereen op de pagina die bij de rol hoort; alleen medewerkers zien Nieuw idee", async ({ page }) => {
