@@ -21,7 +21,7 @@ import type {
   VerduidelijkInvoer,
 } from "./CoachClient";
 import { verwijderContactgegevens } from "./privacy";
-import { systeemPrompt, type CoachTaak } from "./prompts";
+import { systeemPrompt, type CoachTaak, type PromptOpties } from "./prompts";
 
 export interface HermesInstellingen {
   /** Basis-URL inclusief /v1, bijvoorbeeld http://hermes.intern:8642/v1 */
@@ -57,7 +57,7 @@ export class HermesCoachClient implements CoachClient {
   ) {}
 
   /** Eén verzoek aan Hermes. Stuurt alleen het pseudoniem en de inhoud die voor de taak nodig is. */
-  private async vraag(taak: CoachTaak, ctx: CoachContext, invoer: object, opties: { tool?: string } = {}): Promise<unknown> {
+  private async vraag(taak: CoachTaak, ctx: CoachContext, invoer: object, opties: PromptOpties = {}): Promise<unknown> {
     const { apiUrl, apiKey, model, timeoutMs } = this.instellingen;
     const res = await this.doeFetch(`${apiUrl.replace(/\/$/, "")}/chat/completions`, {
       method: "POST",
@@ -89,12 +89,18 @@ export class HermesCoachClient implements CoachClient {
     return this.vraag("verduidelijk", ctx, { beschrijving: schoon(beschrijving) });
   }
 
-  tooladvies({ beschrijving, verduidelijking, uitsluiten }: TooladviesInvoer, ctx: CoachContext) {
-    return this.vraag("tooladvies", ctx, {
-      beschrijving: schoon(beschrijving),
-      verduidelijking: verduidelijking.map((v) => ({ vraag: v.vraag, antwoord: schoon(v.antwoord) })),
-      uitsluiten,
-    });
+  tooladvies({ beschrijving, verduidelijking, uitsluiten, adviesregels }: TooladviesInvoer, ctx: CoachContext) {
+    // De adviesregels gaan in de systeeminstructie (als afgebakende gegevens), niet in het gebruikersbericht.
+    return this.vraag(
+      "tooladvies",
+      ctx,
+      {
+        beschrijving: schoon(beschrijving),
+        verduidelijking: verduidelijking.map((v) => ({ vraag: v.vraag, antwoord: schoon(v.antwoord) })),
+        uitsluiten,
+      },
+      { adviesregels },
+    );
   }
 
   checksVoorinvullen({ beschrijving, verduidelijking, tool }: ChecksInvoer, ctx: CoachContext) {
@@ -134,7 +140,7 @@ export class HermesCoachClient implements CoachClient {
     );
   }
 
-  chat({ vraag, stap, beschrijving, tool, geschiedenis, onderwerp }: ChatInvoer, ctx: CoachContext) {
+  chat({ vraag, stap, beschrijving, tool, geschiedenis, onderwerp, adviesregels }: ChatInvoer, ctx: CoachContext) {
     return this.vraag(
       "chat",
       ctx,
@@ -146,7 +152,7 @@ export class HermesCoachClient implements CoachClient {
         geschiedenis: geschiedenis.map((b) => ({ rol: b.rol, tekst: schoon(b.tekst) })),
         ...(onderwerp ? { huidige_vraag: onderwerp } : {}),
       },
-      { tool },
+      { tool, adviesregels },
     );
   }
 }

@@ -172,6 +172,16 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
         <section>
           <h3>Tooladvies</h3>
           <p><ToolIcoon content={content} tool={advies.tooladvies.tool} /><strong>{tool}</strong>{!compact && advies.tooladvies.motivatie ? ` — ${advies.tooladvies.motivatie}` : ""}</p>
+          {(advies.tooladvies.aanvullend?.length ?? 0) > 0 && (
+            <ul className="tool-aanvullend" aria-label={content.teksten.tooladvies.aanvullend_titel}>
+              {advies.tooladvies.aanvullend!.map((a) => (
+                <li key={a.tool}>
+                  <ToolIcoon content={content} tool={a.tool} /> <strong>{content.tools.tools.find((x) => x.id === a.tool)?.naam ?? a.tool}</strong>
+                  {compact ? ` · ${content.tools.tools.find((x) => x.id === a.tool)?.rol ?? ""}` : `: ${a.rol}`}
+                </li>
+              ))}
+            </ul>
+          )}
           {link && (
             <p className="hulptekst" style={{ margin: 0, overflowWrap: "anywhere" }}>
               Link: <a href={link} rel="noopener noreferrer nofollow" target="_blank">{link}</a>

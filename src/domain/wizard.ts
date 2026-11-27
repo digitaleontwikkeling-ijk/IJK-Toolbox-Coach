@@ -38,6 +38,16 @@ export const tooladviesSchema = z.object({
   /** Alleen bij tool = ANDERE_TOOL. */
   andereTool: andereToolSchema.optional(),
   motivatie: z.string().max(1000).default(""),
+  /** Wat de medewerker wil bereiken (van de coach). */
+  doel: z.string().max(300).optional(),
+  /** De rol van de hoofdtool in de oplossing. */
+  rol: z.string().max(300).optional(),
+  /** Aanvullende tools bij de hoofdtool, met hun rol. Fase 2 gaat over de hoofdtool. */
+  aanvullend: z.array(z.object({ tool: id, rol: z.string().max(300) })).max(2).optional(),
+  /** Afgewogen alternatieven en waarom die minder passen. */
+  alternatieven: z.array(z.object({ tool: id, waarom_niet: z.string().max(300) })).max(3).optional(),
+  /** Versie van de adviesregels bij dit advies (adviesregels.yaml + aantal beheerwijzigingen). */
+  regelsversie: z.string().max(40).optional(),
   /** Kwam het advies van de coach, of koos de medewerker zelf? */
   bron: z.enum(["coach", "medewerker"]),
   geaccepteerd: z.boolean().default(false),

@@ -197,7 +197,7 @@ export function Wizard() {
 
   async function vraagTooladvies(uitsluiten: string[]) {
     const d = dataRef.current!;
-    const r = await coach<{ behoefte: string; tool: string; motivatie: string }>("tooladvies", {
+    const r = await coach<Omit<NonNullable<WizardData["tooladvies"]>, "bron" | "geaccepteerd">>("tooladvies", {
       beschrijving: d.beschrijving,
       verduidelijking: d.verduidelijking,
       uitsluiten,
@@ -302,8 +302,11 @@ export function Wizard() {
     }
     setFout(null);
     wijzig((d) => {
-      const metAi = content!.tools.tools.find((x) => x.id === d.tooladvies!.tool)?.ai === true;
-      // Tool met AI: "Gebruikt je oplossing AI?" vooraf op Ja (de medewerker bevestigt of past aan).
+      // Tool met AI (ook een aanvullende tool, zoals Azure OpenAI als AI-bouwsteen): "Gebruikt je oplossing AI?"
+      // vooraf op Ja (de medewerker bevestigt of past aan). Zo hoeft dat niet opnieuw gevraagd te worden.
+      const metAi = [d.tooladvies!.tool, ...(d.tooladvies!.aanvullend ?? []).map((a) => a.tool)].some(
+        (id) => content!.tools.tools.find((x) => x.id === id)?.ai === true,
+      );
       const voorstel = metAi && d.verdieping.ai_gebruik === undefined;
       return {
         ...d,

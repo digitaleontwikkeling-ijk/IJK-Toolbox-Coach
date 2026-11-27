@@ -1,17 +1,24 @@
 # Tools in de IJK Toolbox en de behoeften waarvoor de coach ze adviseert.
-# Bron: presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026).
+# Bron: presentatie "Verantwoord innoveren en ontwikkelen met de IJK Toolbox coach" (nov. 2026) en
+# "IJK Digitale Toolbox" (positionering, nov. 2026).
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
+# Wat een tool doet, waarvoor hij geschikt is en wanneer de coach hem adviseert (de adviesregels) staat in
+# adviesregels.yaml en is te beheren in het beheerscherm. Hier staan de vaste gegevens per tool.
 # TODO: valideren door toetsers
 
-versie: "0.8"
+versie: "0.9"
 
+# categorie: werken | automatiseren | bouwen | ai_modellen. rol: de rol van de tool in een oplossing (vast label).
 # ai: true = de tool gebruikt zelf AI. Dan staat de vraag "Gebruikt je oplossing AI?" vooraf op "Ja"
-# (een sterk signaal, de medewerker bevestigt). Bij andere tools hangt het af van wat je bouwt.
+# (een sterk signaal, de medewerker bevestigt). Bij andere tools hangt het af van wat je bouwt. AI Flows kan ook
+# zonder AI (flow editor binnen HubBI), dus daar niet.
 # beheer: wie de tool beheert en waar je een licentie of account aanvraagt. Bij "Account aanvragen" gaat de
 # aanvraag per e-mail naar dit adres. licentienaam: hoe de licentie heet in de aanvraagmail ({licentie}).
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
+    categorie: werken
+    rol: Assistent voor de medewerker
     spelregels: spelregels/m365_copilot.yaml
     ai: true
     icoon: iconen/m365_copilot.png
@@ -22,11 +29,8 @@ tools:
       licentie: De uitgebreide licentie Copilot for Microsoft 365. Daarmee heb je ook Copilot workflows.
   - id: copilot_workflows
     naam: Copilot workflows
-    omschrijving: >-
-      Automatiseert terugkerende taken binnen Microsoft 365 (Outlook, Teams, SharePoint, Planner).
-      Kan niet koppelen met systemen buiten Microsoft 365. De workflow draait op het account van de medewerker.
-      Functie in vroege toegang (Microsoft Frontier-programma) die nog kan veranderen.
-      Gebruikt de AI-modellen die Copilot biedt, ook GPT-modellen van OpenAI via de Microsoft 365-tenant.
+    categorie: automatiseren
+    rol: Automatiseringsplatform binnen Microsoft 365
     spelregels: spelregels/copilot_workflows.yaml
     icoon: iconen/copilot_workflows.png
     beheer:
@@ -36,8 +40,8 @@ tools:
       licentie: Onderdeel van de uitgebreide licentie Copilot for Microsoft 365.
   - id: hubbi
     naam: HubBI
-    omschrijving: >-
-      IJK's eigen automatiserings- en integratieplatform voor AFAS: voor handmatige, repeterende taken in en om AFAS.
+    categorie: automatiseren
+    rol: Automatiseringsplatform voor bedrijfsprocessen
     spelregels: spelregels/hubbi.yaml
     icoon: iconen/hubbi.png
     beheer:
@@ -46,11 +50,9 @@ tools:
       licentienaam: HubBI-licentie
   - id: ai_flows
     naam: AI Flows
-    omschrijving: >-
-      Add-on binnen HubBI om AI-stappen toe te voegen aan werkprocessen. Gebruikt standaard Microsoft Azure OpenAI,
-      de zelf gehoste modellen in de Azure-tenant van IJK (de voorkeursmodellen van IJK).
+    categorie: automatiseren
+    rol: Flow editor binnen HubBI
     spelregels: spelregels/ai_flows.yaml
-    ai: true
     icoon: iconen/ai_flows.png
     beheer:
       naam: HR tech (IJK)
@@ -59,6 +61,8 @@ tools:
       licentie: Add-on binnen HubBI.
   - id: claude_code
     naam: Claude Code
+    categorie: bouwen
+    rol: Ontwikkeltool
     spelregels: spelregels/claude_code.yaml
     icoon: iconen/claude_code.png
     beheer:
@@ -67,9 +71,8 @@ tools:
       licentienaam: Claude Code-licentie
   - id: azure_openai
     naam: Azure OpenAI
-    omschrijving: >-
-      Microsoft Azure OpenAI: de zelf gehoste AI-modellen in de Azure-tenant van IJK. Dit zijn de voorkeursmodellen
-      van IJK; ze zijn standaard beschikbaar in AI Flows.
+    categorie: ai_modellen
+    rol: AI-model en capability
     # TODO: beheer en aanvraagadres voor Azure OpenAI nog bepalen.
     spelregels: spelregels/azure_openai.yaml
     ai: true
@@ -77,32 +80,20 @@ tools:
 
 behoeften:
   - id: sneller_afhandelen
-    omschrijving: Mails, vergaderingen en documenten sneller afhandelen
+    omschrijving: Het eigen kenniswerk ondersteunen met AI, zoals mails, vergaderingen, teksten en documenten
     tools: [m365_copilot]
   - id: m365_automatiseren
-    omschrijving: Een taak in Microsoft 365 automatiseren
+    omschrijving: Een terugkerende taak binnen Microsoft 365 automatiseren
     tools: [copilot_workflows]
   - id: verbinden
-    omschrijving: Systemen of gegevens met elkaar verbinden
+    omschrijving: Een bedrijfsproces automatiseren, in en rond AFAS of met meerdere systemen
     tools: [hubbi]
   - id: ai_in_werkproces
-    omschrijving: AI toevoegen aan een werkproces
-    tools: [ai_flows]
+    omschrijving: AI als bouwsteen toevoegen aan een geautomatiseerd proces
+    tools: [hubbi, copilot_workflows]
   - id: bouwen
-    omschrijving: Een tool, app of dashboard bouwen
+    omschrijving: Een eigen applicatie, tool of dashboard bouwen (maatwerk)
     tools: [claude_code]
   - id: ai_model_eigen_oplossing
-    omschrijving: Een AI-model gebruiken in een eigen oplossing
+    omschrijving: Een AI-model gebruiken in een eigen oplossing of proces
     tools: [azure_openai]
-
-# Toelichting bij het kiezen van een tool. Wordt in de wizard getoond én aan de coach meegegeven.
-keuzehints:
-  - HubBI is voor handmatige, repeterende taken in en om AFAS. Gebruik HubBI bij voorkeur ook voor data van klantmedewerkers waarvoor IJK verwerker is.
-  - Copilot workflows automatiseert terugkerende taken binnen Microsoft 365 en kan niet koppelen met systemen buiten Microsoft 365.
-  - AI Flows en Copilot workflows zijn beide geschikt om AI-stappen in werkprocessen in te bouwen. Kies AI Flows bij data van klantmedewerkers waarvoor IJK verwerker is.
-  - Microsoft Azure OpenAI (de zelf gehoste modellen in de Azure-tenant van IJK) zijn de voorkeurs-AI-modellen. In AI Flows zijn ze standaard beschikbaar. In Copilot workflows gebruik je de modellen die Copilot biedt, ook GPT-modellen van OpenAI via de Microsoft 365-tenant.
-  - Met de uitgebreide licentie Copilot for Microsoft 365 (aan te vragen bij ICT Driessen Groep) heb je ook Copilot workflows.
-
-# Alleen voor de coach (niet zichtbaar in de wizard).
-coach_instructies:
-  - IJK gebruikt geen n8n. Stel het nooit voor.

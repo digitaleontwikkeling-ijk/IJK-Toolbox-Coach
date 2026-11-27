@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ANDERE_TOOL, type Regelset, type Spelregels, type Teksten, type ToolsConfig } from "@/domain/content-schema";
 import type { AdviesRij } from "@/db/adviezen";
+import type { Adviesregel } from "@/domain/adviesregels";
 import { volledigPad } from "@/lib/paden";
 
 export interface ContentDto {
@@ -14,6 +15,8 @@ export interface ContentDto {
   mailsjablonen?: Record<string, { onderwerp: string; tekst: string; aangepast?: boolean }>;
   /** tool-id → logo (data-URI); alleen tools met een icoon. */
   iconen: Record<string, string>;
+  /** De actieve adviesregels voor het tooladvies (beheerbaar), voor de keuzehulp in de wizard. */
+  adviesregelsActief?: Adviesregel[];
   gebruiker: { naam: string; rollen: string[] };
 }
 

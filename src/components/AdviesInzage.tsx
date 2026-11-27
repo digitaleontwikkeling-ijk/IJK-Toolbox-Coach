@@ -51,6 +51,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
               <p className="hulptekst" style={{ margin: 0 }}>
                 Pseudoniem: {advies.pseudoniemId?.slice(0, 12)}… · Regelversie {advies.regelversie} · Toolsversie{" "}
                 {advies.toolsversie}
+                {advies.tooladvies.regelsversie ? ` · Adviesregels ${advies.tooladvies.regelsversie}` : ""}
               </p>
             </div>
             <Adviescard advies={advies} content={content} weergave="inzage" />

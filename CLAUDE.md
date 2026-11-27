@@ -15,8 +15,9 @@ een vervolgactie (webhooks). Ook als persoonlijk tabblad in Microsoft Teams. Pro
   functies: `src/domain/beslisregels.ts` en `src/domain/verdieping.ts`. De coach (Hermes Agent, profiel
   `toolbox-coach`) stelt alleen vragen, doet voorstellen en legt uit; alles wordt gevalideerd (Zod).
 - **Inhoud staat in `content/` (YAML), niet in code.** Elke inhoudelijke wijziging: versienummer verhogen in
-  `regelset.yaml` of `tools.yaml` en een regel in `content/CHANGELOG.md`. Het versienummer wordt bij elk advies
-  opgeslagen.
+  `regelset.yaml`, `tools.yaml` of `adviesregels.yaml` en een regel in `content/CHANGELOG.md`. Het versienummer wordt
+  bij elk advies opgeslagen. Uitzondering: mailsjablonen en adviesregels (tooladvies) kan een beheerder in het
+  beheerscherm wijzigen (database, audit-log; adviesregels met historie en versie `<versie>+b<n>`).
 - **Verzin geen beslisregels.** Is iets onduidelijk: vraag het, of maak het instelbaar en markeer het met
   `TODO: valideren door toetsers`. Pas bestaande regels niet stilzwijgend aan.
 - **Vraag informatie één keer** (REUSE → REFINE → ASK): wat uit eerdere antwoorden volgt, wordt niet opnieuw gevraagd.
@@ -53,7 +54,7 @@ naar `main` en voeg die samen (merge), zodat de demo wordt bijgewerkt. Controlee
 ## Waar staat wat
 | Map | Inhoud |
 | --- | --- |
-| `content/` | Regelset (checks, aanvullende vragen, privacy- en AI-vragen, regels), tools en logo's, spelregels, teksten |
+| `content/` | Regelset (checks, aanvullende vragen, privacy- en AI-vragen, regels), tools en logo's, adviesregels (tooladvies), spelregels, teksten |
 | `src/domain/` | Beslisregels, verdieping (feiten met herkomst, DPIA-telling, AI-risico), schema's, wizarddata |
 | `src/components/` | Wizard (Stap1–3, uitleg fase 2), Adviescard, Beoordelingen, lijsten, toetsing |
 | `src/coach/` | Hermes- en oefencoach, prompts, validatie |

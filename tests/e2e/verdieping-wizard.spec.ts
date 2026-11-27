@@ -9,7 +9,7 @@ test("vragen verschijnen alleen als ze nodig zijn; terugzetten naar openbare geg
   await login(page, "Testmedewerker Chris");
   await naarStap3(page, "Een overzicht van verlof voor mijn team (testscenario).");
   await page.getByRole("button", { name: "Zelf een tool kiezen" }).click();
-  await page.getByText("Claude Code", { exact: true }).click();
+  await page.locator(`label[for="tool-claude_code"]`).click();
   await naarChecks(page, "Claude Code past, verder →");
 
   await kies(page, "data", "Openbaar");

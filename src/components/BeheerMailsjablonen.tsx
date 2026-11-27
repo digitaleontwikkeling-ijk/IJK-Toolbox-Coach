@@ -88,7 +88,7 @@ function Sjabloon({ toolId, toolNaam, aan, sjabloon, teksten: t, onOpgeslagen }:
 
   const id = `mail-${toolId}`;
   return (
-    <details className="paneel mailsjabloon">
+    <details className="paneel beheer-blok mailsjabloon">
       <summary>
         <h3 id={`${id}-kop`}>
           {toolNaam} <span className="status">{sjabloon.aangepast ? t.aangepast : t.standaard}</span>

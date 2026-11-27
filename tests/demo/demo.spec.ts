@@ -85,6 +85,16 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
   await expect(page).toHaveURL(new RegExp(`${B}/beheer/$`));
   await expect(page.getByText("Regelset versie")).toBeVisible();
   await expect(page.getByRole("link", { name: ref })).toBeVisible();
+  // Adviesregels beheren in de demo: deactiveren en terug naar de standaard (zelfde controles als de server).
+  const groep = page.locator("details.adviesregels-groep", { has: page.getByRole("heading", { name: /^HubBI/ }) });
+  await groep.locator("> summary").click();
+  const regel = groep.locator("details.adviesregel", { has: page.locator("summary", { hasText: "Wanneer HubBI" }) });
+  await regel.locator("> summary").click();
+  await regel.getByLabel("Actief (wordt gebruikt bij nieuwe adviezen)").uncheck();
+  await regel.getByRole("button", { name: "Opslaan" }).click();
+  await expect(regel.locator("> summary")).toContainText("inactief");
+  await regel.getByRole("button", { name: "Standaard herstellen" }).click();
+  await expect(regel.getByText("De standaardregel geldt weer.")).toBeVisible();
 
   // Medewerker heeft geen toegang tot toetsing.
   await login(page, "Testmedewerker Bram");

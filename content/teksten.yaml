@@ -64,6 +64,103 @@ mailsjablonen_beheer:
   aangepast: eigen sjabloon
   standaard: standaard
 
+# Het tooladvies (fase 1): hoofdtool, aanvullende tools en afgewogen alternatieven.
+tooladvies:
+  doel_label: Wat je wilt bereiken
+  aanvullend_titel: Aanvullende tools
+  alternatieven_titel: Afgewogen alternatieven
+  geen_goedkeuring: >-
+    Dit advies gaat over welke tool past bij wat je wilt. Of je de tool voor deze use case mag gebruiken, en onder
+    welke voorwaarden, bekijken we hierna met de checks.
+  keuzehulp_titel: Zo kies ik een tool
+
+adviesregels_beheer:
+  titel: Adviesregels voor het tooladvies
+  intro: >-
+    Met deze regels kiest de coach welke tool, of welke hoofdtool met aanvullende tools, past bij een use case. Ze
+    bepalen niet of de use case mag: dat doen de checks met de vaste beslisregels. Een wijziging geldt direct bij
+    nieuwe adviezen. Elke wijziging wordt eerst gecontroleerd; klopt er iets niet, dan blijven de huidige regels
+    actief. Elke wijziging komt in de audit-log en in de wijzigingsgeschiedenis.
+  versie: "Versie van de regels: {versie} (standaard uit content/adviesregels.yaml, plus het aantal wijzigingen hier)."
+  algemeen: Algemeen
+  aantal: "{n} regels"
+  aantal_inactief: "{n} inactief"
+  inactief: inactief
+  aandacht: "Let op:"
+  soorten_titel: Welke soorten regels zijn er?
+  soorten:
+    beschrijving: Beschrijving
+    toepassing: Toepassingen
+    voorkeur: Voorkeursregel
+    uitsluiting: Uitsluitingsregel
+    combinatie: Combinatie
+    algemeen: Adviesregel
+    voorwaarde: Voorwaarde
+    voorbeeld: Voorbeeld
+  soorten_uitleg:
+    beschrijving: de hoofdrol van een tool (één actieve beschrijving per tool)
+    toepassing: waarvoor de tool geschikt is, één toepassing per regel in de tekst
+    voorkeur: wanneer deze tool vóór een andere tool gaat; bij tegenstrijdige voorkeuren wint de laagste prioriteit
+    uitsluiting: wanneer de coach een tool niet adviseert, of nooit als hoofdtool
+    combinatie: wanneer een tool als aanvullende tool bij een hoofdtool hoort; de tekst is de rol in de oplossing
+    algemeen: een algemene regel voor het advies, of voor één tool
+    voorwaarde: een compliance-, privacy-, security- of architectuurvoorwaarde die bij het advies hoort
+    voorbeeld: een voorbeeld van een goed advies of een goede combinatie
+  velden:
+    id: Sleutel
+    titel: Titel
+    soort: Soort regel
+    tool: Toepassingsgebied
+    prioriteit: Prioriteit
+    tekst: Tekst
+    boven: Gaat vóór
+    bij: Aanvullend bij deze hoofdtool(s)
+    nooit_hoofdtool: Nooit als hoofdtool adviseren (wel als aanvullende tool)
+    trefwoorden: Trefwoorden
+    actief: Actief (wordt gebruikt bij nieuwe adviezen)
+  id_hulp: Een vaste sleutel van 3 tot 60 kleine letters, cijfers of _, bijvoorbeeld hubbi_facturen. Later niet te wijzigen.
+  prioriteit_hulp: 1 is het zwaarst. Bepaalt de volgorde, en welke voorkeur wint als twee voorkeuren elkaar tegenspreken.
+  tekst_hulp:
+    beschrijving: Wat doet de tool, in één of twee zinnen?
+    toepassing: Zet elke toepassing op een eigen regel.
+    voorkeur: Beschrijf wanneer deze tool vóór de aangevinkte tool(s) gaat.
+    uitsluiting: Beschrijf wanneer de coach deze tool niet adviseert.
+    combinatie: Beschrijf de rol van deze tool naast de hoofdtool. Deze tekst ziet de medewerker in het advies.
+    algemeen: Een regel voor het kiezen of uitleggen van een tool.
+    voorwaarde: Een voorwaarde die de coach bij het advies noemt. De checks in fase 2 blijven gelden.
+    voorbeeld: Een voorbeeld van een goed advies.
+  trefwoorden_hulp: >-
+    Gescheiden door komma's. Alleen voor de oefencoach (zonder AI): komt een trefwoord voor in de use case, dan telt de
+    regel mee. De echte coach leest de tekst. Bij een voorkeur, uitsluiting of combinatie zonder trefwoorden geldt de
+    regel altijd.
+  toevoegen: Nieuwe regel toevoegen
+  nieuwe_regel: Nieuwe regel
+  opslaan: Opslaan
+  annuleren: Annuleren
+  herstellen: Standaard herstellen
+  verwijderen: Verwijderen
+  terugzetten: Terugzetten
+  status:
+    standaard: standaard
+    aangepast: aangepast
+    nieuw: nieuw
+  opgeslagen: De regel is opgeslagen en geldt bij nieuwe adviezen.
+  toegevoegd: De regel is toegevoegd en geldt bij nieuwe adviezen.
+  hersteld: De standaardregel geldt weer.
+  verwijderd: De regel is verwijderd. Via de wijzigingsgeschiedenis zet je hem terug.
+  teruggezet: De vorige versie geldt weer.
+  geannuleerd: Je wijzigingen zijn niet opgeslagen. De opgeslagen regel staat er weer.
+  fout: De regel kon niet worden opgeslagen. Probeer het opnieuw.
+  bevestig_verwijderen: "Weet je zeker dat je de regel ‘{titel}’ wilt verwijderen? Zet hem liever op inactief als je hem later misschien weer nodig hebt."
+  bevestig_terugzetten: Wil je de versie van vóór deze wijziging terugzetten?
+  verwijderde_titel: Verwijderde standaardregels
+  historie_titel: Wijzigingsgeschiedenis
+  historie_leeg: Er zijn nog geen wijzigingen.
+  historie_toegevoegd: toegevoegd
+  historie_gewijzigd: gewijzigd
+  historie_verwijderd: verwijderd
+  vorige_terugzetten: Vorige versie terugzetten
+
 beheer_tool: "Beheer: {naam}. Een licentie of account vraag je aan via {email}."
 aanvraag_naar: "Met de knop hieronder opent een e-mail aan {beheer} in je mailprogramma (bijvoorbeeld Outlook). Verstuur die om je licentie aan te vragen."
 # De e-mail voor de licentieaanvraag (mailto): de standaard voor elke tool. Een beheerder kan per tool een eigen

@@ -23,16 +23,41 @@ export const verduidelijkSchema = z.object({
 export function tooladviesSchema(content: Content, uitsluiten: string[] = []) {
   const toolIds = content.tools.tools.map((t) => t.id);
   const behoefteIds = content.tools.behoeften.map((b) => b.id);
+  const inToolbox = z.string().refine((t) => toolIds.includes(t), "tool staat niet in de IJK Toolbox");
   return z
     .object({
       behoefte: z.string().refine((b) => behoefteIds.includes(b), "onbekende behoefte"),
-      tool: z
-        .string()
-        .refine((t) => toolIds.includes(t), "tool staat niet in de IJK Toolbox")
-        .refine((t) => !uitsluiten.includes(t), "deze tool wilde de medewerker niet"),
+      /** Wat de medewerker wil bereiken. */
+      doel: tekst(300).optional(),
+      tool: inToolbox.refine((t) => !uitsluiten.includes(t), "deze tool mag niet als hoofdtool"),
+      /** De rol van de hoofdtool in de oplossing. */
+      rol: tekst(300).optional(),
       motivatie: tekst(1000),
+      aanvullend: z.array(z.object({ tool: inToolbox, rol: tekst(300) }).strip()).max(2).default([]),
+      alternatieven: z.array(z.object({ tool: inToolbox, waarom_niet: tekst(300) }).strip()).max(3).default([]),
     })
-    .strip();
+    .strip()
+    .superRefine((a, ctx) => {
+      const aanvullend = a.aanvullend.map((x) => x.tool);
+      if (aanvullend.includes(a.tool) || new Set(aanvullend).size !== aanvullend.length) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "aanvullende tools: dubbel of gelijk aan de hoofdtool" });
+      }
+      if (a.alternatieven.some((x) => x.tool === a.tool || aanvullend.includes(x.tool))) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "een alternatief is ook de hoofdtool of een aanvullende tool" });
+      }
+      const teksten = [a.doel, a.rol, a.motivatie, ...a.aanvullend.map((x) => x.rol), ...a.alternatieven.map((x) => x.waarom_niet)];
+      if (teksten.some((t) => t && claimtGoedkeuring(t))) {
+        ctx.addIssue({ code: z.ZodIssueCode.custom, message: "het advies presenteert de tool als goedgekeurd" });
+      }
+    });
+}
+
+/**
+ * Het tooladvies gaat over welke tool functioneel past; of de use case mag, beoordelen de checks in fase 2.
+ * Een advies dat de tool als goedgekeurd of toegestaan presenteert, wordt geweigerd.
+ */
+export function claimtGoedkeuring(tekst: string): boolean {
+  return /\b(je|jij|u)\s+(mag|kunt|kan)\s+(deze tool|dit|het|hem|die)\s+(dus\s+|gewoon\s+|direct\s+|meteen\s+)?(gebruiken|inzetten)\s*(zonder|$|\.)|\b(is|zijn|wordt)\s+(al\s+|dus\s+)?(goedgekeurd|toegestaan)\s+voor\s+(deze|jouw|je|dit)\b|\bzonder\s+(toetsing|toetsen|checks|beoordeling)\b/i.test(tekst);
 }
 
 export const ZEKERHEDEN = ["hoog", "middel", "laag"] as const;

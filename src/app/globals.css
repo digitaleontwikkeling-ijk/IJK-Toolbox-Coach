@@ -218,6 +218,13 @@ fieldset.keuze legend + * { clear: both; }
 /* ---------- Tooladvies en spelregels ---------- */
 .tool-kaart { border: 2px solid var(--blad); border-radius: var(--radius); padding: 1.25rem 1.5rem; }
 .tool-kaart h3 { font-size: 1.3rem; margin-bottom: 0.25rem; }
+.tool-rol { margin-top: 0; color: var(--tekst-zacht, #4a5560); font-weight: 600; }
+.tool-doel { margin-top: 0.25rem; }
+.tool-aanvullend ul, .keuzehulp { padding-left: 1.25rem; }
+.tool-aanvullend li { margin-bottom: 0.5rem; }
+.tool-aanvullend li img { vertical-align: middle; }
+.tool-alternatieven { margin: 0.75rem 0; }
+.witruimte { white-space: pre-line; }
 .spelregels { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); margin-top: 1.25rem; }
 .spelregels h4 { margin: 0 0 0.5rem; font-size: 0.95rem; }
 .spelregels ul { margin: 0; padding-left: 1.1rem; }
@@ -427,13 +434,29 @@ fieldset.keuze legend + * { clear: both; }
 .beoordeling h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
 
 /* Beheer: mailsjablonen */
-.mailsjabloon { margin-top: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
-.mailsjabloon > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
-.mailsjabloon > summary::-webkit-details-marker { display: none; }
-.mailsjabloon > summary::before { content: "▸"; color: var(--water); font-size: 1.1rem; }
-.mailsjabloon[open] > summary::before { content: "▾"; }
-.mailsjabloon > summary h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0; }
-.mailsjabloon[open] > summary { margin-bottom: 1rem; }
-.mailsjabloon .status { font-family: var(--font-tekst); font-weight: 400; }
+.beheer-blok { margin-top: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
+.beheer-blok > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+.beheer-blok > summary::-webkit-details-marker { display: none; }
+.beheer-blok > summary::before { content: "▸"; color: var(--water); font-size: 1.1rem; }
+.beheer-blok[open] > summary::before { content: "▾"; }
+.beheer-blok > summary h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0; }
+.beheer-blok[open] > summary { margin-bottom: 1rem; }
+.beheer-blok .status { font-family: var(--font-tekst); font-weight: 400; }
 .mailsjablonen__velden { margin-bottom: 0.5rem; }
 .mailsjablonen__velden summary { cursor: pointer; color: var(--water); text-decoration: underline; }
+
+/* Beheer: adviesregels (zelfde opbouw als de mailsjablonen) */
+.adviesregel { border-top: 1px solid var(--rand); padding: 0.75rem 0; }
+.adviesregel:first-of-type { border-top: 0; }
+.adviesregel > summary { cursor: pointer; display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem; }
+.adviesregel > summary .status { font-weight: 400; }
+.adviesregel__titel { font-weight: 600; }
+.adviesregel__formulier { margin-top: 0.75rem; }
+.adviesregel__rij { display: grid; gap: 0 1rem; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+.status--inactief { border-style: dashed; }
+.vinkje { display: flex; align-items: center; gap: 0.4rem; margin: 0.25rem 0; }
+fieldset.veld { border: 0; padding: 0; margin-inline: 0; }
+fieldset.veld legend { font-weight: 600; padding: 0; }
+.adviesregels-lijst { list-style: none; padding: 0; }
+.adviesregels-lijst li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0.5rem; padding: 0.4rem 0; border-top: 1px solid var(--rand); }
+.adviesregels-lijst li:first-child { border-top: 0; }

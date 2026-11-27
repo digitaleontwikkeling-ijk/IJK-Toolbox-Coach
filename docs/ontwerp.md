@@ -253,3 +253,45 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Meer regelafstand (1,6) en witruimte tussen en binnen blokken: alinea's, lijsten, keuzes, kaarten, het gesprek en de
   adviescard. In de vraag van de coach geen kader meer om de keuzes (de beurt zelf is het kader).
 - Smal scherm: compactere binnenruimte en de antwoordentabel op de adviescard gestapeld (vraag boven antwoord).
+
+## 21. Adviesregels voor het tooladvies (beheerbaar)
+
+Bron: "IJK Digitale Toolbox" (positionering van de zes tools en de adviesvolgorde, nov. 2026). Keuze IJK: één
+hoofdtool, met waar relevant aanvullende tools en hun rol (bijvoorbeeld HubBI, met AI Flows en Azure OpenAI).
+
+- **Wat het is.** De regels waarmee de coach in fase 1 een tool adviseert: beschrijving (hoofdrol), toepassingen,
+  voorkeur (gaat vóór), uitsluiting (eventueel "nooit als hoofdtool"), combinatie (aanvullend bij een hoofdtool; de
+  tekst is de rol), adviesregel, voorwaarde (compliance, privacy, security, architectuur) en voorbeeld. Elke regel
+  heeft een vaste sleutel, titel, soort, toepassingsgebied (een tool of algemeen), tekst, actief, prioriteit en
+  optioneel trefwoorden (voor de oefencoach). Ze bepalen **niet** of de use case mag: dat blijven de checks,
+  beslisregels, privacy- en AI-beoordeling in fase 2, ongewijzigd.
+- **Opslag (zelfde patroon als de mailsjablonen).** De standaard en de veilige terugval staan in
+  `content/adviesregels.yaml` (met versie). Een beheerder wijzigt, voegt toe, (de)activeert, verwijdert en zet terug
+  in het beheerscherm; de database bewaart alleen wat anders is (tabel `adviesregel`, migratie 008) plus de
+  wijzigingshistorie met vorige en nieuwe waarde (`adviesregel_historie`). API `/api/beheer/adviesregels`, alleen
+  voor beheerders, met audit-log (`adviesregel_gewijzigd`). Samenvoegen, controleren en de wijzigingen zelf zijn pure
+  functies (`src/domain/adviesregels.ts`), zodat server en demo hetzelfde doen.
+- **Controle vóór het actief wordt.** Elke wijziging wordt gecontroleerd op de héle set: verplichte velden, soort,
+  toepassingsgebied, lengtes, sleutel, prioriteit (1–999), dubbele actieve teksten, meer dan één beschrijving per
+  tool, tegenstrijdige voorkeuren met dezelfde prioriteit, verwijzingen naar zichzelf of onbekende tools, en "geen
+  enkele hoofdtool meer". Bij een fout wordt niets opgeslagen. Tekst die op een technische instructie, een geheim,
+  beveiliging, de kleur of "goedgekeurd zonder toetsing" lijkt, en links, code en onzichtbare tekens worden
+  geweigerd.
+- **In de coach.** Bij elk tooladvies en elke chatvraag worden de regels opnieuw opgehaald. De vaste instructies
+  (taak, veiligheid, formaat) blijven in de code (`src/coach/prompts.ts`); de actieve regels gaan als afgebakend
+  JSON-blok mee, gesorteerd op toepassingsgebied en prioriteit, zonder dubbele teksten. Tools met "nooit als
+  hoofdtool" worden ook in de validatie uitgesloten. Het advies bewaart de versie van de regels
+  (`tooladvies.regelsversie`, bijvoorbeeld `1.0+b3` = standaard 1.0 plus drie beheerwijzigingen).
+- **Oefencoach (demo en tests).** Kiest volledig op basis van dezelfde regels (trefwoorden, voorkeur op prioriteit,
+  uitsluiting, combinatie); er is geen tweede, vaste lijst meer in de code.
+- **Terugval.** Lukt het ophalen niet, dan de laatst bekende geldige regels; na een herstart de standaard uit
+  `content/`. Een ongeldige opgeslagen regel wordt overgeslagen (dan geldt de standaard).
+- **In de wizard.** Het tooladvies toont wat de medewerker wil bereiken, de hoofdtool met zijn rol, de motivatie, de
+  aanvullende tools met hun rol, de afgewogen alternatieven en de vaste zin dat de toolkeuze geen toestemming is. Een
+  aanvullende tool met AI (Azure OpenAI) zet "Gebruikt je oplossing AI?" vooraf op Ja (de medewerker bevestigt).
+- **Gewijzigd in de content.** tools 0.9: per tool `categorie` en `rol`; de omschrijvingen, keuzehints en
+  coach-instructies zijn naar de adviesregels verhuisd (geen dubbele bron); AI Flows heeft niet meer `ai: true` (kan ook
+  zonder AI); behoefte "AI in een werkproces" wijst naar HubBI of Copilot workflows (AI Flows is geen los alternatief).
+  TODO: valideren door toetsers: HubBI gaat bij AFAS ook vóór Microsoft 365 Copilot (interpretatie).
+- **Nog niet gedaan.** Versies vergelijken naast elkaar, een vier-ogenprincipe voor wijzigingen, en het beheren van de
+  vaste gegevens per tool (`tools.yaml`: naam, rol, beheer) in het scherm.

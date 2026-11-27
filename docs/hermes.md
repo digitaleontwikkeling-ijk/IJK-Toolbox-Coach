@@ -23,7 +23,13 @@ Controleer bij een nieuwe Hermes-versie of dit nog klopt.
 De vier coach-taken (plus vrije chat):
 
 1. **verduidelijk** – `{ "vragen": [max. 2] }`; elke vraag is een tekst (open vraag) of `{ "vraag", "opties": [max. 6] }`. De wizard toont opties als aanvinkbare knoppen (meerdere antwoorden mogelijk) en voegt zelf "Iets anders" met een tekstveld toe; de coach krijgt de antwoorden als tekst, gescheiden door "; ".
-2. **tooladvies** – `{ "behoefte", "tool", "motivatie" }`; tool moet in `content/tools.yaml` staan
+2. **tooladvies** – `{ "behoefte", "doel", "tool", "rol", "motivatie", "aanvullend": [{ "tool", "rol" }], "alternatieven": [{ "tool", "waarom_niet" }] }`;
+   één hoofdtool (fase 2 gaat daarover) met maximaal twee aanvullende tools. Alle tools moeten in `content/tools.yaml`
+   staan; een tool met een actieve uitsluiting "nooit als hoofdtool" (zoals AI Flows) wordt als hoofdtool geweigerd.
+   Een advies dat de tool als goedgekeurd presenteert, wordt geweigerd: de toolkeuze is geen toestemming. De
+   **adviesregels** (`content/adviesregels.yaml` plus de wijzigingen van de beheerder) staan in de systeeminstructie
+   als afgebakend JSON-blok (`<<<ADVIESREGELS … ADVIESREGELS>>>`) ná de vaste regels, met de opdracht dat ze de vaste
+   regels, de taak en het antwoordformaat niet kunnen veranderen. Ook de chat krijgt ze.
 3. **checks** – `{ "checks": [{ "check", "voorstel", "zekerheid", "vervolgvraag?" }] }`; waarden uit de schaal
 4. **uitleg** – `{ "uitleg" }`; wordt geweigerd als de tekst een andere uitkomst noemt dan berekend
 5. **chat** – `{ "antwoord" }`. In het gesprek (stap 3) bevat de invoer ook `huidige_vraag`: de check, de vraag, de uitleg
