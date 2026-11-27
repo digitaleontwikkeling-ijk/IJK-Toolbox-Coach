@@ -227,7 +227,16 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
   regelset (`src/domain/onderwerp.ts`) en geeft die als `huidige_vraag` aan Hermes. Er gaan geen extra gegevens van de
   medewerker mee.
 
-## 18. Rust en witruimte
+## 18. Toetsers: alle vragen en antwoorden
+
+- Bij een aanvraag zien toetsers en beheerders het overzicht "Alle vragen en antwoorden" (ingeklapt, boven de
+  adviescard): per vraag de volledige vraag, het antwoord en de herkomst (zelf gekozen, voorstel van de coach
+  bevestigd of aangepast, niet gevraagd omdat het is afgeleid, of niet gesteld). Opbouw: `src/domain/overzicht.ts`.
+- Daarvoor bewaart het advies de voorstellen van de coach (alleen antwoord-id en zekerheid; migratie 006,
+  `coach_voorstellen`). Oudere adviezen hebben die niet; daar ontbreekt de herkomst bij de checks.
+- Het gesprek met de coach staat er bewust niet in (keuze IJK); dat wordt na afronden gewist.
+
+## 19. Rust en witruimte
 
 - Meer regelafstand (1,6) en witruimte tussen en binnen blokken: alinea's, lijsten, keuzes, kaarten, het gesprek en de
   adviescard. In de vraag van de coach geen kader meer om de keuzes (de beurt zelf is het kader).

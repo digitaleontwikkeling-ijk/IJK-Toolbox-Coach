@@ -112,6 +112,8 @@ export interface AdviesRij {
   dpia: DpiaUitkomst | null;
   aiRisico: AiUitkomst | null;
   feiten: Feit[] | null;
+  /** Voorstellen van de coach (alleen antwoord-id en zekerheid); null bij adviezen van vóór migratie 006. */
+  coachVoorstellen: Record<string, { voorstel: string; zekerheid: "hoog" | "middel" | "laag" }> | null;
   motivatie: string;
   voorwaarden: string[];
   alternatieven: string[];
@@ -128,7 +130,7 @@ export const adviesVelden = `id, referentie, pseudoniem_id AS "pseudoniemId",
   aangemaakt_op AS "aangemaaktOp",
   bijgewerkt_op AS "bijgewerktOp", beschrijving, verduidelijking, tooladvies, antwoorden,
   rode_vlaggen AS "rodeVlaggen", uitkomst, toetsers, dpia_signaal AS "dpiaSignaal", ai_act_signaal AS "aiActSignaal",
-  dpia, ai_risico AS "aiRisico", feiten, motivatie,
+  dpia, ai_risico AS "aiRisico", feiten, coach_voorstellen AS "coachVoorstellen", motivatie,
   voorwaarden, alternatieven, regelversie, toolsversie, status, vorig_advies_id AS "vorigAdviesId",
   verloopt_op AS "verlooptOp"`;
 
@@ -153,6 +155,7 @@ function adviesParameters(a: NieuwAdvies) {
     a.aiActSignaal, a.aanvrager?.naam ?? null, a.aanvrager?.email ?? null,
     a.dpia === null ? null : JSON.stringify(a.dpia), a.aiRisico === null ? null : JSON.stringify(a.aiRisico),
     a.feiten === null ? null : JSON.stringify(a.feiten),
+    a.coachVoorstellen === null ? null : JSON.stringify(a.coachVoorstellen),
   ];
 }
 
@@ -161,8 +164,8 @@ export async function voegAdviesToe(q: Querier, referentie: string, a: NieuwAdvi
     `INSERT INTO advies (pseudoniem_id, beschrijving, verduidelijking, tooladvies, antwoorden, rode_vlaggen,
        uitkomst, toetsers, dpia_signaal, motivatie, voorwaarden, alternatieven, regelversie, toolsversie,
        status, vorig_advies_id, verloopt_op, ai_act_signaal, aanvrager_naam, aanvrager_email, dpia, ai_risico, feiten,
-       referentie)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24)
+       coach_voorstellen, referentie)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25)
      RETURNING ${adviesVelden}`,
     [...adviesParameters(a), referentie],
   );
@@ -176,8 +179,8 @@ export async function werkAdviesBij(q: Querier, id: string, a: NieuwAdvies): Pro
        rode_vlaggen=$6, uitkomst=$7, toetsers=$8, dpia_signaal=$9, motivatie=$10, voorwaarden=$11,
        alternatieven=$12, regelversie=$13, toolsversie=$14, status=$15, vorig_advies_id=$16, verloopt_op=$17,
        ai_act_signaal=$18, aanvrager_naam=$19, aanvrager_email=$20, dpia=$21, ai_risico=$22, feiten=$23,
-       bijgewerkt_op=now()
-     WHERE id=$24 RETURNING ${adviesVelden}`,
+       coach_voorstellen=$24, bijgewerkt_op=now()
+     WHERE id=$25 RETURNING ${adviesVelden}`,
     [...adviesParameters(a), id],
   );
   return r.rows[0];

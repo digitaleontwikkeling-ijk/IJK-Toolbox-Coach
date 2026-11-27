@@ -105,6 +105,17 @@ describe("adviesregister", () => {
     expect(r.json.advies.tooladvies.andereTool).toEqual({ naam: "Notion", link: "https://www.notion.so" });
   });
 
+  it("I11a. de voorstellen van de coach worden bij het advies bewaard, zonder vrije tekst (voor het overzicht van de toetsers)", async () => {
+    const id = await nieuwConcept(ANNA, {
+      ...VOLLEDIG,
+      coachVoorstellen: { data: { voorstel: "persoonsgegevens", zekerheid: "hoog" }, systemen: { voorstel: "geen", zekerheid: "laag", vervolgvraag: "Koppel je iets?" } },
+    });
+    const r = await roep(adviesRoute.POST as Handler, { body: { conceptId: id } });
+    expect(r.status).toBe(200);
+    const rij = (await db().query("SELECT coach_voorstellen FROM advies WHERE id = $1", [r.json.advies.id])).rows[0];
+    expect(rij.coach_voorstellen).toEqual({ data: { voorstel: "persoonsgegevens", zekerheid: "hoog" }, systemen: { voorstel: "geen", zekerheid: "laag" } });
+  });
+
   it("I11. volledig advies wordt vastgelegd met referentie, uitkomst en regelversie, zonder chat of pseudoniem", async () => {
     const id = await nieuwConcept();
     const r = await roep(adviesRoute.POST as Handler, { body: { conceptId: id } });

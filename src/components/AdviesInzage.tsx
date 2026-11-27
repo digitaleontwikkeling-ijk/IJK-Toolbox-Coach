@@ -4,6 +4,7 @@ import { Aanvrager } from "./Aanvrager";
 import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Adviescard } from "./Adviescard";
+import { AlleAntwoorden } from "./AlleAntwoorden";
 import { Keuze } from "./Keuze";
 import { api, ApiFoutClient, isTerInformatie, toetserNaam, useContent, type AdviesDto, type ContentDto } from "./client";
 
@@ -51,6 +52,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
                 {advies.toolsversie}
               </p>
             </div>
+            <AlleAntwoorden advies={advies} content={content} />
             <Adviescard advies={advies} content={content} weergave="inzage" />
           </div>
           {modus === "toetsing" && <Besluitpaneel advies={advies} content={content} onKlaar={laad} />}
