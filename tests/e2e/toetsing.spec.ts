@@ -48,8 +48,22 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await page.getByRole("link", { name: referentie }).click();
   await expect(page.getByRole("heading", { name: `Aanvraag ${referentie}` })).toBeVisible();
   await expect(page.getByRole("link", { name: "anna@voorbeeld.invalid" })).toHaveAttribute("href", "mailto:anna@voorbeeld.invalid");
-  await expect(page.getByText("Een verzuimdashboard bouwen")).toBeVisible();
-  await expect(page.locator(".adviescard")).toContainText("Privacy: Waarschijnlijk volledige DPIA nodig");
+  // Titel van de use case (eerste zin) en de volledige beschrijving.
+  await expect(page.getByRole("heading", { name: "Use case: Een verzuimdashboard bouwen voor de afdeling met gegevens uit AFAS", level: 2 })).toBeVisible();
+  const kaart = page.locator(".adviescard");
+  await expect(kaart).toContainText("Privacy: Waarschijnlijk volledige DPIA nodig");
+  // Waarom deze kleur in zinnen; aandachtspunten onder een eigen titel; geen uitleg over de coach en geen disclaimer.
+  await expect(kaart).toContainText("De uitkomst is ‘Eerst toetsen’ (oranje). Dat komt door het volgende:");
+  await expect(kaart.getByRole("heading", { name: "Aandachtspunten voor de toetsing", level: 3 })).toBeVisible();
+  await expect(kaart.getByRole("heading", { name: /^Privacy:/, level: 4 })).toBeVisible();
+  await expect(kaart).not.toContainText("niet door de AI agent");
+  await expect(kaart).not.toContainText("eerste risico-indicatie");
+  // Het overzicht met alle vragen en antwoorden staat onder de adviescard.
+  const onder = await page.evaluate(() => {
+    const k = document.querySelector(".adviescard")!, o = document.querySelector(".overzicht")!;
+    return !!(k.compareDocumentPosition(o) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(onder).toBe(true);
 
   // Alle vragen en antwoorden: ingeklapt; open: per vraag het antwoord en de herkomst.
   const overzicht = page.locator(".overzicht");

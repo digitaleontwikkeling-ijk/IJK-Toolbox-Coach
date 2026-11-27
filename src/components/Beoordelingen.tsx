@@ -34,7 +34,8 @@ export function BeoordelingenKort({ advies, content }: { advies: AdviesDto; cont
   );
 }
 
-export function Beoordelingen({ advies, content }: { advies: AdviesDto; content: ContentDto }) {
+export function Beoordelingen({ advies, content, kopNiveau = 3 }: { advies: AdviesDto; content: ContentDto; kopNiveau?: 3 | 4 }) {
+  const Kop = kopNiveau === 4 ? "h4" : "h3";
   const t = content.teksten;
   const { dpia, aiRisico } = advies;
   // Adviezen van vóór regelset 0.8 hebben deze beoordelingen niet.
@@ -54,9 +55,9 @@ export function Beoordelingen({ advies, content }: { advies: AdviesDto; content:
   return (
     <>
       <section className="beoordeling" aria-labelledby="privacy-kop">
-        <h3 id="privacy-kop">
+        <Kop id="privacy-kop">
           {t.privacy.titel}: {dpia.actief ? dpia.klasseNaam : "niet van toepassing"}
-        </h3>
+        </Kop>
         {!dpia.actief ? (
           <p>{t.privacy.niet_nodig}</p>
         ) : (
@@ -82,9 +83,9 @@ export function Beoordelingen({ advies, content }: { advies: AdviesDto; content:
       </section>
 
       <section className="beoordeling" aria-labelledby="ai-kop">
-        <h3 id="ai-kop">
+        <Kop id="ai-kop">
           {t.ai.titel}: {aiRisico.actief ? aiRisico.klasseNaam : "niet van toepassing"}
-        </h3>
+        </Kop>
         {!aiRisico.actief ? (
           <p>{t.ai.niet_nodig}</p>
         ) : (
@@ -123,7 +124,7 @@ export function Beoordelingen({ advies, content }: { advies: AdviesDto; content:
 
       {techniek.length > 0 && (
         <section className="beoordeling" aria-labelledby="techniek-kop">
-          <h3 id="techniek-kop">{t.techniek.titel}</h3>
+          <Kop id="techniek-kop">{t.techniek.titel}</Kop>
           <p className="beoordeling__sub">{t.techniek.intro}</p>
           <ul>{techniek.map(([k, v]) => <li key={k}>{v}</li>)}</ul>
         </section>

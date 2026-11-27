@@ -11,6 +11,7 @@ import { hoeWerktHetHref } from "@/lib/paden";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
 import { Beoordelingen, BeoordelingenKort } from "./Beoordelingen";
+import { kleurToelichting } from "@/domain/toelichting";
 import { ToolIcoon } from "./ToolIcoon";
 import { datum, kleurVan, toetserNaam, toolWeergave, type AdviesDto, type ContentDto } from "./client";
 
@@ -60,6 +61,9 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const klaar = !actieKanNog;
   // Medewerker: compact (less is more); details onder "Meer over dit advies". Toetsers en beheerders: alles open.
   const compact = weergave === "medewerker";
+  const inzage = weergave === "inzage";
+  // Toetsers en beheerders: "Waarom deze kleur?" in zinnen (uit de beslisregels; anders de korte motivatie).
+  const toelichting = inzage ? kleurToelichting(r, advies) : null;
 
   const antwoordenTabel = (
         <section>
@@ -154,9 +158,16 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
 
         <section>
           <h3>Waarom deze kleur?</h3>
-          <p>{advies.motivatie}</p>
-          {/* In het gesprek zei de coach dit al ("Het volgt uit de vaste spelregels van IJK …"). */}
-          {!ikVorm && (
+          {toelichting ? (
+            <>
+              <p>{toelichting.intro}</p>
+              {toelichting.zinnen.length > 0 && <ul>{toelichting.zinnen.map((z) => <li key={z}>{z}</li>)}</ul>}
+            </>
+          ) : (
+            <p>{advies.motivatie}</p>
+          )}
+          {/* In het gesprek zei de coach dit al; toetsers kennen de werking. */}
+          {!ikVorm && !inzage && (
             <p className="hulptekst" style={{ margin: 0 }}>
               {t.hoe_werkt_het.kleur_hint} <HoeWerktHetLink tekst={t.hoe_werkt_het.link} href={hoeWerktHetHref()} />
             </p>
@@ -172,7 +183,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
 
         {extraRegelen.length > 0 && (
           <section>
-            <h3>{t.extra_regelen_titel}</h3>
+            <h3>{inzage ? t.adviescard.extra_regelen_toetser : t.extra_regelen_titel}</h3>
             <ul>{extraRegelen.map((e) => <li key={e.id}>{e.naam}: {e.tekst}</li>)}</ul>
           </section>
         )}
@@ -190,7 +201,13 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             <BeoordelingenKort advies={advies} content={content} />
           </section>
         ) : (
-  <Beoordelingen advies={advies} content={content} />
+          <section className="beoordelingen">
+            <h3>{t.adviescard.beoordelingen_toetser}</h3>
+            <p className="hulptekst" style={{ marginTop: 0 }}>{t.adviescard.beoordelingen_toetser_intro}</p>
+            <div className="beoordelingen__lijst">
+              <Beoordelingen advies={advies} content={content} kopNiveau={4} />
+            </div>
+          </section>
         )}
 
         {toetserNamen.length > 0 && (
@@ -200,13 +217,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           </section>
         )}
 
-        {!compact && (
-          <>
-  <p className="disclaimer">{t.disclaimer}</p>
-
-        {antwoordenTabel}
-          </>
-        )}
+        {!compact && antwoordenTabel}
 
         {advies.besluiten && advies.besluiten.length > 0 && (
           <section>

@@ -8,6 +8,9 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,
   antwoorden en beslisregels zijn niet veranderd; daarom geen nieuw versienummer. TODO: valideren (concepttekst).
 - Gesprek: in de chatvelden staat "Typ hier je vraag".
+- Toetsers en beheerders, aanvraag: kop "Use case: …", "Waarom deze kleur?" in zinnen, titel "Aandachtspunten voor
+  de toetsing", "Wat moet de use case-eigenaar (extra) regelen?", zonder uitleg over de coach en de disclaimer;
+  het overzicht met alle vragen en antwoorden onderaan.
 - Toetsers en beheerders: overzicht "Alle vragen en antwoorden" met de herkomst per antwoord (teksten `overzicht`).
   Het advies bewaart daarvoor de voorstellen van de coach (migratie 006). Geen wijziging in de regels.
 - Overal "je use case" in plaats van "je beschrijving" (coach, uitleg, Hoe werkt de coach?); bij de toetsers

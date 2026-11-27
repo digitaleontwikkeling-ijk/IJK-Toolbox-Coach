@@ -401,7 +401,15 @@ export const tekstenSchema = z.object({
     herkomst: z.object({ zelf: tekst, voorstel: tekst, aangepast: tekst, afgeleid: tekst, niet_gesteld: tekst }),
   }),
   /** Adviescard voor de medewerker (compact; details onder "Meer over dit advies"). */
-  adviescard: z.object({ beoordelingen_titel: tekst, meer_over_advies: tekst }),
+  adviescard: z.object({
+    beoordelingen_titel: tekst,
+    meer_over_advies: tekst,
+    /** Toetsers en beheerders. */
+    beoordelingen_toetser: tekst,
+    beoordelingen_toetser_intro: tekst,
+    extra_regelen_toetser: tekst,
+    usecase_titel: tekst,
+  }),
   contact_opnieuw: z.object({ melding: tekst, knop: tekst }),
   beheer: z.object({ titel: tekst, intro: tekst }),
   verdieping: z.object({

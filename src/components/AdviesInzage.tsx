@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useState, type FormEvent } from "react";
 import { Adviescard } from "./Adviescard";
 import { AlleAntwoorden } from "./AlleAntwoorden";
+import { korteTitel } from "@/domain/toelichting";
 import { Keuze } from "./Keuze";
 import { api, ApiFoutClient, isTerInformatie, toetserNaam, useContent, type AdviesDto, type ContentDto } from "./client";
 
@@ -34,7 +35,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
         <div className="wizard">
           <div style={{ display: "grid", gap: "1rem" }}>
             <div className="paneel paneel--vlak">
-              <h2>Use case van de medewerker</h2>
+              <h2>{content.teksten.adviescard.usecase_titel.replace("{titel}", korteTitel(advies.beschrijving))}</h2>
               <p><Aanvrager advies={advies} /></p>
               <p style={{ whiteSpace: "pre-wrap" }}>{advies.beschrijving}</p>
               {advies.verduidelijking.length > 0 && (
@@ -52,8 +53,8 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
                 {advies.toolsversie}
               </p>
             </div>
-            <AlleAntwoorden advies={advies} content={content} />
             <Adviescard advies={advies} content={content} weergave="inzage" />
+            <AlleAntwoorden advies={advies} content={content} />
           </div>
           {modus === "toetsing" && <Besluitpaneel advies={advies} content={content} onKlaar={laad} />}
         </div>
