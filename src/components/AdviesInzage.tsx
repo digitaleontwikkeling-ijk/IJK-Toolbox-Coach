@@ -33,7 +33,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
         <div className="wizard">
           <div style={{ display: "grid", gap: "1rem" }}>
             <div className="paneel paneel--vlak">
-              <h2>Beschrijving van de medewerker</h2>
+              <h2>Use case van de medewerker</h2>
               <p><Aanvrager advies={advies} /></p>
               <p style={{ whiteSpace: "pre-wrap" }}>{advies.beschrijving}</p>
               {advies.verduidelijking.length > 0 && (

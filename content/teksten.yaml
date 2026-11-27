@@ -18,10 +18,10 @@ stappen:
     instructie: Beschrijf in eigen woorden welke uitdaging je wilt oplossen of welk idee je hebt, zonder al meteen aan een tool te denken.
   - nummer: 2
     titel: Welke tool past?
-    instructie: Op basis van je beschrijving adviseert de coach een tool uit de IJK Toolbox.
+    instructie: Op basis van je use case adviseert de coach een tool uit de IJK Toolbox.
   - nummer: 3
     titel: Zes checks
-    instructie: De coach heeft de checks alvast ingevuld op basis van je beschrijving. Klopt het? Pas aan waar nodig.
+    instructie: De coach heeft de checks alvast ingevuld op basis van je use case. Klopt het? Pas aan waar nodig.
   - nummer: 4
     titel: Advies
     instructie: Dit is je advies, berekend met de vaste spelregels van IJK.
@@ -71,7 +71,7 @@ fase2_uitleg:
     Niet de tool bepaalt wat mag, maar wat je ermee doet.
   hoe_titel: Hoe werkt het?
   hoe:
-    - De coach (een AI agent) vult de checks alvast in op basis van je beschrijving.
+    - De coach (een AI agent) vult de checks alvast in op basis van je use case.
     - Jij controleert de antwoorden en past ze aan waar nodig. Twijfelt de coach, dan stelt hij een vraag in de chat.
     - Daarna berekent de tool je advies met de vaste spelregels van IJK. De AI agent bepaalt de uitkomst niet.
   vragen_titel: Welke vragen krijg je, en waarom?
@@ -177,7 +177,7 @@ verdieping:
 gesprek:
   instructie: Ik loop de checks met je door, één vraag tegelijk.
   intro: >-
-    Ik loop zes checks met je door, één vraag tegelijk. Bij de meeste vragen heb ik op basis van je beschrijving al
+    Ik loop zes checks met je door, één vraag tegelijk. Bij de meeste vragen heb ik op basis van je use case al
     een antwoord voorgesteld. Klopt het? Dan bevestig je het met één klik. Klopt het niet? Kies dan zelf.
   intro_zonder_coach: >-
     Ik loop zes checks met je door, één vraag tegelijk. Ik kon nu geen antwoorden voorstellen, dus je kiest zelf.
@@ -220,7 +220,7 @@ gesprek:
   beschrijving_hulp: >-
     Bijvoorbeeld: "Ik wil elke week een overzicht van openstaande facturen, zodat mijn team weet wat er openstaat."
     Gebruik geen echte namen of gegevens van personen.
-  leest: Ik lees je beschrijving…
+  leest: Ik lees je use case…
   # In het gesprek praat de coach zelf (ik-vorm); het formulier gebruikt de teksten elders in dit bestand.
   verduidelijking_kop_een: Ik heb nog een vraag
   verduidelijking_kop_twee: Ik heb nog twee vragen
@@ -365,7 +365,7 @@ hoe_werkt_het:
   rijen:
     - onderdeel: Je idee begrijpen
       wie: AI-coach
-      hoe: De coach leest je beschrijving en stelt hooguit twee vragen als iets nog niet duidelijk is.
+      hoe: De coach leest je use case en stelt hooguit twee vragen als iets nog niet duidelijk is.
     - onderdeel: Welke tool past?
       wie: AI-coach
       hoe: De coach kiest een tool uit de IJK Toolbox en legt uit waarom. Je kunt het advies accepteren, om een andere tool vragen of zelf kiezen.
@@ -394,7 +394,7 @@ hoe_werkt_het:
     - "Controleerbaar: de spelregels worden beheerd door Team Digitale Ontwikkeling en de AI governance & compliance officer."
   privacy_titel: Wat gaat er naar de AI agent?
   privacy:
-    - Alleen wat nodig is voor de vraag, zoals je beschrijving en je antwoorden.
+    - Alleen wat nodig is voor de vraag, zoals je use case en je antwoorden.
     - Niet je naam of e-mailadres. De coach kent je alleen als een willekeurige code.
     - E-mailadressen, telefoonnummers en rekeningnummers in je tekst worden er eerst uitgehaald. Gebruik toch liever geen namen of andere persoonsgegevens.
     - Het gesprek wordt niet bewaard in het adviesregister. Na het afronden wordt het verwijderd.
