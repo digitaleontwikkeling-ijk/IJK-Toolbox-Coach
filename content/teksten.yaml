@@ -131,6 +131,7 @@ besluiten:
 toetsing:
   titel: Toetsing
   intro: Aanvragen die bij jouw rol als toetser horen. Bekijk de antwoorden en leg je besluit vast. Je inzage wordt vastgelegd in de audit-log.
+  besluit_titel: Advies en/of besluit
   besluit_label: Jouw advies en/of besluit
   toelichting_voorwaarden: Welke voorwaarden gelden?
   toelichting_afwijzing: Waarom wijs je de aanvraag af?

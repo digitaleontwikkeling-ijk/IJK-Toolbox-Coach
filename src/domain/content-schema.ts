@@ -384,6 +384,7 @@ export const tekstenSchema = z.object({
   toetsing: z.object({
     titel: tekst,
     intro: tekst,
+    besluit_titel: tekst,
     besluit_label: tekst,
     toelichting_voorwaarden: tekst,
     toelichting_afwijzing: tekst,

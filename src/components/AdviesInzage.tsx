@@ -98,7 +98,7 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
 
   return (
     <aside className="paneel" aria-labelledby="besluit-titel">
-      <h2 id="besluit-titel">Besluit</h2>
+      <h2 id="besluit-titel">{t.toetsing.besluit_titel}</h2>
       {gelukt && <p className="info" role="status">{gelukt}</p>}
       {isTerInformatie(content, advies.uitkomst) ? (
         <p>{t.toetsing.ter_informatie_uitleg}</p>
