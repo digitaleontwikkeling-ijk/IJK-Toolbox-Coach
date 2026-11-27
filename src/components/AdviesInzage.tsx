@@ -32,7 +32,7 @@ export function AdviesInzage({ id, modus }: { id: string; modus: "toetsing" | "b
       {fout && <p className="foutmelding" role="alert">{fout}</p>}
       {!fout && (!content || !advies) && <p role="status">Bezig met laden…</p>}
       {content && advies && (
-        <div className="wizard">
+        <div className="wizard wizard--inzage">
           <div style={{ display: "grid", gap: "1rem" }}>
             <div className="paneel paneel--vlak">
               <h2>{content.teksten.adviescard.usecase_titel.replace("{titel}", korteTitel(advies.beschrijving))}</h2>

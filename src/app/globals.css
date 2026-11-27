@@ -163,6 +163,13 @@ main { max-width: var(--max-breedte); margin: 0 auto; padding: 1.75rem var(--rui
   .wizard { grid-template-columns: minmax(0, 1fr) 20rem; align-items: start; }
   .chat { position: sticky; top: 1rem; }
 }
+/* Toetsers en beheerders: bredere kolom voor "Advies en/of besluit". */
+@media (min-width: 900px) {
+  .wizard--inzage { grid-template-columns: minmax(0, 1fr) 24rem; }
+}
+@media (min-width: 1100px) {
+  .wizard--inzage { grid-template-columns: minmax(0, 1fr) 28rem; }
+}
 .paneel { background: var(--wit); border: 1px solid var(--rand); border-radius: var(--radius); padding: 1.5rem; }
 @media (min-width: 600px) { .paneel { padding: 2rem; } }
 .paneel--vlak { background: var(--wolk); border-color: var(--wolk); }
