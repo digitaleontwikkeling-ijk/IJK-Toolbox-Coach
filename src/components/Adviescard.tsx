@@ -217,7 +217,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           </section>
         )}
 
-        {!compact && antwoordenTabel}
+        {/* Toetsers en beheerders zien de antwoorden (met kleur en herkomst) in "Alle vragen en antwoorden". */}
 
         {advies.besluiten && advies.besluiten.length > 0 && (
           <section>

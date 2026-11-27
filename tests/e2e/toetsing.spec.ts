@@ -71,6 +71,9 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await overzicht.getByText(/^Alle vragen en antwoorden \(\d+\)$/).click();
   const data = overzicht.getByRole("row", { name: /Welke data gebruik je\?/ });
   await expect(data).toContainText("Persoonsgegevens");
+  // Kleurlabel bij het antwoord; de tabel "Antwoorden" staat niet meer op de kaart.
+  await expect(data.locator(".badge-kleur")).toHaveText("oranje");
+  await expect(page.locator(".adviescard").getByRole("heading", { name: "Antwoorden" })).toHaveCount(0);
   await expect(data).toContainText(/Zelf gekozen|Voorstel van de coach, bevestigd|Zelf aangepast/);
   await expect(overzicht.getByRole("row", { name: /kwetsbare positie/ })).toContainText("Ja");
   await expect(overzicht.getByRole("row", { name: /Welke tool past\?/ })).toBeVisible();

@@ -413,6 +413,7 @@ fieldset.keuze legend + * { clear: both; }
 .overzicht__tabel th, .overzicht__tabel td { text-align: left; vertical-align: top; padding: 0.55rem 0.5rem; border-bottom: 1px solid var(--wolk); }
 .overzicht__tabel thead th { font-size: 0.85rem; color: var(--tekst-zacht); }
 .overzicht__tabel tbody th { font-weight: 600; }
+.overzicht__antwoord + .overzicht__antwoord { margin-top: 0.25rem; }
 .overzicht__rij--niet-gevraagd td, .overzicht__rij--niet-gevraagd th { color: var(--tekst-zacht); }
 @media (max-width: 599px) {
   .overzicht__tabel thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
