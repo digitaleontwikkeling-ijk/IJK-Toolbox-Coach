@@ -4,7 +4,7 @@
  * en de herkomst. Ingeklapt, zodat het besluitformulier overzichtelijk blijft. Opbouw: `antwoordenOverzicht` (domein).
  */
 import { antwoordenOverzicht } from "@/domain/overzicht";
-import type { AdviesDto, ContentDto } from "./client";
+import { kleurVan, type AdviesDto, type ContentDto } from "./client";
 
 export function AlleAntwoorden({ advies, content }: { advies: AdviesDto; content: ContentDto }) {
   const t = content.teksten.overzicht;
@@ -39,7 +39,19 @@ export function AlleAntwoorden({ advies, content }: { advies: AdviesDto; content
               {g.regels.map((r, i) => (
                 <tr key={i} className={r.herkomst === "niet_gesteld" || r.herkomst === "afgeleid" ? "overzicht__rij--niet-gevraagd" : undefined}>
                   <th scope="row">{r.vraag}</th>
-                  <td>{r.antwoord}</td>
+                  <td>
+                    {r.antwoordKleuren && r.antwoordKleuren.length > 0
+                      ? r.antwoordKleuren.map((a) => {
+                          const k = kleurVan(content, a.kleur);
+                          return (
+                            <div key={a.label} className="overzicht__antwoord">
+                              {a.label}{" "}
+                              {k && <span className="badge-kleur" style={{ background: k.hex, color: k.tekstkleur }}>{k.id}</span>}
+                            </div>
+                          );
+                        })
+                      : r.antwoord}
+                  </td>
                   <td>
                     {r.herkomst ? t.herkomst[r.herkomst] : "—"}
                     {r.toelichting && <span className="hulptekst overzicht__toelichting"> ({r.toelichting})</span>}

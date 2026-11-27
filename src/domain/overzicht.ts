@@ -15,6 +15,8 @@ export type Herkomst = "zelf" | "voorstel" | "aangepast" | "afgeleid" | "niet_ge
 export interface OverzichtRegel {
   vraag: string;
   antwoord: string;
+  /** Bij de checks: per gekozen antwoord de kleur uit de regelset (voor een kleurlabel). */
+  antwoordKleuren?: { label: string; kleur: string }[];
   /** Ontbreekt bij adviezen van vóór het opslaan van de voorstellen van de coach. */
   herkomst?: Herkomst;
   /** Bijvoorbeeld wat de coach voorstelde, of waaruit het antwoord is afgeleid. */
@@ -72,6 +74,11 @@ export function antwoordenOverzicht(regelset: Regelset, tools: ToolsConfig, a: O
   const feiten = a.feiten ? new Map(a.feiten.map((f) => [f.id, f])) : null;
   for (const c of regelset.checks) {
     const labelVan = (id: string) => c.antwoorden.find((x) => x.id === id)?.label ?? id;
+    const kleuren = (ids: string[]) =>
+      ids.flatMap((id) => {
+        const x = c.antwoorden.find((y) => y.id === id);
+        return x ? [{ label: x.label, kleur: x.kleur }] : [];
+      });
     const ruw = a.antwoorden.checks[c.id];
     const regels: OverzichtRegel[] = [];
     if (c.deelvragen.length > 0) {
@@ -81,12 +88,13 @@ export function antwoordenOverzicht(regelset: Regelset, tools: ToolsConfig, a: O
         regels.push({
           vraag: `${d.naam}: ${d.vraag}`,
           antwoord: id ? labelVan(id) : "—",
+          antwoordKleuren: id ? kleuren([id]) : [],
           ...herkomst(`${c.id}.${d.id}`, id ? [id] : [], labelVan),
         });
       }
     } else {
       const ids = lijst(ruw);
-      regels.push({ vraag: c.vraag, antwoord: ids.length ? ids.map(labelVan).join(", ") : "—", ...herkomst(c.id, ids, labelVan) });
+      regels.push({ vraag: c.vraag, antwoord: ids.length ? ids.map(labelVan).join(", ") : "—", antwoordKleuren: kleuren(ids), ...herkomst(c.id, ids, labelVan) });
     }
 
     for (const e of regelset.extra_vragen.filter((x) => x.check === c.id && x.id in a.antwoorden.extraVragen)) {

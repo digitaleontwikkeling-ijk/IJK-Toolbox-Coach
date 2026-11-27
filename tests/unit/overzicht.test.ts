@@ -27,6 +27,8 @@ describe("overzicht alle vragen en antwoorden", () => {
     ));
     const data = regel(g, "Data", /Welke data gebruik je/);
     expect(data.antwoord).toBe("Intern");
+    expect(data.antwoordKleuren).toEqual([{ label: "Intern", kleur: "groen" }]);
+    expect(regel(g, "Impact", /^Integriteit: /).antwoordKleuren?.[0]?.kleur).toBeDefined();
     expect(data.herkomst).toBe("voorstel");
     const systemen = regel(g, "Systemen", /Welke systemen raak je/);
     expect(systemen.herkomst).toBe("aangepast");
