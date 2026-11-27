@@ -51,15 +51,21 @@ test("toetsenbord: een verdiepingsvraag beantwoorden met pijltjes, en de voortga
   await login(page, "Testmedewerker Chris");
   await naarStap3(page, "Een prototype voor mezelf met testdata.");
   await naarChecks(page);
+  // Wacht tot de coach klaar is met voorinvullen (anders wordt het formulier net opnieuw opgebouwd).
+  await expect(page.getByText("De coach vult de checks alvast voor je in…")).toHaveCount(0);
   const voortgang = page.locator(".voortgang");
   await expect(voortgang).toHaveAttribute("role", "status");
-  const voor = await voortgang.innerText();
+  const ja = page.locator("#veld-ai_gebruik").getByLabel("Ja", { exact: true });
   const nee = page.locator("#veld-ai_gebruik").getByLabel("Nee", { exact: true });
-  await page.locator("#veld-ai_gebruik").getByLabel("Ja", { exact: true }).focus();
+  await expect(ja).toBeVisible();
+  // Gebruikt de gekozen tool AI, dan staat "Ja" al voorgesteld (en telt de vraag al als beantwoord).
+  const alBeantwoord = await ja.isChecked();
+  const voor = await voortgang.innerText();
+  await ja.focus();
   await page.keyboard.press("ArrowDown");
   await expect(nee).toBeChecked();
   await expect(nee).toBeFocused();
-  await expect(voortgang).not.toHaveText(voor);
+  if (!alBeantwoord) await expect(voortgang).not.toHaveText(voor);
 });
 
 test("verduidelijkende vragen: meerdere antwoorden kiezen, en 'Iets anders' met een eigen antwoord", async ({ page }) => {
