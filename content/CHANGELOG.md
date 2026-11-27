@@ -62,6 +62,20 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Teksten voor de chat in het gesprek (`chat_label`, `chat_label_klaar`, `chat_plaatshouder`, `chat_stuur`, `denkt`,
   `eerdere_berichten`). Ook geen nieuwe regelset.
 
+## tools 0.7 (concept)
+
+- Per tool het beheer en het aanvraagadres (`beheer` in `tools.yaml`):
+  - Microsoft 365 Copilot en Copilot workflows: ICT Driessen Groep, ict@driessengroep.nl. Met de uitgebreide licentie
+    Copilot for Microsoft 365 heb je ook Copilot workflows.
+  - HubBI en AI Flows (add-on binnen HubBI): HR tech (IJK), info@hubbi.nl. TODO: definitief adres bevestigen.
+  - Claude Code: Team Digitale Ontwikkeling, digitaleontwikkeling@ijk.nl.
+  - Azure OpenAI: beheer nog te bepalen (TODO).
+- Microsoft Azure OpenAI (zelf gehoste modellen in de Azure-tenant van IJK) als voorkeurs-AI-modellen: standaard in
+  AI Flows; Copilot workflows gebruikt de modellen van Copilot (ook GPT-modellen van OpenAI via de Microsoft 365-tenant).
+  In de omschrijvingen en de keuzehulp (ook voor de coach).
+- De accountaanvraag (webhook) bevat `tool.beheer` (naam en e-mail); de flow mailt de aanvraag naar dat adres. De
+  medewerker ziet bij het tooladvies en op de adviescard waar de aanvraag naartoe gaat. Geen wijziging in de regels.
+
 ## regelset 0.9.1 (concept)
 
 - Afhankelijkheid = Experiment: geen tekst meer bij "Wat moet je extra regelen?" (was "Niets extra's."). Op de

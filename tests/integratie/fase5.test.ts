@@ -75,7 +75,8 @@ describe("vervolgacties via webhooks", () => {
     expect(w.body).toMatchObject({
       type: "accountaanvraag",
       referentie: a.referentie,
-      tool: { id: "claude_code", naam: "Claude Code" },
+      // Claude Code: beheer bij Team Digitale Ontwikkeling; de flow mailt de aanvraag naar dit adres.
+      tool: { id: "claude_code", naam: "Claude Code", beheer: { naam: "Team Digitale Ontwikkeling", email: "digitaleontwikkeling@ijk.nl" } },
       uitkomst: { kleur: "groen", naam: "Direct aan de slag" },
       link: `https://coach.test/advies/${a.id}`,
       aanvrager: { pseudoniemId: maakPseudoniem(ANNA.oid) },
@@ -360,7 +361,10 @@ describe("regelset 0.7: tool buiten de IJK Toolbox", () => {
   it("F23. een tool uit de toolbox staat in de payload met buitenToolbox: false", async () => {
     const a = await nieuwAdvies(ANNA, ALLEEN_ARCHITECT);
     await actie(a.id);
-    expect(mock.ontvangen[0]!.body.tool).toEqual({ id: "claude_code", naam: "Claude Code", buitenToolbox: false });
+    expect(mock.ontvangen[0]!.body.tool).toEqual({
+      id: "claude_code", naam: "Claude Code", buitenToolbox: false,
+      beheer: { naam: "Team Digitale Ontwikkeling", email: "digitaleontwikkeling@ijk.nl" },
+    });
   });
 });
 

@@ -25,12 +25,20 @@ Voorbeeld (accountaanvraag):
   "adviesId": "…",
   "aanvrager": { "pseudoniemId": "3f2a…" },
   "regelversie": "0.7",
-  "tool": { "id": "hubbi", "naam": "HubBI", "buitenToolbox": false },
+  "tool": { "id": "hubbi", "naam": "HubBI", "buitenToolbox": false,
+            "beheer": { "naam": "HR tech (IJK)", "email": "info@hubbi.nl" } },
   "uitkomst": { "kleur": "geel", "naam": "Aan de slag met voorwaarden" },
   "voorwaarden": ["Gebruik de goedgekeurde koppeling …"],
   "link": "https://<app>/advies/…"
 }
 ```
+
+**E-mail naar de beheerder.** `tool.beheer` komt uit `content/tools.yaml` (wie de tool beheert en waar je een
+licentie of account aanvraagt). De flow achter `ACTIE_ACCOUNT_URL` stuurt de accountaanvraag per e-mail naar
+`tool.beheer.email`, met de referentie, de tool, de uitkomst, eventuele voorwaarden en de link naar het advies.
+Bijvoorbeeld: Claude Code → digitaleontwikkeling@ijk.nl, Microsoft 365 Copilot en Copilot workflows →
+ict@driessengroep.nl, HubBI en AI Flows → info@hubbi.nl. De webapp verstuurt zelf geen e-mail (geen mailserver of
+geheimen in de app); de medewerker ziet op de adviescard naar welk adres de aanvraag gaat.
 
 Bij een tool buiten de IJK Toolbox is `tool` bijvoorbeeld
 `{ "id": "andere_tool", "naam": "<naam die de medewerker opgaf>", "buitenToolbox": true, "link": "https://…" }`

@@ -62,7 +62,11 @@ export function maakPayloads(advies: AdviesRij, o: Omit<VervolgactieOpties, "adv
         buitenToolbox: true,
         ...(andere.link.trim() && geldigeLink(andere.link) ? { link: andere.link.trim() } : {}),
       }
-    : { id: advies.tooladvies.tool, naam: content.tools.tools.find((t) => t.id === advies.tooladvies.tool)?.naam, buitenToolbox: false };
+    : (() => {
+        const t = content.tools.tools.find((x) => x.id === advies.tooladvies.tool);
+        // beheer: de flow stuurt de aanvraag per e-mail naar dit adres (zie docs/acties.md).
+        return { id: advies.tooladvies.tool, naam: t?.naam, buitenToolbox: false, ...(t?.beheer ? { beheer: { naam: t.beheer.naam, email: t.beheer.email } } : {}) };
+      })();
   const basis = {
     referentie: advies.referentie,
     adviesId: advies.id,
