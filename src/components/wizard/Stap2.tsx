@@ -55,6 +55,15 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
           </p>
           <h3 className="tool-naam"><ToolIcoon content={content} tool={advies.tool} groot />{toolNaam(content, advies.tool)}</h3>
           {advies.motivatie && <p>{advies.motivatie}</p>}
+          {(() => {
+            const b = content.tools.tools.find((x) => x.id === advies.tool)?.beheer;
+            return b ? (
+              <p className="hulptekst tool-beheer">
+                {content.teksten.beheer_tool.replace("{naam}", b.naam).replace("{email}", b.email)}
+                {b.licentie ? ` ${b.licentie}` : ""}
+              </p>
+            ) : null;
+          })()}
           <Spelregels content={content} tool={advies.tool} />
         </div>
       )}

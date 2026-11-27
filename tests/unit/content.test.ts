@@ -107,3 +107,19 @@ describe("schema vangt fouten in de content", () => {
     expect(meldingen(r)).toContain("verwacht een hexkleur zoals #50A78A");
   });
 });
+
+describe("beheer van de tools (tools 0.7)", () => {
+  const beheer = (id: string) => content.tools.tools.find((t) => t.id === id)?.beheer;
+  it("per tool wie het beheert en waar je een licentie of account aanvraagt", () => {
+    expect(content.tools.versie).toBe("0.7");
+    expect(beheer("m365_copilot")).toMatchObject({ naam: "ICT Driessen Groep", email: "ict@driessengroep.nl" });
+    expect(beheer("copilot_workflows")).toMatchObject({ naam: "ICT Driessen Groep", email: "ict@driessengroep.nl" });
+    expect(beheer("hubbi")).toMatchObject({ naam: "HR tech (IJK)", email: "info@hubbi.nl" });
+    expect(beheer("ai_flows")).toMatchObject({ naam: "HR tech (IJK)", email: "info@hubbi.nl" });
+    expect(beheer("claude_code")).toEqual({ naam: "Team Digitale Ontwikkeling", email: "digitaleontwikkeling@ijk.nl" });
+  });
+  it("Azure OpenAI als voorkeursmodellen staat in de keuzehulp (ook voor de coach)", () => {
+    expect(content.tools.keuzehints.some((h) => h.includes("Azure OpenAI") && h.includes("AI Flows"))).toBe(true);
+    expect(systeemPrompt("tooladvies", content)).toContain("voorkeurs-AI-modellen");
+  });
+});

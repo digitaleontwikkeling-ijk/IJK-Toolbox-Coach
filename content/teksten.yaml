@@ -45,10 +45,15 @@ vervolgacties:
     knop: ""
     uitleg: Op deze manier kan het niet. Je advies is vastgelegd. Bekijk hieronder hoe het wel kan, of stel je vraag aan de coach.
 
+# Beheer van de tool (uit tools.yaml): bij het tooladvies en op de adviescard.
+beheer_tool: "Beheer: {naam}. Een licentie of account vraag je aan via {email}."
+aanvraag_naar: "Met de knop hieronder gaat je aanvraag per e-mail naar {beheer}."
+beheer_onbekend: de beheerder van de tool
+
 # "Wat nu?" nadat de vervolgactie is uitgevoerd of de toetsers hebben besloten.
 # {tool} = gekozen tool, {toetsers} = namen van de toetsers.
 na_actie:
-  account_aangevraagd: Je accountaanvraag voor {tool} is verstuurd. De status van je aanvraag zie je bij Mijn aanvragen.
+  account_aangevraagd: Je accountaanvraag voor {tool} is per e-mail verstuurd naar {beheer}. De status van je aanvraag zie je bij Mijn aanvragen.
   in_toetsing: Je aanvraag is ingediend bij {toetsers}. Zij beoordelen je idee. Het besluit, met eventuele voorwaarden, zie je bij Mijn aanvragen.
   goedgekeurd: Je aanvraag is goedgekeurd. Je kunt aan de slag.
   goedgekeurd_met_voorwaarden: Je aanvraag is goedgekeurd met voorwaarden. Houd je aan de voorwaarden van de toetsers hierboven.

@@ -42,6 +42,10 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const andere = advies.tooladvies.tool === ANDERE_TOOL ? advies.tooladvies.andereTool : undefined;
   const link = andere?.link?.trim() && geldigeLink(andere.link) ? andere.link.trim() : null;
   const actie = t.vervolgacties[kleur.vervolgactie];
+  // Beheer van de gekozen tool: de accountaanvraag gaat per e-mail naar dit adres.
+  const beheer = content.tools.tools.find((x) => x.id === advies.tooladvies.tool)?.beheer;
+  const beheerTekst = beheer ? `${beheer.naam} (${beheer.email})` : t.beheer_onbekend;
+  const isAccountaanvraag = kleur.vervolgactie === "accountaanvraag" || kleur.vervolgactie === "accountaanvraag_met_voorwaarden";
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
   // "Wat moet je extra regelen?" bij de gekozen antwoorden (bijvoorbeeld bij Afhankelijkheid). Hoort bij het advies,
   // niet bij de vraag.
@@ -246,6 +250,9 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             {advies.status === "advies_gegeven" ? (
               <>
                 <p>{(ikVorm && t.gesprek.vervolgactie_uitleg[kleur.vervolgactie]) || actie?.uitleg}</p>
+                {isAccountaanvraag && beheer && weergave === "medewerker" && (
+                  <p className="hulptekst">{t.aanvraag_naar.replace("{beheer}", beheerTekst)}</p>
+                )}
                 {contactOpnieuw && <p className="foutmelding">{t.contact_opnieuw.melding}</p>}
               </>
             ) : (
@@ -254,7 +261,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                   <strong>Status: {t.statussen[advies.status]}.</strong>{" "}
                   {t.na_actie[advies.status as keyof typeof t.na_actie]
                     .replace("{tool}", tool)
-                    .replace("{toetsers}", toetserNamen.join(" en ") || "de toetsers")}
+                    .replace("{toetsers}", toetserNamen.join(" en ") || "de toetsers")
+                    .replace("{beheer}", beheerTekst)}
                 </p>
               </>
             )}

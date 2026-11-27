@@ -295,6 +295,14 @@ export const toolsSchema = z
            * vooraf op "Ja" gezet, maar de medewerker bevestigt of past aan (het gaat om wat de oplossing doet).
            */
           ai: z.boolean().optional(),
+          /** Wie de tool beheert en waar je een licentie of account aanvraagt (de aanvraag gaat per e-mail hierheen). */
+          beheer: z
+            .object({
+              naam: tekst,
+              email: z.string().trim().regex(/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i, "beheer.email: geen geldig e-mailadres"),
+              licentie: tekst.optional(),
+            })
+            .optional(),
           /** Optioneel logo, bijvoorbeeld iconen/hubbi.png (png, svg of webp, max. 200 kB). */
           icoon: z
             .string()
@@ -399,6 +407,9 @@ export const tekstenSchema = z.object({
     ter_informatie_uitleg: tekst,
   }),
   extra_regelen_titel: tekst,
+  beheer_tool: tekst,
+  aanvraag_naar: tekst,
+  beheer_onbekend: tekst,
   /** Toetsers en beheerders: overzicht van alle vragen en antwoorden. */
   overzicht: z.object({
     titel: tekst,

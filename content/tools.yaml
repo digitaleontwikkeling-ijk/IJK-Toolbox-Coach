@@ -3,41 +3,69 @@
 # Beheer: Team Digitale Ontwikkeling. Verhoog bij wijziging de versie.
 # TODO: valideren door toetsers
 
-versie: "0.6"
+versie: "0.7"
 
 # ai: true = de tool gebruikt zelf AI. Dan staat de vraag "Gebruikt je oplossing AI?" vooraf op "Ja"
 # (een sterk signaal, de medewerker bevestigt). Bij andere tools hangt het af van wat je bouwt.
+# beheer: wie de tool beheert en waar je een licentie of account aanvraagt. Bij "Account aanvragen" gaat de
+# aanvraag (via de webhook, zie docs/acties.md) per e-mail naar dit adres.
 tools:
   - id: m365_copilot
     naam: Microsoft 365 Copilot
     spelregels: spelregels/m365_copilot.yaml
     ai: true
     icoon: iconen/m365_copilot.png
+    beheer:
+      naam: ICT Driessen Groep
+      email: ict@driessengroep.nl
+      licentie: De uitgebreide licentie Copilot for Microsoft 365. Daarmee heb je ook Copilot workflows.
   - id: copilot_workflows
     naam: Copilot workflows
     omschrijving: >-
       Automatiseert terugkerende taken binnen Microsoft 365 (Outlook, Teams, SharePoint, Planner).
       Kan niet koppelen met systemen buiten Microsoft 365. De workflow draait op het account van de medewerker.
       Functie in vroege toegang (Microsoft Frontier-programma) die nog kan veranderen.
+      Gebruikt de AI-modellen die Copilot biedt, ook GPT-modellen van OpenAI via de Microsoft 365-tenant.
     spelregels: spelregels/copilot_workflows.yaml
     icoon: iconen/copilot_workflows.png
+    beheer:
+      naam: ICT Driessen Groep
+      email: ict@driessengroep.nl
+      licentie: Onderdeel van de uitgebreide licentie Copilot for Microsoft 365.
   - id: hubbi
     naam: HubBI
     omschrijving: >-
       IJK's eigen automatiserings- en integratieplatform voor AFAS: voor handmatige, repeterende taken in en om AFAS.
     spelregels: spelregels/hubbi.yaml
     icoon: iconen/hubbi.png
+    beheer:
+      naam: HR tech (IJK)
+      email: info@hubbi.nl # TODO: definitief adres voor licentieaanvragen bevestigen
   - id: ai_flows
     naam: AI Flows
+    omschrijving: >-
+      Add-on binnen HubBI om AI-stappen toe te voegen aan werkprocessen. Gebruikt standaard Microsoft Azure OpenAI,
+      de zelf gehoste modellen in de Azure-tenant van IJK (de voorkeursmodellen van IJK).
     spelregels: spelregels/ai_flows.yaml
     ai: true
     icoon: iconen/ai_flows.png
+    beheer:
+      naam: HR tech (IJK)
+      email: info@hubbi.nl # TODO: definitief adres voor licentieaanvragen bevestigen
+      licentie: Add-on binnen HubBI.
   - id: claude_code
     naam: Claude Code
     spelregels: spelregels/claude_code.yaml
     icoon: iconen/claude_code.png
+    beheer:
+      naam: Team Digitale Ontwikkeling
+      email: digitaleontwikkeling@ijk.nl
   - id: azure_openai
     naam: Azure OpenAI
+    omschrijving: >-
+      Microsoft Azure OpenAI: de zelf gehoste AI-modellen in de Azure-tenant van IJK. Dit zijn de voorkeursmodellen
+      van IJK; ze zijn standaard beschikbaar in AI Flows.
+    # TODO: beheer en aanvraagadres voor Azure OpenAI nog bepalen.
     spelregels: spelregels/azure_openai.yaml
     ai: true
     icoon: iconen/azure_openai.png
@@ -67,6 +95,8 @@ keuzehints:
   - HubBI is voor handmatige, repeterende taken in en om AFAS. Gebruik HubBI bij voorkeur ook voor data van klantmedewerkers waarvoor IJK verwerker is.
   - Copilot workflows automatiseert terugkerende taken binnen Microsoft 365 en kan niet koppelen met systemen buiten Microsoft 365.
   - AI Flows en Copilot workflows zijn beide geschikt om AI-stappen in werkprocessen in te bouwen. Kies AI Flows bij data van klantmedewerkers waarvoor IJK verwerker is.
+  - Microsoft Azure OpenAI (de zelf gehoste modellen in de Azure-tenant van IJK) zijn de voorkeurs-AI-modellen. In AI Flows zijn ze standaard beschikbaar. In Copilot workflows gebruik je de modellen die Copilot biedt, ook GPT-modellen van OpenAI via de Microsoft 365-tenant.
+  - Met de uitgebreide licentie Copilot for Microsoft 365 (aan te vragen bij ICT Driessen Groep) heb je ook Copilot workflows.
 
 # Alleen voor de coach (niet zichtbaar in de wizard).
 coach_instructies:

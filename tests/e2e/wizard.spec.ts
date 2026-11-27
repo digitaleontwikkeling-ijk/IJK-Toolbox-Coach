@@ -95,8 +95,11 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
 
   await expect(page.getByRole("heading", { name: "Direct aan de slag", level: 2 })).toBeVisible();
   await expect(page.locator(".adviescard")).toContainText(/TC-\d{4}-\d{4}/);
+  // Claude Code: beheer bij Team Digitale Ontwikkeling; de aanvraag gaat per e-mail naar hun adres.
+  await expect(page.locator(".adviescard")).toContainText("Met de knop hieronder gaat je aanvraag per e-mail naar Team Digitale Ontwikkeling (digitaleontwikkeling@ijk.nl).");
   await page.getByRole("button", { name: "Account aanvragen voor Claude Code" }).click();
   await expect(page.locator(".adviescard")).toContainText("Status: Account aangevraagd");
+  await expect(page.locator(".adviescard")).toContainText("per e-mail verstuurd naar Team Digitale Ontwikkeling (digitaleontwikkeling@ijk.nl)");
 
   // Het nieuwe advies staat naast het vorige in Mijn aanvragen.
   const nieuweRef = (await page.locator(".adviescard__voet strong").innerText()).trim();
