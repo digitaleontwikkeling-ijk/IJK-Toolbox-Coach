@@ -80,17 +80,17 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
   async function verstuur(e: FormEvent) {
     e.preventDefault();
     setFout(null);
-    if (!besluit) return setFout("Kies een besluit.");
+    if (!besluit) return setFout(t.toetsing.besluit_kies);
     if (verplicht && toelichting.trim().length < 5) return setFout(`${toelichtingLabel} Vul dit in.`);
     setBezig(true);
     try {
       const r = await api<{ status: AdviesDto["status"] }>(`/api/toetsing/${advies.id}/besluit`, {
         body: { besluit, toelichting, rol },
       });
-      setGelukt(`Je besluit is vastgelegd. Status van de aanvraag: ${t.statussen[r.status]}.`);
+      setGelukt(t.toetsing.besluit_gelukt.replace("{status}", t.statussen[r.status] ?? r.status));
       onKlaar();
     } catch (err) {
-      setFout(err instanceof ApiFoutClient ? (err.details?.join(" ") || err.message) : "Het besluit kon niet worden vastgelegd.");
+      setFout(err instanceof ApiFoutClient ? (err.details?.join(" ") || err.message) : t.toetsing.besluit_fout);
     } finally {
       setBezig(false);
     }
@@ -105,13 +105,13 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
       ) : advies.eigenAanvraag ? (
         <p>Dit is je eigen aanvraag. Een andere toetser beoordeelt hem.</p>
       ) : open.length === 0 ? (
-        !gelukt && <p>Je hoeft voor deze aanvraag geen besluit (meer) te nemen.</p>
+        !gelukt && <p>{t.toetsing.besluit_geen}</p>
       ) : (
         <form onSubmit={verstuur} noValidate>
           {open.length > 1 && (
-            <Keuze naam="rol" legend="Namens welke rol besluit je?" opties={open.map((r) => ({ id: r, label: toetserNaam(content, r) }))} waarde={rol} onKies={setRol} />
+            <Keuze naam="rol" legend={t.toetsing.besluit_rol} opties={open.map((r) => ({ id: r, label: toetserNaam(content, r) }))} waarde={rol} onKies={setRol} />
           )}
-          <p className="hulptekst">Je besluit als {toetserNaam(content, rol ?? "")}.</p>
+          <p className="hulptekst">{t.toetsing.besluit_als.replace("{rol}", toetserNaam(content, rol ?? ""))}</p>
           <Keuze
             naam="besluit"
             legend={t.toetsing.besluit_label}
@@ -124,7 +124,7 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
             <textarea id="toelichting" value={toelichting} maxLength={2000} required={verplicht} aria-required={verplicht} onChange={(e) => setToelichting(e.target.value)} />
           </div>
           {fout && <p className="foutmelding" role="alert">{fout}</p>}
-          <button type="submit" className="knop" disabled={bezig}>Besluit vastleggen</button>
+          <button type="submit" className="knop" disabled={bezig}>{t.toetsing.besluit_knop}</button>
         </form>
       )}
     </aside>

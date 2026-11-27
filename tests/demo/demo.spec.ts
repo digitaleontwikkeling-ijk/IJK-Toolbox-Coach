@@ -71,8 +71,8 @@ test("demo: medewerker → toetsers → besluit, beheer, en geen WCAG-overtredin
     await page.getByRole("link", { name: ref }).click();
     await page.getByText(besluit, { exact: true }).click();
     if (toelichting) await page.getByLabel(/Welke voorwaarden gelden/).fill(toelichting);
-    await page.getByRole("button", { name: "Besluit vastleggen" }).click();
-    await expect(page.getByText("Je besluit is vastgelegd.")).toBeVisible();
+    await page.getByRole("button", { name: "Advies en/of besluit vastleggen" }).click();
+    await expect(page.getByText("Je advies en/of besluit is vastgelegd.")).toBeVisible();
   }
 
   await login(page, "Testmedewerker Anna");

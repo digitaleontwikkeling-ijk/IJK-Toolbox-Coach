@@ -83,7 +83,7 @@ test("toetser ziet het rode advies ter informatie, zonder besluitformulier", asy
   await expect(page.getByRole("heading", { name: /Ter informatie/ })).toBeVisible();
   await page.getByRole("link", { name: referentie }).click();
   await expect(page.getByText("Bij deze uitkomst is er geen aanvraag en hoef je geen besluit te nemen.")).toBeVisible();
-  await expect(page.getByRole("button", { name: "Besluit vastleggen" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Advies en/of besluit vastleggen" })).toHaveCount(0);
 });
 
 test("'i'-knopje bij een keuze toont de toelichting, kiest het antwoord niet, en sluit met Escape", async ({ page }) => {
