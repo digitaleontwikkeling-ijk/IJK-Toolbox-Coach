@@ -205,7 +205,7 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
             <h3>{t.adviescard.beoordelingen_toetser}</h3>
             <p className="hulptekst" style={{ marginTop: 0 }}>{t.adviescard.beoordelingen_toetser_intro}</p>
             <div className="beoordelingen__lijst">
-              <Beoordelingen advies={advies} content={content} kopNiveau={4} />
+              <Beoordelingen advies={advies} content={content} kopNiveau={4} voorToetser={inzage} />
             </div>
           </section>
         )}

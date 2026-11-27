@@ -169,6 +169,9 @@ adviescard:
   beoordelingen_toetser_intro: Wat de spelregels uit de antwoorden afleiden voor privacy, AI en techniek.
   extra_regelen_toetser: Wat moet de use case-eigenaar (extra) regelen?
   usecase_titel: "Use case: {titel}"
+  # Herkomst van een antwoord bij de privacy- en AI-beoordeling.
+  herkomst_medewerker: jouw antwoord
+  herkomst_toetser: antwoord van de medewerker
 
 # Op de adviescard: wat je extra moet regelen bij het gekozen antwoord (bijvoorbeeld bij Afhankelijkheid).
 extra_regelen_titel: Wat moet je extra regelen?

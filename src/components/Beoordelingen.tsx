@@ -17,8 +17,8 @@ function antwoordLabel(content: ContentDto, f: Pick<Feit, "id" | "waarde">): str
 }
 
 /** "(beantwoord)" of "(afgeleid uit Autonomie: Beslissen (over mensen))" */
-function Herkomst({ feit }: { feit: Feit }) {
-  return <span className="herkomst"> ({feit.herkomst === "afgeleid" ? feit.toelichting : "jouw antwoord"})</span>;
+function Herkomst({ feit, eigen }: { feit: Feit; eigen: string }) {
+  return <span className="herkomst"> ({feit.herkomst === "afgeleid" ? feit.toelichting : eigen})</span>;
 }
 
 /** Kort: alleen de uitkomst van de privacy- en AI-beoordeling (de toelichting staat onder "Meer over dit advies"). */
@@ -34,8 +34,10 @@ export function BeoordelingenKort({ advies, content }: { advies: AdviesDto; cont
   );
 }
 
-export function Beoordelingen({ advies, content, kopNiveau = 3 }: { advies: AdviesDto; content: ContentDto; kopNiveau?: 3 | 4 }) {
+/** `voorToetser`: herkomst "antwoord van de medewerker" in plaats van "jouw antwoord". */
+export function Beoordelingen({ advies, content, kopNiveau = 3, voorToetser = false }: { advies: AdviesDto; content: ContentDto; kopNiveau?: 3 | 4; voorToetser?: boolean }) {
   const Kop = kopNiveau === 4 ? "h4" : "h3";
+  const eigen = voorToetser ? content.teksten.adviescard.herkomst_toetser : content.teksten.adviescard.herkomst_medewerker;
   const t = content.teksten;
   const { dpia, aiRisico } = advies;
   // Adviezen van vóór regelset 0.8 hebben deze beoordelingen niet.
@@ -71,7 +73,7 @@ export function Beoordelingen({ advies, content, kopNiveau = 3 }: { advies: Advi
                   .map((i) => (
                     <li key={i.id}>
                       {i.naam}: {antwoordLabel(content, i.feit)}
-                      <Herkomst feit={i.feit} />
+                      <Herkomst feit={i.feit} eigen={eigen} />
                     </li>
                   ))}
               </ul>
@@ -98,7 +100,7 @@ export function Beoordelingen({ advies, content, kopNiveau = 3 }: { advies: Advi
                   {aiRisico.redenen.map((r) => (
                     <li key={`${r.gegeven}-${r.antwoord}`}>
                       {r.naam}: {r.antwoordLabel}
-                      <Herkomst feit={r.feit} />
+                      <Herkomst feit={r.feit} eigen={eigen} />
                       {r.voorwaarde && <> Regel: {r.voorwaarde}</>}
                     </li>
                   ))}
@@ -112,7 +114,7 @@ export function Beoordelingen({ advies, content, kopNiveau = 3 }: { advies: Advi
                   {aiFeiten.map(({ g, f }) => (
                     <li key={g.id}>
                       {g.naam}: {antwoordLabel(content, f)}
-                      <Herkomst feit={f} />
+                      <Herkomst feit={f} eigen={eigen} />
                     </li>
                   ))}
                 </ul>
