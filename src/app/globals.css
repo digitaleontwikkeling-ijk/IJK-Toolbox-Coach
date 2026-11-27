@@ -427,8 +427,13 @@ fieldset.keuze legend + * { clear: both; }
 .beoordeling h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
 
 /* Beheer: mailsjablonen */
-.mailsjabloon { margin-top: 1.25rem; }
-.mailsjabloon h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.mailsjabloon { margin-top: 1rem; padding-top: 1rem; padding-bottom: 1rem; }
+.mailsjabloon > summary { cursor: pointer; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+.mailsjabloon > summary::-webkit-details-marker { display: none; }
+.mailsjabloon > summary::before { content: "▸"; color: var(--water); font-size: 1.1rem; }
+.mailsjabloon[open] > summary::before { content: "▾"; }
+.mailsjabloon > summary h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: 0; }
+.mailsjabloon[open] > summary { margin-bottom: 1rem; }
 .mailsjabloon .status { font-family: var(--font-tekst); font-weight: 400; }
 .mailsjablonen__velden { margin-bottom: 0.5rem; }
 .mailsjablonen__velden summary { cursor: pointer; color: var(--water); text-decoration: underline; }

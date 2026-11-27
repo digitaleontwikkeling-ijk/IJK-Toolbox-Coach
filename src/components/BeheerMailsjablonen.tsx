@@ -88,10 +88,13 @@ function Sjabloon({ toolId, toolNaam, aan, sjabloon, teksten: t, onOpgeslagen }:
 
   const id = `mail-${toolId}`;
   return (
-    <form className="paneel mailsjabloon" onSubmit={(e) => verstuur(e, "PUT")} aria-labelledby={`${id}-kop`}>
-      <h3 id={`${id}-kop`}>
-        {toolNaam} <span className="status">{sjabloon.aangepast ? t.aangepast : t.standaard}</span>
-      </h3>
+    <details className="paneel mailsjabloon">
+      <summary>
+        <h3 id={`${id}-kop`}>
+          {toolNaam} <span className="status">{sjabloon.aangepast ? t.aangepast : t.standaard}</span>
+        </h3>
+      </summary>
+    <form onSubmit={(e) => verstuur(e, "PUT")} aria-labelledby={`${id}-kop`}>
       <p className="hulptekst" style={{ marginTop: 0 }}>{t.aan.replace("{email}", aan)}</p>
       <div className="veld">
         <label htmlFor={`${id}-onderwerp`}>{t.onderwerp}</label>
@@ -111,5 +114,6 @@ function Sjabloon({ toolId, toolNaam, aan, sjabloon, teksten: t, onOpgeslagen }:
         )}
       </div>
     </form>
+    </details>
   );
 }
