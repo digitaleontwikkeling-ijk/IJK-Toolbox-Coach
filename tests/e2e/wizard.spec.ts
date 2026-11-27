@@ -105,7 +105,8 @@ test("Er is iets veranderd: wizard start opnieuw met vorige antwoorden en geeft 
   expect(mail).toMatch(/^mailto:digitaleontwikkeling@ijk\.nl\?subject=/);
   const url = new URL(mail!);
   expect(url.searchParams.get("subject")).toBe("Aanvraag licentie Claude Code - Testmedewerker Anna");
-  expect(url.searchParams.get("body")).toContain("Referentie: TC-");
+  expect(url.searchParams.get("body")).toContain("licentie aanvragen voor de Claude Code-licentie");
+  expect(url.searchParams.get("body")).toContain("Testmedewerker Anna");
 
   // Het nieuwe advies staat naast het vorige in Mijn aanvragen.
   const nieuweRef = (await page.locator(".adviescard__voet strong").innerText()).trim();

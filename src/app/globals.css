@@ -425,3 +425,10 @@ fieldset.keuze legend + * { clear: both; }
 /* Toetsers: aandachtspunten (privacy, AI, techniek) onder één titel. */
 .beoordelingen__lijst { display: grid; gap: 1rem; }
 .beoordeling h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }
+
+/* Beheer: mailsjablonen */
+.mailsjabloon { margin-top: 1.25rem; }
+.mailsjabloon h3 { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.mailsjabloon .status { font-family: var(--font-tekst); font-weight: 400; }
+.mailsjablonen__velden { margin-bottom: 0.5rem; }
+.mailsjablonen__velden summary { cursor: pointer; color: var(--water); text-decoration: underline; }

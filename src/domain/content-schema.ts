@@ -301,6 +301,8 @@ export const toolsSchema = z
               naam: tekst,
               email: z.string().trim().regex(/^[^\s@]+@[^\s@]+\.[a-z]{2,}$/i, "beheer.email: geen geldig e-mailadres"),
               licentie: tekst.optional(),
+              /** Naam van de licentie in de aanvraagmail ({licentie}); anders "<tool>-licentie". */
+              licentienaam: tekst.optional(),
             })
             .optional(),
           /** Optioneel logo, bijvoorbeeld iconen/hubbi.png (png, svg of webp, max. 200 kB). */
@@ -407,6 +409,10 @@ export const tekstenSchema = z.object({
     ter_informatie_uitleg: tekst,
   }),
   extra_regelen_titel: tekst,
+  mailsjablonen_beheer: z.object({
+    titel: tekst, intro: tekst, velden_titel: tekst, aan: tekst, onderwerp: tekst, tekst: tekst, opslaan: tekst,
+    herstellen: tekst, opgeslagen: tekst, hersteld: tekst, fout: tekst, aangepast: tekst, standaard: tekst,
+  }),
   beheer_tool: tekst,
   aanvraag_naar: tekst,
   aanvraag_mail: z.object({ onderwerp: tekst, tekst: tekst, opnieuw: tekst }),

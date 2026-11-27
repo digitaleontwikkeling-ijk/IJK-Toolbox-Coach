@@ -9,6 +9,7 @@ import { alsLijst } from "./Keuze";
 import { HoeWerktHetLink } from "./HoeWerktHet";
 import { adviesPad, hoeWerktHetHref, volledigPad } from "@/lib/paden";
 import { aanvraagMailto, openMail } from "@/lib/aanvraagMail";
+import { licentieNaam, standaardSjabloon } from "@/domain/mailsjablonen";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
 import { Beoordelingen, BeoordelingenKort } from "./Beoordelingen";
@@ -48,9 +49,11 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const beheerTekst = beheer ? `${beheer.naam} (${beheer.email})` : t.beheer_onbekend;
   const isAccountaanvraag = kleur.vervolgactie === "accountaanvraag" || kleur.vervolgactie === "accountaanvraag_met_voorwaarden";
   // Bij een accountaanvraag opent de knop ook een e-mail aan de beheerder (Outlook), met onderwerp en tekst ingevuld.
+  const sjabloon = content.mailsjablonen?.[advies.tooladvies.tool] ?? standaardSjabloon(t);
   const mailto =
     isAccountaanvraag && beheer && weergave === "medewerker" && typeof window !== "undefined"
       ? aanvraagMailto({
+          licentie: licentieNaam(content.tools, advies.tooladvies.tool),
           aan: beheer.email,
           tool,
           naam: content.gebruiker.naam,
@@ -58,8 +61,8 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
           uitkomst: kleur.uitkomst,
           voorwaarden: advies.voorwaarden,
           link: `${window.location.origin}${volledigPad(adviesPad(advies.id))}`,
-          onderwerp: t.aanvraag_mail.onderwerp,
-          tekst: t.aanvraag_mail.tekst,
+          onderwerp: sjabloon.onderwerp,
+          tekst: sjabloon.tekst,
         })
       : null;
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
