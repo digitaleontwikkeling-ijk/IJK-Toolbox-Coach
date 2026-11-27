@@ -62,6 +62,12 @@ Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is 
 - Teksten voor de chat in het gesprek (`chat_label`, `chat_label_klaar`, `chat_plaatshouder`, `chat_stuur`, `denkt`,
   `eerdere_berichten`). Ook geen nieuwe regelset.
 
+## teksten: e-mail bij de licentieaanvraag
+
+- "Account aanvragen voor …" opent een e-mail in het mailprogramma (Outlook) aan de beheerder van de tool, met het
+  onderwerp "Aanvraag licentie <tool> - <naam>" en een korte tekst (`aanvraag_mail`). Na de aanvraag: link om de mail
+  opnieuw te openen. Geen nieuwe regels.
+
 ## tools 0.7 (concept)
 
 - Per tool het beheer en het aanvraagadres (`beheer` in `tools.yaml`):
