@@ -3,6 +3,24 @@
 Elke inhoudelijke wijziging krijgt een nieuw versienummer in `regelset.yaml` (of `tools.yaml`).
 Dit versienummer wordt bij elk advies opgeslagen, zodat altijd terug te zien is met welke regels een advies is gegeven.
 
+## adviesregels 1.0 en tools 0.9: beheerbare adviesregels voor het tooladvies
+
+- Nieuw: `adviesregels.yaml` (versie 1.0) met de positionering van de IJK Digitale Toolbox (nov. 2026): per tool de
+  hoofdrol, toepassingen, voorkeurs-, uitsluitings- en combinatieregels, adviesregels en voorwaarden, plus de
+  adviesvolgorde (richtinggevend, geen harde beslisboom) en voorbeelden. Een beheerder kan ze in het beheerscherm
+  wijzigen, aanvullen, (de)activeren, verwijderen en terugzetten (database, met historie); het advies bewaart de
+  versie (`1.0+b<aantal wijzigingen>`). TODO: valideren door toetsers.
+- Het tooladvies is nu één hoofdtool met waar relevant aanvullende tools en hun rol, wat de medewerker wil bereiken
+  en de afgewogen alternatieven. De toolkeuze is uitdrukkelijk geen toestemming; de checks blijven gelden.
+- tools 0.9: per tool `categorie` en `rol` (ontwikkeltool, assistent voor de medewerker, automatiseringsplatform,
+  flow editor, AI-model en capability). De omschrijvingen, `keuzehints` en `coach_instructies` zijn verhuisd naar
+  de adviesregels (zelfde inhoud, nu beheerbaar): HubBI bij voorkeur voor gegevens van klantmedewerkers, Copilot
+  workflows niet buiten Microsoft 365, Azure OpenAI als voorkeursmodellen, licentie Copilot for Microsoft 365, geen n8n.
+- AI Flows is de flow editor binnen HubBI en kan ook zonder AI: geen `ai: true` meer en niet meer als losse hoofdtool
+  (uitsluiting "nooit als hoofdtool"; wel aanvullend bij HubBI). Behoefte "AI als bouwsteen in een proces" wijst naar
+  HubBI of Copilot workflows. Een aanvullende tool met AI (Azure OpenAI) zet de AI-vraag vooraf op Ja.
+- Geen wijziging in de regelset (checks, beslisregels, privacy en AI): versie 0.9.1 blijft.
+
 ## teksten: stap 3 als gesprek (geen nieuwe regelset)
 
 - Nieuwe teksten onder `gesprek` in `teksten.yaml` voor de checks als gesprek (één vraag tegelijk). De vragen,

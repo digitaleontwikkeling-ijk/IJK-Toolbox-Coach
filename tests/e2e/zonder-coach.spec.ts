@@ -8,7 +8,7 @@ test("zonder coach: alles handmatig invullen geeft een advies", async ({ page })
   await page.getByRole("button", { name: "Volgende →" }).click();
 
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();
-  await page.getByText("Microsoft 365 Copilot", { exact: true }).click();
+  await page.locator(`label[for="tool-m365_copilot"]`).click();
   await naarChecks(page, "Microsoft 365 Copilot past, verder →");
 
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();

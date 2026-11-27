@@ -63,7 +63,7 @@ export async function zetStatusNaBesluit(q: Querier, id: string, status: string)
   await q.query("UPDATE advies SET status = $2, bijgewerkt_op = now() WHERE id = $1", [id, status]);
 }
 
-export type AuditActie = "inzage_lijst" | "inzage_advies" | "besluit" | "inzage_content" | "mailsjabloon_gewijzigd";
+export type AuditActie = "inzage_lijst" | "inzage_advies" | "besluit" | "inzage_content" | "mailsjabloon_gewijzigd" | "adviesregel_gewijzigd";
 
 /** Audit-log van inzage en besluiten door toetsers en beheerders. */
 export async function audit(

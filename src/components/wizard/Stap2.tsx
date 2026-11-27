@@ -24,6 +24,10 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
   const t = content.teksten.andere_tool;
   const andere = advies?.andereTool ?? { naam: "", link: "" };
   const linkFout = buiten && !geldigeLink(andere.link);
+  const ta = content.teksten.tooladvies;
+  const rolLabel = (id: string) => content.tools.tools.find((x) => x.id === id)?.rol ?? "";
+  // Keuzehulp: de algemene adviesregels die nu gelden (beheerbaar).
+  const keuzehulp = (content.adviesregelsActief ?? []).filter((r) => r.actief && r.tool === "algemeen" && (r.soort === "algemeen" || r.soort === "voorwaarde"));
 
   if (coachBezig === "tooladvies") {
     return <p role="status">{ikVorm ? g.zoekt_tool : "De coach zoekt een passende tool…"}</p>;
@@ -53,8 +57,37 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
           <p className="hulptekst" style={{ margin: 0 }}>
             {advies.bron === "coach" ? (ikVorm ? g.tool_label : "Advies van de coach") : "Door jou gekozen"}
           </p>
+          {advies.doel && (
+            <p className="tool-doel"><strong>{ta.doel_label}:</strong> {advies.doel.replace(/^Je wilt:\s*/i, "")}</p>
+          )}
           <h3 className="tool-naam"><ToolIcoon content={content} tool={advies.tool} groot />{toolNaam(content, advies.tool)}</h3>
+          <p className="tool-rol">{rolLabel(advies.tool)}{advies.rol ? ` · ${advies.rol}` : ""}</p>
           {advies.motivatie && <p>{advies.motivatie}</p>}
+          {(advies.aanvullend?.length ?? 0) > 0 && (
+            <div className="tool-aanvullend">
+              <h4>{ta.aanvullend_titel}</h4>
+              <ul>
+                {advies.aanvullend!.map((a) => (
+                  <li key={a.tool}>
+                    <ToolIcoon content={content} tool={a.tool} /> <strong>{toolNaam(content, a.tool)}</strong> · {rolLabel(a.tool)}
+                    <br />
+                    {a.rol}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {(advies.alternatieven?.length ?? 0) > 0 && (
+            <details className="tool-alternatieven">
+              <summary>{ta.alternatieven_titel}</summary>
+              <ul>
+                {advies.alternatieven!.map((a) => (
+                  <li key={a.tool}><strong>{toolNaam(content, a.tool)}</strong>: {a.waarom_niet}</li>
+                ))}
+              </ul>
+            </details>
+          )}
+          <p className="info tool-geen-goedkeuring">{ta.geen_goedkeuring}</p>
           {(() => {
             const b = content.tools.tools.find((x) => x.id === advies.tool)?.beheer;
             return b ? (
@@ -154,8 +187,20 @@ export function Stap2({ content, data, wijzig, coachBezig, coachNietBeschikbaar,
                   {b.omschrijving}: {b.tools.map((x) => toolNaam(content, x)).join(" of ")}
                 </li>
               ))}
-              {content.tools.keuzehints.map((h) => <li key={h}>{h}</li>)}
             </ul>
+            <ul>
+              {content.tools.tools.map((x) => (
+                <li key={x.id}>{`${x.naam}: ${x.rol}`}</li>
+              ))}
+            </ul>
+            {keuzehulp.length > 0 && (
+              <>
+                <h4>{ta.keuzehulp_titel}</h4>
+                <ul className="keuzehulp">
+                  {keuzehulp.map((r) => <li key={r.id}><strong>{r.titel}.</strong> <span className="witruimte">{r.tekst}</span></li>)}
+                </ul>
+              </>
+            )}
           </details>
         </div>
       )}

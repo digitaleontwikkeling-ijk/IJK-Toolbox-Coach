@@ -23,6 +23,10 @@ import { ApiFoutClient } from "../components/client";
 import contentJson from "./content.generated.json";
 import { onderwerpVanVeld } from "../domain/onderwerp";
 import { mailsjabloonSchema, mailsjablonen, standaardSjabloon } from "../domain/mailsjablonen";
+import {
+  actieveRegels, controleer, nooitHoofdtool, pasToe, RegelFout, regelsVersie, samenvoegen, zonderStatus,
+  type Historie, type Mutatie, type Opgeslagen,
+} from "../domain/adviesregels";
 
 const content = contentJson as unknown as Content;
 const SLEUTEL = "ijk-toolbox-coach-demo";
@@ -70,6 +74,17 @@ interface DemoStaat {
   teller: Record<string, number>;
   /** Eigen mailsjablonen van de beheerder (per tool). */
   mailsjablonen?: Record<string, { onderwerp: string; tekst: string }>;
+  /** Adviesregels die de beheerder wijzigde (zelfde vorm als de database), met historie. */
+  adviesregels?: Record<string, Opgeslagen>;
+  adviesregelHistorie?: Historie[];
+}
+
+/** De adviesregels die nu gelden in de demo (standaard + wijzigingen van de beheerder). */
+function demoRegels(s: DemoStaat) {
+  const opgeslagen = s.adviesregels ?? {};
+  const regels = samenvoegen(content.adviesregels.regels, opgeslagen, content.tools.tools);
+  const laatste = (s.adviesregelHistorie ?? []).reduce((m, h) => Math.max(m, h.nr), 0);
+  return { ...regels, versie: regelsVersie(content.adviesregels.versie, laatste) };
 }
 
 function lees(): DemoStaat {
@@ -172,7 +187,12 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
 
   if (pad === "/api/content") {
     const g = vereis("medewerker", "toetser_compliance", "toetser_architect", "beheerder");
-    return r({ ...content, mailsjablonen: mailsjablonen(content.tools, content.teksten, s.mailsjablonen ?? {}), gebruiker: { naam: g.naam, rollen: g.rollen } });
+    return r({
+      ...content,
+      mailsjablonen: mailsjablonen(content.tools, content.teksten, s.mailsjablonen ?? {}),
+      adviesregelsActief: actieveRegels(demoRegels(s).regels).map(zonderStatus),
+      gebruiker: { naam: g.naam, rollen: g.rollen },
+    });
   }
 
   // Concept (de wizard)
@@ -218,15 +238,20 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
     switch (deel[1]) {
       case "verduidelijk":
         return r({ resultaat: await coach.verduidelijk(b, ctx) });
-      case "tooladvies":
-        return r({ resultaat: await coach.tooladvies({ verduidelijking: [], uitsluiten: [], ...(body as object) } as never, ctx) });
+      case "tooladvies": {
+        const regels = demoRegels(s);
+        const invoer = { verduidelijking: [], uitsluiten: [] as string[], ...(body as object) } as { uitsluiten: string[] };
+        const uitsluiten = [...new Set([...invoer.uitsluiten, ...nooitHoofdtool(regels.regels)])];
+        const res = await coach.tooladvies({ ...invoer, uitsluiten, adviesregels: regels.regels } as never, ctx);
+        return r({ resultaat: res ? { ...res, regelsversie: regels.versie } : null });
+      }
       case "checks":
         return r({ resultaat: await coach.checksVoorinvullen({ verduidelijking: [], ...(body as object) } as never, ctx) });
       case "chat":
       {
         const { veld, ...rest } = (body ?? {}) as { veld?: string };
         const onderwerp = typeof veld === "string" ? onderwerpVanVeld(content.regelset, veld) : undefined;
-        return r({ resultaat: await coach.chat({ geschiedenis: [], ...rest, onderwerp } as never, ctx) });
+        return r({ resultaat: await coach.chat({ geschiedenis: [], ...rest, onderwerp, adviesregels: demoRegels(s).regels } as never, ctx) });
       }
       case "uitleg": {
         const a = s.adviezen.find((x) => x.id === body?.adviesId && x.pseudoniemId === g.pseudoniemId);
@@ -387,6 +412,43 @@ export async function demoApi<T>(pad: string, opties: { method?: string; body?: 
       s.log.push({ tijd: nu(), tekst: `mailsjabloon ${tool} gewijzigd` });
     }
     return r({ sjablonen: mailsjablonen(content.tools, content.teksten, eigen), standaard: standaardSjabloon(content.teksten) });
+  }
+
+  // Beheer: adviesregels voor het tooladvies (zelfde controles als de server)
+  if (deel[0] === "beheer" && deel[1] === "adviesregels") {
+    const g = vereis("beheerder");
+    const overzicht = (waarschuwingen?: string[]) => {
+      const d = demoRegels(s);
+      return r({
+        regels: d.regels, verwijderdeStandaard: d.verwijderdeStandaard, versie: d.versie,
+        historie: [...(s.adviesregelHistorie ?? [])].reverse().slice(0, 30),
+        controle: controleer(d.regels, content.tools.tools), ...(waarschuwingen ? { waarschuwingen } : {}),
+      });
+    };
+    if (methode === "GET") return overzicht();
+    const b = (body ?? {}) as Record<string, unknown>;
+    let m: Mutatie;
+    if (methode === "POST" && b.actie === "toevoegen") m = { actie: "toevoegen", regel: b.regel as never };
+    else if (methode === "POST" && b.actie === "terugzetten") {
+      const h = (s.adviesregelHistorie ?? []).find((x) => x.nr === b.historie);
+      if (!h) throw fout(400, "Deze versie bestaat niet (meer).");
+      m = { actie: "terugzetten", historie: h };
+    } else if (methode === "PUT") m = { actie: "wijzigen", regel: b.regel as never };
+    else if (methode === "DELETE") m = b.standaard ? { actie: "standaard", id: String(b.id) } : { actie: "verwijderen", id: String(b.id) };
+    else throw fout(400, "Ongeldige invoer.");
+    const opgeslagen = (s.adviesregels ??= {});
+    try {
+      const w = pasToe(content.adviesregels.regels, opgeslagen, content.tools.tools, m);
+      if (w.opslaan) opgeslagen[w.id] = { ...w.opslaan, bijgewerktOp: nu(), bijgewerktDoor: g.pseudoniemId };
+      else delete opgeslagen[w.id];
+      const historie = (s.adviesregelHistorie ??= []);
+      historie.push({ nr: historie.reduce((x, h) => Math.max(x, h.nr), 0) + 1, regelId: w.id, vorige: w.vorige, nieuwe: w.nieuwe, gewijzigdOp: nu() });
+      s.log.push({ tijd: nu(), tekst: `adviesregel ${w.id} gewijzigd` });
+      return overzicht(w.waarschuwingen);
+    } catch (e) {
+      if (e instanceof RegelFout) throw fout(400, e.message, e.details);
+      throw e;
+    }
   }
 
   // Beheer

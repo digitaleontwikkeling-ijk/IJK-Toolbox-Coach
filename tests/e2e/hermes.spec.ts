@@ -21,7 +21,7 @@ test("Hermes faalt: de wizard valt terug op handmatig invullen en blijft bruikba
   await page.getByLabel("Jouw use case").fill("Notulen van het teamoverleg laten maken #hermes-fout");
   await page.getByRole("button", { name: "Volgende →" }).click();
   await expect(page.getByText("De coach is nu niet beschikbaar")).toBeVisible();
-  await page.getByText("Microsoft 365 Copilot", { exact: true }).click();
+  await page.locator(`label[for="tool-m365_copilot"]`).click();
   await naarChecks(page, "Microsoft 365 Copilot past, verder →");
   await expect(page.getByText("Voorgesteld door de coach")).toHaveCount(0);
   await kies(page, "data", "Intern");

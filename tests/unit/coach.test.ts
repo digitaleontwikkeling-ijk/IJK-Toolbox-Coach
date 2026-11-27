@@ -25,7 +25,7 @@ describe("coach: validatie en terugval", () => {
 
   it("K1. geldig tooladvies wordt doorgegeven", async () => {
     const s = new CoachService(nep({ tooladvies: { behoefte: "bouwen", tool: "claude_code", motivatie: "Past goed." } }), content);
-    expect(await s.tooladvies({ ...vv, uitsluiten: [] }, ctx)).toEqual({ behoefte: "bouwen", tool: "claude_code", motivatie: "Past goed." });
+    expect(await s.tooladvies({ ...vv, uitsluiten: [] }, ctx)).toEqual({ behoefte: "bouwen", tool: "claude_code", motivatie: "Past goed.", aanvullend: [], alternatieven: [] });
   });
 
   it("K2. een tool die niet in de configuratie staat wordt geweigerd", async () => {

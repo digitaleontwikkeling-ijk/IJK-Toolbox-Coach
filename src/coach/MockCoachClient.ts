@@ -12,18 +12,10 @@ import type {
   UitlegInvoer,
   VerduidelijkInvoer,
 } from "./CoachClient";
+import { samenvoegen } from "../domain/adviesregels";
+import { oefenToolkeuze } from "./oefenToolkeuze";
 
 const heeft = (tekst: string, patroon: RegExp) => patroon.test(tekst.toLowerCase());
-
-/** Volgorde waarin de mock tools herkent: [tool, behoefte, trefwoorden]. IJK gebruikt geen n8n. */
-const TOOLREGELS: [string, string, RegExp][] = [
-  ["hubbi", "verbinden", /\bafas\b|koppel|verbind/],
-  ["ai_flows", "ai_in_werkproces", /\bai\b|beoordeel|kandidat|classific/],
-  ["azure_openai", "ai_model_eigen_oplossing", /taalmodel|openai|\bmodel\b/],
-  ["claude_code", "bouwen", /dashboard|prototype|\bapp\b|tool bouwen|bouwen/],
-  ["copilot_workflows", "m365_automatiseren", /outlook|planner|sharepoint|herinner|workflow|automati/],
-  ["m365_copilot", "sneller_afhandelen", /notulen|mail|vergader|document|samenvat/],
-];
 
 export class MockCoachClient implements CoachClient {
   constructor(private readonly content: Content) {}
@@ -52,19 +44,11 @@ export class MockCoachClient implements CoachClient {
     return { vragen };
   }
 
-  async tooladvies({ beschrijving, verduidelijking, uitsluiten }: TooladviesInvoer) {
+  /** Tooladvies op basis van de beheerde adviesregels (zie oefenToolkeuze). IJK gebruikt geen n8n. */
+  async tooladvies({ beschrijving, verduidelijking, uitsluiten, adviesregels }: TooladviesInvoer) {
     const tekst = [beschrijving, ...verduidelijking.map((v) => v.antwoord)].join(" ");
-    const kandidaten = TOOLREGELS.filter(([tool]) => !uitsluiten.includes(tool));
-    const match = kandidaten.find(([, , patroon]) => heeft(tekst, patroon)) ?? kandidaten[0];
-    if (!match) return { fout: "geen tool meer over" };
-    const [tool, behoefte] = match;
-    const behoefteTekst = this.content.tools.behoeften.find((b) => b.id === behoefte)?.omschrijving ?? "";
-    const naam = this.content.tools.tools.find((t) => t.id === tool)?.naam ?? tool;
-    return {
-      behoefte,
-      tool,
-      motivatie: `Je wilt: ${behoefteTekst.toLowerCase()}. Daarvoor is ${naam} de tool in de IJK Toolbox.`,
-    };
+    const regels = adviesregels ?? samenvoegen(this.content.adviesregels.regels, {}, this.content.tools.tools).regels;
+    return oefenToolkeuze(tekst, regels, this.content.tools, uitsluiten) ?? { fout: "geen tool meer over" };
   }
 
   async checksVoorinvullen({ beschrijving, verduidelijking }: ChecksInvoer) {

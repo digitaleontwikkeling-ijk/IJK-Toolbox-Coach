@@ -8,6 +8,8 @@ import { body, nietGevonden, route, vereisUuid } from "@/lib/api";
 import { coachService, content } from "@/lib/app";
 import { antwoordLabels } from "@/domain/weergave";
 import { onderwerpVanVeld } from "@/domain/onderwerp";
+import { nooitHoofdtool } from "@/domain/adviesregels";
+import { actieveAdviesregels } from "@/lib/adviesregels";
 
 const beschrijving = z.string().trim().min(1).max(4000);
 const verduidelijking = z.array(z.object({ vraag: z.string().max(500), antwoord: z.string().max(1000) })).max(2).default([]);
@@ -24,7 +26,11 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
     }
     case "tooladvies": {
       const b = await body(req, z.object({ beschrijving, verduidelijking, uitsluiten: z.array(toolId).max(10).default([]) }));
-      return { resultaat: await coach.tooladvies(b, ctx) };
+      // Elk advies met de regels die nu gelden (wijzigingen van de beheerder werken direct door; anders de terugval).
+      const regels = await actieveAdviesregels();
+      const uitsluiten = [...new Set([...b.uitsluiten, ...nooitHoofdtool(regels.regels)])];
+      const r = await coach.tooladvies({ ...b, uitsluiten, adviesregels: regels.regels }, ctx);
+      return { resultaat: r ? { ...r, regelsversie: regels.versie } : null };
     }
     case "checks": {
       const b = await body(req, z.object({ beschrijving, verduidelijking, tool: toolId }));
@@ -76,7 +82,8 @@ export const POST = route<{ taak: string }>(["medewerker"], async ({ req, gebrui
       );
       const { veld, ...rest } = b;
       const onderwerp = veld ? onderwerpVanVeld(content().regelset, veld) : undefined;
-      return { resultaat: await coach.chat({ ...rest, onderwerp }, ctx) };
+      const regels = await actieveAdviesregels();
+      return { resultaat: await coach.chat({ ...rest, onderwerp, adviesregels: regels.regels }, ctx) };
     }
     default:
       throw nietGevonden();

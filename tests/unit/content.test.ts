@@ -49,10 +49,10 @@ describe("content-bestanden", () => {
     }
   });
 
-  it("C6. IJK gebruikt geen n8n: geen keuze, niet in de keuzehulp van de wizard, wel als instructie voor de coach", () => {
+  it("C6. IJK gebruikt geen n8n: geen keuze, wel een uitsluiting in de adviesregels voor de coach", () => {
     expect(content.tools.tools.map((t) => t.id)).not.toContain("n8n");
     for (const b of content.tools.behoeften) expect(b.tools).not.toContain("n8n");
-    expect(content.tools.keuzehints.join(" ")).not.toMatch(/n8n/);
+    expect(content.adviesregels.regels.find((r) => r.id === "geen_n8n")).toMatchObject({ soort: "uitsluiting", tool: "algemeen" });
     expect(systeemPrompt("tooladvies", content)).toContain("IJK gebruikt geen n8n. Stel het nooit voor.");
   });
 
@@ -111,15 +111,16 @@ describe("schema vangt fouten in de content", () => {
 describe("beheer van de tools (tools 0.7)", () => {
   const beheer = (id: string) => content.tools.tools.find((t) => t.id === id)?.beheer;
   it("per tool wie het beheert en waar je een licentie of account aanvraagt", () => {
-    expect(content.tools.versie).toBe("0.8");
+    expect(content.tools.versie).toBe("0.9");
     expect(beheer("m365_copilot")).toMatchObject({ naam: "ICT Driessen Groep", email: "ict@driessengroep.nl" });
     expect(beheer("copilot_workflows")).toMatchObject({ naam: "ICT Driessen Groep", email: "ict@driessengroep.nl" });
     expect(beheer("hubbi")).toMatchObject({ naam: "HR tech (IJK)", email: "info@hubbi.nl" });
     expect(beheer("ai_flows")).toMatchObject({ naam: "HR tech (IJK)", email: "info@hubbi.nl" });
     expect(beheer("claude_code")).toMatchObject({ naam: "Team Digitale Ontwikkeling", email: "digitaleontwikkeling@ijk.nl" });
   });
-  it("Azure OpenAI als voorkeursmodellen staat in de keuzehulp (ook voor de coach)", () => {
-    expect(content.tools.keuzehints.some((h) => h.includes("Azure OpenAI") && h.includes("AI Flows"))).toBe(true);
-    expect(systeemPrompt("tooladvies", content)).toContain("voorkeurs-AI-modellen");
+  it("Azure OpenAI als voorkeursmodellen staat in de adviesregels (ook voor de coach)", () => {
+    const azure = content.adviesregels.regels.filter((r) => r.tekst.includes("Azure OpenAI-voorkeursmodellen"));
+    expect(azure.map((r) => r.tool)).toEqual(expect.arrayContaining(["ai_flows", "azure_openai"]));
+    expect(systeemPrompt("tooladvies", content)).toContain("Azure OpenAI-voorkeursmodellen");
   });
 });

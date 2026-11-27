@@ -288,7 +288,10 @@ export const toolsSchema = z
         z.object({
           id,
           naam: tekst,
-          omschrijving: tekst.optional(),
+          /** Wat de tool doet staat in de adviesregels (adviesregels.yaml, beheerbaar); hier alleen vaste gegevens. */
+          categorie: z.enum(["werken", "automatiseren", "bouwen", "ai_modellen"]),
+          /** De rol van de tool in een oplossing (vast label, bijvoorbeeld "Ontwikkeltool"). */
+          rol: tekst,
           spelregels: tekst,
           /**
            * Gebruikt deze tool zelf AI? Een sterk signaal: de vraag "Gebruikt je oplossing AI?" wordt dan
@@ -314,10 +317,8 @@ export const toolsSchema = z
       )
       .min(1),
     behoeften: z.array(z.object({ id, omschrijving: tekst, tools: z.array(id).min(1) })).min(1),
-    keuzehints: z.array(tekst).default([]),
-    /** Alleen voor de coach; niet zichtbaar in de wizard. */
-    coach_instructies: z.array(tekst).default([]),
   })
+  .strict()
   .superRefine((t, ctx) => {
     const toolIds = new Set(t.tools.map((x) => x.id));
     const fout = (message: string) => ctx.addIssue({ code: z.ZodIssueCode.custom, message });
@@ -413,6 +414,18 @@ export const tekstenSchema = z.object({
     titel: tekst, intro: tekst, velden_titel: tekst, aan: tekst, onderwerp: tekst, tekst: tekst, opslaan: tekst,
     herstellen: tekst, opgeslagen: tekst, hersteld: tekst, fout: tekst, aangepast: tekst, standaard: tekst,
   }),
+  adviesregels_beheer: z.object({
+    titel: tekst, intro: tekst, versie: tekst, algemeen: tekst, aantal: tekst, aantal_inactief: tekst, inactief: tekst, aandacht: tekst,
+    soorten_titel: tekst, soorten: z.object({ beschrijving: tekst, toepassing: tekst, voorkeur: tekst, uitsluiting: tekst, combinatie: tekst, algemeen: tekst, voorwaarde: tekst, voorbeeld: tekst }), soorten_uitleg: z.object({ beschrijving: tekst, toepassing: tekst, voorkeur: tekst, uitsluiting: tekst, combinatie: tekst, algemeen: tekst, voorwaarde: tekst, voorbeeld: tekst }),
+    velden: z.object({ id: tekst, titel: tekst, soort: tekst, tool: tekst, prioriteit: tekst, tekst: tekst, boven: tekst, bij: tekst, nooit_hoofdtool: tekst, trefwoorden: tekst, actief: tekst }),
+    id_hulp: tekst, prioriteit_hulp: tekst, tekst_hulp: z.object({ beschrijving: tekst, toepassing: tekst, voorkeur: tekst, uitsluiting: tekst, combinatie: tekst, algemeen: tekst, voorwaarde: tekst, voorbeeld: tekst }), trefwoorden_hulp: tekst,
+    toevoegen: tekst, nieuwe_regel: tekst, opslaan: tekst, annuleren: tekst, herstellen: tekst, verwijderen: tekst, terugzetten: tekst,
+    status: z.object({ standaard: tekst, aangepast: tekst, nieuw: tekst }),
+    opgeslagen: tekst, toegevoegd: tekst, hersteld: tekst, verwijderd: tekst, teruggezet: tekst, geannuleerd: tekst, fout: tekst,
+    bevestig_verwijderen: tekst, bevestig_terugzetten: tekst, verwijderde_titel: tekst, historie_titel: tekst, historie_leeg: tekst,
+    historie_toegevoegd: tekst, historie_gewijzigd: tekst, historie_verwijderd: tekst, vorige_terugzetten: tekst,
+  }),
+  tooladvies: z.object({ doel_label: tekst, aanvullend_titel: tekst, alternatieven_titel: tekst, geen_goedkeuring: tekst, keuzehulp_titel: tekst }),
   beheer_tool: tekst,
   aanvraag_naar: tekst,
   aanvraag_mail: z.object({ onderwerp: tekst, tekst: tekst, opnieuw: tekst }),

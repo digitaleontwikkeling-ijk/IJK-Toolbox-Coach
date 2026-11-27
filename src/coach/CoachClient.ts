@@ -11,6 +11,7 @@
  */
 import type { Onderwerp } from "@/domain/onderwerp";
 import type { BeslisUitkomst } from "../domain/beslisregels";
+import type { Adviesregel } from "../domain/adviesregels";
 
 export interface CoachContext {
   pseudoniemId: string;
@@ -28,8 +29,10 @@ export interface VerduidelijkInvoer {
 export interface TooladviesInvoer {
   beschrijving: string;
   verduidelijking: Verduidelijking[];
-  /** Tools die de medewerker niet wil. */
+  /** Tools die de medewerker niet wil, plus tools die volgens de adviesregels nooit hoofdtool zijn. */
   uitsluiten: string[];
+  /** De adviesregels die nu gelden (beheerbaar). Zonder: de standaard uit content/. */
+  adviesregels?: Adviesregel[];
 }
 
 export interface ChecksInvoer {
@@ -60,12 +63,14 @@ export interface ChatInvoer {
   geschiedenis: { rol: "coach" | "medewerker"; tekst: string }[];
   /** In het gesprek (stap 3): de vraag waar de medewerker het over heeft, uit de regelset. */
   onderwerp?: Onderwerp;
+  /** De adviesregels die nu gelden (beheerbaar). Zonder: de standaard uit content/. */
+  adviesregels?: Adviesregel[];
 }
 
 export interface CoachClient {
   /** Taak 1: maximaal twee verduidelijkende vragen. Verwacht: { vragen: string[] } */
   verduidelijk(invoer: VerduidelijkInvoer, ctx: CoachContext): Promise<unknown>;
-  /** Taak 2: tooladvies. Verwacht: { behoefte, tool, motivatie } */
+  /** Taak 2: tooladvies. Verwacht: { behoefte, doel, tool, rol, motivatie, aanvullend, alternatieven } */
   tooladvies(invoer: TooladviesInvoer, ctx: CoachContext): Promise<unknown>;
   /** Taak 3: checks voorinvullen. Verwacht: { checks: [{ check, voorstel, zekerheid, vervolgvraag? }] } */
   checksVoorinvullen(invoer: ChecksInvoer, ctx: CoachContext): Promise<unknown>;

@@ -11,7 +11,7 @@ test("volledige wizard met mock-coach: verzuimdashboard → Eerst toetsen, aanvr
   await expect(page.getByRole("heading", { name: "HubBI", level: 3 })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Wat mag je zelf doen?" })).toBeVisible();
   await page.getByRole("button", { name: "Zelf een tool kiezen" }).click();
-  await page.getByText("Claude Code", { exact: true }).click();
+  await page.locator(`label[for="tool-claude_code"]`).click();
   await naarChecks(page, "Claude Code past, verder →");
 
   // Stap 3: de coach heeft voorgesteld; voorgestelde waarde is geselecteerd.

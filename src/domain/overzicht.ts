@@ -30,7 +30,7 @@ export interface OverzichtGroep {
 
 export interface OverzichtInvoer {
   verduidelijking: { vraag: string; antwoord: string }[];
-  tooladvies: { tool: string; bron: "coach" | "medewerker"; andereTool?: { naam: string; link?: string } };
+  tooladvies: { tool: string; bron: "coach" | "medewerker"; andereTool?: { naam: string; link?: string }; aanvullend?: { tool: string; rol: string }[] };
   antwoorden: { checks: Record<string, CheckAntwoord>; extraVragen: Record<string, boolean | "onzeker">; verdieping?: Record<string, string> };
   rodeVlaggen: Record<string, boolean | "onzeker">;
   feiten: Feit[] | null;
@@ -57,9 +57,11 @@ export function antwoordenOverzicht(regelset: Regelset, tools: ToolsConfig, a: O
   const groepen: OverzichtGroep[] = [];
 
   // ---------- Fase 1 ----------
+  const naamVan = (id: string) => tools.tools.find((t) => t.id === id)?.naam ?? id;
+  const aanvullend = (a.tooladvies.aanvullend ?? []).map((x) => naamVan(x.tool));
   const tool = a.tooladvies.tool === ANDERE_TOOL
     ? `${a.tooladvies.andereTool?.naam || "Andere tool"} (nog niet in de IJK Toolbox)`
-    : tools.tools.find((t) => t.id === a.tooladvies.tool)?.naam ?? a.tooladvies.tool;
+    : `${naamVan(a.tooladvies.tool)}${aanvullend.length ? ` (met ${aanvullend.join(" en ")})` : ""}`;
   groepen.push({
     titel: "Fase 1 · Welke tool past?",
     regels: [

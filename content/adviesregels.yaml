@@ -1,0 +1,382 @@
+# Adviesregels voor het tooladvies (fase 1): welke hoofdtool, met eventueel aanvullende tools, past functioneel bij
+# een use case. Ze bepalen NIET of de use case mag; dat doen de checks en beslisregels in fase 2.
+#
+# Dit is de standaard (en de veilige terugval). Een beheerder kan regels wijzigen, toevoegen, (de)activeren en
+# verwijderen in het beheerscherm; die wijzigingen staan in de database en gelden direct bij nieuwe adviezen.
+# Bron: "IJK Digitale Toolbox" (positionering en adviesvolgorde, nov. 2026), aangevuld met de keuzehints uit
+# tools.yaml 0.8. Verhoog bij een wijziging de versie en zet een regel in CHANGELOG.md.
+#
+# Velden per regel:
+#   id          vaste sleutel (kleine letters, cijfers, _)
+#   titel       korte naam
+#   soort       beschrijving | toepassing | voorkeur | uitsluiting | combinatie | algemeen | voorwaarde | voorbeeld
+#               (algemeen = een adviesregel; voorwaarde = compliance, privacy, security of architectuur)
+#   tool        toepassingsgebied: een tool-id uit tools.yaml, of "algemeen"
+#   tekst       de regel zelf (gaat als gegevens naar de coach)
+#   actief      true/false (standaard true)
+#   prioriteit  1-999, 1 = zwaarst; volgorde, en bij tegenstrijdige voorkeuren wint de laagste (standaard 100)
+#   trefwoorden signaalwoorden voor de oefencoach zonder AI (Hermes leest de tekst)
+#   boven       (voorkeur) deze tool gaat vóór deze tools
+#   bij         (combinatie) deze tool komt als aanvullende tool bij deze hoofdtools; de tekst is de rol
+#   nooit_hoofdtool (uitsluiting) deze tool nooit als hoofdtool adviseren
+# TODO: valideren door toetsers
+
+versie: "1.0"
+
+regels:
+  # ---------- Algemeen ----------
+  - id: toolkeuze_los_van_toetsing
+    titel: Toolkeuze is geen goedkeuring
+    soort: voorwaarde
+    tool: algemeen
+    prioriteit: 1
+    tekst: >-
+      Toolselectie staat los van de vraag of de use case verantwoord en toegestaan is. Presenteer een tool die
+      technisch past nooit als goedgekeurd. De checks in fase 2 (doel, gegevens, persoonsgegevens, systemen en
+      koppelingen, gebruikers, autonomie, impact, menselijke controle, privacy en DPIA, AI-risico's,
+      informatiebeveiliging, architectuur en afhankelijkheid) bepalen of en onder welke voorwaarden het mag.
+  - id: adviesvolgorde
+    titel: Adviesvolgorde (richtinggevend, geen harde beslisboom)
+    soort: algemeen
+    tool: algemeen
+    prioriteit: 10
+    tekst: |-
+      1. Wil de medewerker vooral het eigen kenniswerk ondersteunen met AI? Kijk eerst naar Microsoft 365 Copilot.
+      2. Wil de medewerker een terugkerende taak of workflow automatiseren? Bepaal eerst in welke systemen het proces plaatsvindt. Hoofdzakelijk Microsoft 365: kijk eerst naar Copilot workflows. AFAS, andere bedrijfssystemen, meerdere systemen of een breder bedrijfsproces: kijk naar HubBI en de flow editor AI Flows.
+      3. Is binnen de automatisering AI nodig? Behandel AI als een mogelijke bouwsteen en niet automatisch als oplossing voor het hele proces. Kijk binnen AI Flows bij voorkeur naar de Azure OpenAI-voorkeursmodellen.
+      4. Is een standaardoplossing onvoldoende en is maatwerk nodig? Overweeg bouwen met Claude Code.
+      5. Heeft de zelfgebouwde oplossing AI nodig? Beoordeel het AI-model apart en geef bij voorkeur Azure OpenAI mee, als dat past binnen de IJK-kaders.
+  - id: rollen_van_de_tools
+    titel: Rollen van de tools consequent uit elkaar houden
+    soort: algemeen
+    tool: algemeen
+    prioriteit: 15
+    tekst: >-
+      Ontwikkeltool: Claude Code. Assistent voor de medewerker: Microsoft 365 Copilot. Automatiseringsplatform en
+      flow editor: HubBI met AI Flows, en Copilot workflows. AI-model en capability: Azure OpenAI.
+  - id: hoofdtool_en_aanvullend
+    titel: Eén hoofdtool, met aanvullende tools waar dat helpt
+    soort: algemeen
+    tool: algemeen
+    prioriteit: 20
+    tekst: >-
+      Een use case kan meerdere onderdelen van de Toolbox nodig hebben. Adviseer één hoofdtool en noem waar relevant
+      aanvullende tools, met per tool kort de rol in de oplossing. Leg uit waarom de hoofdtool beter past dan
+      relevante alternatieven. Geef nooit alleen een toolnaam.
+  - id: licentie_copilot
+    titel: Licentie Copilot for Microsoft 365
+    soort: algemeen
+    tool: algemeen
+    prioriteit: 60
+    tekst: Met de uitgebreide licentie Copilot for Microsoft 365 (aan te vragen bij ICT Driessen Groep) heb je ook Copilot workflows.
+  - id: geen_n8n
+    titel: Geen n8n
+    soort: uitsluiting
+    tool: algemeen
+    prioriteit: 5
+    tekst: IJK gebruikt geen n8n. Stel het nooit voor.
+  - id: voorbeeld_combinaties
+    titel: Voorbeelden van combinaties
+    soort: voorbeeld
+    tool: algemeen
+    prioriteit: 50
+    tekst: |-
+      Claude Code om een applicatie te bouwen, met Azure OpenAI als AI-model.
+      HubBI met AI Flows voor het bedrijfsproces, met Azure OpenAI voor een AI-stap.
+      Microsoft 365 Copilot voor het kenniswerk van de medewerker, met Copilot workflows voor de terugkerende automatisering daaromheen.
+  - id: voorbeeld_advies_hubbi
+    titel: Voorbeeld van een goed advies (HubBI)
+    soort: voorbeeld
+    tool: algemeen
+    prioriteit: 51
+    tekst: >-
+      Voor deze use case lijkt HubBI het meest geschikte platform voor de procesautomatisering. De workflow kan worden
+      ingericht met AI Flows. Voor de stap waarin ongestructureerde tekst moet worden geanalyseerd, kan een
+      Azure OpenAI-voorkeursmodel als AI-bouwsteen worden gebruikt.
+  - id: voorbeeld_advies_copilot_workflows
+    titel: Voorbeeld van een goed advies (Copilot workflows)
+    soort: voorbeeld
+    tool: algemeen
+    prioriteit: 52
+    tekst: >-
+      Deze automatisering speelt volledig binnen Outlook, Teams en SharePoint. Daardoor ligt Copilot workflows meer
+      voor de hand dan HubBI/AI Flows. Er lijkt op dit moment geen maatwerkapplicatie nodig.
+
+  # ---------- Microsoft 365 Copilot (werken) ----------
+  - id: m365_copilot_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: m365_copilot
+    prioriteit: 10
+    tekst: AI-assistent voor het dagelijkse werk van medewerkers binnen Microsoft 365.
+  - id: m365_copilot_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: m365_copilot
+    prioriteit: 20
+    tekst: |-
+      E-mails en e-mailwisselingen samenvatten.
+      Conceptantwoorden opstellen.
+      Teksten schrijven, herschrijven, inkorten of verbeteren.
+      Teams-vergaderingen en gesprekken samenvatten.
+      Acties, besluiten en openstaande vragen uit vergaderingen halen.
+      Documenten maken en verbeteren.
+      Informatie zoeken en combineren uit bestanden, e-mails, chats en vergaderingen waartoe de medewerker toegang heeft.
+      Ondersteunen bij presentaties.
+      Ondersteunen bij het analyseren en begrijpen van informatie in Excel.
+      Brainstormen en complexe informatie eenvoudiger uitleggen.
+    trefwoorden: [samenvat, e-mail, mail, conceptantwoord, schrijven, herschrijv, teksten, tekst, vergader, notulen, uitschrijven, besluiten, documenten, presentatie, excel, brainstorm, uitleggen]
+  - id: m365_copilot_adviesregel
+    titel: Wanneer Microsoft 365 Copilot
+    soort: algemeen
+    tool: m365_copilot
+    prioriteit: 30
+    tekst: Gebruik Microsoft 365 Copilot vooral wanneer een medewerker AI-ondersteuning zoekt bij het eigen dagelijkse kenniswerk.
+
+  # ---------- Copilot workflows (automatiseren) ----------
+  - id: copilot_workflows_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: copilot_workflows
+    prioriteit: 10
+    tekst: >-
+      Terugkerende werkzaamheden binnen het Microsoft 365-ecosysteem automatiseren (Outlook, Teams, SharePoint,
+      Planner). De workflow draait op het account van de medewerker. Functie in vroege toegang (Microsoft
+      Frontier-programma) die nog kan veranderen.
+  - id: copilot_workflows_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: copilot_workflows
+    prioriteit: 20
+    tekst: |-
+      Terugkerende werkzaamheden in Outlook, Teams en SharePoint automatiseren.
+      Automatisch meldingen, herinneringen of berichten versturen.
+      Acties starten op basis van bijvoorbeeld een e-mail, bestand of wijziging in SharePoint.
+      Informatie binnen Microsoft 365 verzamelen, verwerken en delen.
+      Terugkerende overzichten of updates automatisch samenstellen.
+      Eenvoudige goedkeurings- en opvolgprocessen binnen Microsoft 365 automatiseren.
+      Taken automatisch aanmaken of bijwerken.
+      Persoonlijke of teamprocessen automatiseren zonder maatwerksoftware te ontwikkelen.
+    trefwoorden: [outlook, teams, sharepoint, planner, herinner, melding, notificatie, automatisch, automatiseer, terugkerend, elke week, elke dag, wekelijks, dagelijks, goedkeuring, workflow, opvolg]
+  - id: copilot_workflows_voorkeur_m365
+    titel: Binnen Microsoft 365 gaat Copilot workflows voor
+    soort: voorkeur
+    tool: copilot_workflows
+    prioriteit: 20
+    boven: [hubbi, ai_flows]
+    tekst: >-
+      Als een automatiseringsvraag hoofdzakelijk of volledig binnen Microsoft 365 plaatsvindt, heeft Copilot
+      workflows in de regel de voorkeur boven HubBI/AI Flows. Kijk pas nadrukkelijk naar HubBI/AI Flows bij een
+      breder bedrijfsproces, AFAS, andere bedrijfssystemen, complexere proceslogica of een combinatie van systemen.
+    trefwoorden: [outlook, teams, sharepoint, planner]
+  - id: copilot_workflows_niet_buiten_m365
+    titel: Niet voor systemen buiten Microsoft 365
+    soort: uitsluiting
+    tool: copilot_workflows
+    prioriteit: 25
+    tekst: Copilot workflows kan niet koppelen met systemen buiten Microsoft 365, zoals AFAS. Adviseer het niet als hoofdtool voor processen die daarvan afhangen.
+    trefwoorden: [afas, buiten microsoft, extern systeem, externe systemen]
+  - id: copilot_workflows_bij_m365_copilot
+    titel: Automatisering rond het kenniswerk
+    soort: combinatie
+    tool: copilot_workflows
+    prioriteit: 40
+    bij: [m365_copilot]
+    tekst: Copilot workflows voor de terugkerende automatisering rond het kenniswerk, zoals een vaste herinnering of een wekelijkse samenvatting.
+    trefwoorden: [automatisch, terugkerend, herinner, elke week, wekelijks, elke dag, dagelijks]
+  - id: copilot_workflows_modellen
+    titel: AI-modellen in Copilot workflows
+    soort: voorwaarde
+    tool: copilot_workflows
+    prioriteit: 50
+    tekst: In Copilot workflows gebruik je de AI-modellen die Copilot biedt, ook GPT-modellen van OpenAI via de Microsoft 365-tenant.
+
+  # ---------- HubBI (automatiseren) ----------
+  - id: hubbi_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: hubbi
+    prioriteit: 10
+    tekst: >-
+      Platform voor de bredere procesautomatisering: bedrijfsprocessen automatiseren, met name processen in en rond
+      AFAS en andere bedrijfssystemen. IJK's eigen automatiserings- en integratieplatform.
+  - id: hubbi_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: hubbi
+    prioriteit: 20
+    tekst: |-
+      Handmatige en repeterende werkzaamheden rondom AFAS automatiseren.
+      Gegevens automatisch ophalen uit of verwerken in AFAS.
+      Gegevens tussen AFAS en andere goedgekeurde systemen uitwisselen.
+      Automatische controles, meldingen en vervolgacties inrichten.
+      Administratieve HR-, salaris- en bedrijfsprocessen automatiseren.
+      Complexere procesautomatiseringen bouwen waarbij meerdere systemen of processtappen betrokken zijn.
+    trefwoorden: [afas, hr, salaris, verlof, verzuim, factu, administratie, bedrijfsproces, processtap, meerdere systemen, koppel, gegevens uitwisselen, controle, verwerken, api]
+  - id: hubbi_voorkeur_afas
+    titel: Bij AFAS of meerdere systemen gaat HubBI voor
+    soort: voorkeur
+    tool: hubbi
+    prioriteit: 10
+    # TODO: valideren door toetsers: ook vóór Microsoft 365 Copilot (een proces in AFAS is geen eigen kenniswerk).
+    boven: [copilot_workflows, m365_copilot]
+    tekst: >-
+      Betreft de use case een bedrijfsproces waarbij AFAS, andere bedrijfssystemen of meerdere processtappen
+      betrokken zijn, dan gaat HubBI vóór Copilot workflows en vóór Microsoft 365 Copilot (dat is voor het eigen
+      kenniswerk van de medewerker).
+    trefwoorden: [afas, bedrijfssysteem, meerdere systemen, koppel, salaris, api]
+  - id: hubbi_adviesregel
+    titel: Wanneer HubBI
+    soort: algemeen
+    tool: hubbi
+    prioriteit: 30
+    tekst: >-
+      Adviseer HubBI vooral wanneer de use case een bedrijfsproces betreft waarbij AFAS, andere bedrijfssystemen of
+      meerdere processtappen betrokken zijn. Gebruik HubBI niet automatisch voor iedere automatiseringsvraag: voor
+      automatisering die uitsluitend of hoofdzakelijk binnen Microsoft 365 plaatsvindt, ligt Copilot workflows in de
+      regel meer voor de hand.
+  - id: hubbi_klantmedewerkers
+    titel: Gegevens van klantmedewerkers
+    soort: voorwaarde
+    tool: hubbi
+    prioriteit: 40
+    tekst: Gebruik bij voorkeur HubBI, met AI Flows voor AI-stappen, voor gegevens van klantmedewerkers waarvoor IJK verwerker is.
+
+  # ---------- AI Flows (automatiseren, flow editor binnen HubBI) ----------
+  - id: ai_flows_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: ai_flows
+    prioriteit: 10
+    tekst: >-
+      AI Flows is geen losse, generieke AI-tool. Het is de flow editor binnen HubBI: daarmee bouw je geautomatiseerde
+      processen op uit stappen en bouwstenen. AI is één van de mogelijke bouwstenen; AI Flows kan dus ook zonder AI
+      worden gebruikt.
+  - id: ai_flows_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: ai_flows
+    prioriteit: 20
+    tekst: |-
+      Bedrijfsprocessen binnen HubBI stap voor stap opbouwen.
+      Gegevens ophalen, verwerken, controleren en doorgeven tussen processtappen.
+      Beslisregels en voorwaarden toepassen.
+      Verschillende systemen en processtappen met elkaar verbinden.
+      AI als bouwsteen toevoegen aan een proces.
+      Documenten, e-mails of andere ongestructureerde informatie met AI analyseren.
+      Informatie met AI samenvatten, classificeren, structureren of extraheren.
+      Met AI een concept, voorstel of advies genereren dat binnen het verdere proces wordt gebruikt.
+  - id: ai_flows_onderdeel_van_hubbi
+    titel: Onderdeel van HubBI, geen los alternatief
+    soort: uitsluiting
+    tool: ai_flows
+    prioriteit: 10
+    nooit_hoofdtool: true
+    tekst: >-
+      Zie AI Flows als onderdeel van HubBI en niet als los alternatief naast HubBI. Adviseer HubBI als hoofdtool en
+      AI Flows als de flow editor waarmee het proces wordt opgebouwd.
+  - id: ai_flows_bij_hubbi
+    titel: Flow editor bij HubBI
+    soort: combinatie
+    tool: ai_flows
+    prioriteit: 20
+    bij: [hubbi]
+    tekst: De flow editor binnen HubBI waarmee het proces stap voor stap wordt opgebouwd. Dat kan ook zonder AI.
+  - id: ai_flows_onderscheid
+    titel: HubBI, AI Flows en AI uit elkaar houden
+    soort: algemeen
+    tool: ai_flows
+    prioriteit: 30
+    tekst: >-
+      Maak in het advies dit onderscheid: HubBI is het platform voor de bredere procesautomatisering; AI Flows is de
+      flow editor binnen HubBI waarmee de processen worden opgebouwd; AI is een optionele bouwsteen binnen zo'n flow.
+  - id: ai_flows_azure_openai
+    titel: AI-model in AI Flows
+    soort: voorwaarde
+    tool: ai_flows
+    prioriteit: 40
+    tekst: >-
+      Is binnen AI Flows een AI-model nodig, gebruik dan bij voorkeur de binnen IJK beschikbare en goedgekeurde
+      Azure OpenAI-voorkeursmodellen. Die zijn in AI Flows standaard beschikbaar.
+
+  # ---------- Claude Code (bouwen) ----------
+  - id: claude_code_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: claude_code
+    prioriteit: 10
+    tekst: Ontwikkeltool om eigen digitale oplossingen (maatwerk) te ontwikkelen.
+  - id: claude_code_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: claude_code
+    prioriteit: 20
+    tekst: |-
+      Prototypes en proof of concepts ontwikkelen.
+      Interne webapplicaties bouwen.
+      Tools en dashboards ontwikkelen.
+      Registratie-, intake-, beoordelings- of ondersteuningstools maken.
+      Bestaande software begrijpen, aanpassen en uitbreiden.
+      Code genereren, controleren, testen en verbeteren.
+      Koppelingen met API's, databronnen en bedrijfssystemen ontwikkelen.
+      Nieuwe digitale ideeën snel werkend maken en testen.
+    trefwoorden: [webapp, web-app, webapplicatie, applicatie, app, bouwen, ontwikkel, prototype, proof of concept, dashboard, registratie, intake, maatwerk, software, code]
+  - id: claude_code_adviesregel
+    titel: Wanneer Claude Code
+    soort: algemeen
+    tool: claude_code
+    prioriteit: 30
+    tekst: Overweeg bouwen met Claude Code als een standaardoplossing onvoldoende is en maatwerk nodig is.
+  - id: claude_code_ai_model_apart
+    titel: Ontwikkeltool is niet het AI-model
+    soort: algemeen
+    tool: claude_code
+    prioriteit: 15
+    tekst: >-
+      Maak onderscheid tussen de ontwikkeltool en het AI-model in de uiteindelijke applicatie. Claude Code is de tool
+      waarmee software wordt ontwikkeld; een met Claude Code gebouwde applicatie hoeft daarom niet Claude als AI-model
+      te gebruiken. Heeft de toepassing AI nodig, beoordeel het AI-model dan apart. Adviseer geen AI-model als de
+      toepassing geen AI nodig heeft.
+
+  # ---------- Azure OpenAI (AI-modellen) ----------
+  - id: azure_openai_beschrijving
+    titel: Hoofdrol
+    soort: beschrijving
+    tool: azure_openai
+    prioriteit: 10
+    tekst: >-
+      AI-modellen beschikbaar stellen voor eigen IJK-oplossingen en geautomatiseerde processen: de zelf gehoste
+      modellen in de Azure-tenant van IJK (de voorkeursmodellen van IJK). Geen applicatie voor eindgebruikers, maar
+      een AI-capability en modelvoorziening waarop andere oplossingen bouwen.
+  - id: azure_openai_toepassingen
+    titel: Geschikt voor
+    soort: toepassing
+    tool: azure_openai
+    prioriteit: 20
+    tekst: |-
+      AI-functionaliteit toevoegen aan zelfgebouwde applicaties.
+      Als AI-bouwsteen binnen AI Flows.
+      Teksten en documenten analyseren, samenvatten of classificeren.
+      Informatie uit ongestructureerde informatie extraheren.
+      Teksten, antwoorden, adviezen of voorstellen genereren.
+      Interne digitale assistenten, coaches of chatbots ontwikkelen.
+      AI inzetten vanuit een applicatie of geautomatiseerd bedrijfsproces.
+    trefwoorden: [taalmodel, openai, ai-model, llm]
+  - id: azure_openai_adviesregel
+    titel: Voorkeursmodellen bij een taalmodel
+    soort: algemeen
+    tool: azure_openai
+    prioriteit: 10
+    tekst: >-
+      Heeft een eigen IJK-toepassing of geautomatiseerd proces een taalmodel nodig, dan hebben de binnen IJK
+      goedgekeurde Azure OpenAI-voorkeursmodellen in beginsel de voorkeur.
+  - id: azure_openai_bij_ai
+    titel: AI-model bij een proces of eigen applicatie
+    soort: combinatie
+    tool: azure_openai
+    prioriteit: 20
+    bij: [hubbi, claude_code]
+    tekst: >-
+      Het AI-model voor de stap of functie waarin AI nodig is. Beoordeel het AI-model apart; de Azure
+      OpenAI-voorkeursmodellen hebben in beginsel de voorkeur.
+    trefwoorden: [ai, kunstmatige intelligentie, generatieve, genereren, classific, samenvat, extraher, taalmodel, chatbot, assistent, analyseer, analyseren]

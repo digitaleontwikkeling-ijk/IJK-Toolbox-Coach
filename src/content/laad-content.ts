@@ -16,6 +16,7 @@ import {
   type Teksten,
   type ToolsConfig,
 } from "../domain/content-schema";
+import { adviesregelsBestandSchema, controleer, type AdviesregelsBestand } from "../domain/adviesregels";
 
 export interface Content {
   regelset: Regelset;
@@ -23,6 +24,8 @@ export interface Content {
   /** tool-id → spelregels */
   spelregels: Record<string, Spelregels>;
   teksten: Teksten;
+  /** De standaard adviesregels voor het tooladvies (beheerbaar; de database kan ze aanvullen of wijzigen). */
+  adviesregels: AdviesregelsBestand;
   /** tool-id → logo als data-URI (alleen tools met een icoon). */
   iconen: Record<string, string>;
 }
@@ -85,9 +88,12 @@ export function laadContent(map: string = standaardContentMap()): Content {
   }
   const teksten = leesYaml(map, "teksten.yaml", tekstenSchema);
   controleerTekstenBijRegelset(teksten, regelset);
+  const adviesregels = leesYaml(map, "adviesregels.yaml", adviesregelsBestandSchema);
+  const controle = controleer(adviesregels.regels, tools.tools);
+  if (controle.fouten.length) throw new ContentFout("adviesregels.yaml", controle.fouten);
   const iconen: Record<string, string> = {};
   for (const tool of tools.tools) if (tool.icoon) iconen[tool.id] = leesIcoon(map, tool.icoon);
-  return { regelset, tools, spelregels, teksten, iconen };
+  return { regelset, tools, spelregels, teksten, adviesregels, iconen };
 }
 
 /** Teksten die bij onderdelen van de regelset horen, moeten bij elkaar passen (klassen, check-antwoorden). */

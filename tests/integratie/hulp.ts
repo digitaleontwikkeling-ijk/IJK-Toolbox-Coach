@@ -68,5 +68,5 @@ export async function nieuwAdvies(gebruiker: TestGebruiker = ANNA, data: unknown
 }
 
 export async function leegDatabase() {
-  await db().query("TRUNCATE concept, besluit, audit_log, actie_log, advies, referentie_teller, mailsjabloon RESTART IDENTITY CASCADE");
+  await db().query("TRUNCATE concept, besluit, audit_log, actie_log, advies, referentie_teller, mailsjabloon, adviesregel, adviesregel_historie RESTART IDENTITY CASCADE");
 }
