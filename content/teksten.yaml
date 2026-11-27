@@ -47,13 +47,31 @@ vervolgacties:
 
 # Beheer van de tool (uit tools.yaml): bij het tooladvies en op de adviescard.
 beheer_tool: "Beheer: {naam}. Een licentie of account vraag je aan via {email}."
-aanvraag_naar: "Met de knop hieronder gaat je aanvraag per e-mail naar {beheer}."
+aanvraag_naar: "Met de knop hieronder opent een e-mail aan {beheer} in je mailprogramma (bijvoorbeeld Outlook). Verstuur die om je licentie aan te vragen."
+# De e-mail voor de licentieaanvraag (mailto). {tool}, {naam}, {referentie}, {uitkomst}, {voorwaarden}, {link}.
+aanvraag_mail:
+  onderwerp: "Aanvraag licentie {tool} - {naam}"
+  tekst: |-
+    Hallo,
+
+    Graag vraag ik een licentie aan voor {tool}.
+
+    Referentie: {referentie}
+    Advies van de IJK Toolbox Coach: {uitkomst}
+    Voorwaarden:
+    {voorwaarden}
+
+    Het advies: {link}
+
+    Met vriendelijke groet,
+    {naam}
+  opnieuw: "Open de e-mail aan {beheer} opnieuw"
 beheer_onbekend: de beheerder van de tool
 
 # "Wat nu?" nadat de vervolgactie is uitgevoerd of de toetsers hebben besloten.
 # {tool} = gekozen tool, {toetsers} = namen van de toetsers.
 na_actie:
-  account_aangevraagd: Je accountaanvraag voor {tool} is per e-mail verstuurd naar {beheer}. De status van je aanvraag zie je bij Mijn aanvragen.
+  account_aangevraagd: Je aanvraag voor {tool} is vastgelegd en er is een e-mail aan {beheer} geopend in je mailprogramma. Verstuur die e-mail om je licentie aan te vragen. De status zie je bij Mijn aanvragen.
   in_toetsing: Je aanvraag is ingediend bij {toetsers}. Zij beoordelen je idee. Het besluit, met eventuele voorwaarden, zie je bij Mijn aanvragen.
   goedgekeurd: Je aanvraag is goedgekeurd. Je kunt aan de slag.
   goedgekeurd_met_voorwaarden: Je aanvraag is goedgekeurd met voorwaarden. Houd je aan de voorwaarden van de toetsers hierboven.

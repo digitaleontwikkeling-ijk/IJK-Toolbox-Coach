@@ -7,7 +7,8 @@
 import { forwardRef } from "react";
 import { alsLijst } from "./Keuze";
 import { HoeWerktHetLink } from "./HoeWerktHet";
-import { hoeWerktHetHref } from "@/lib/paden";
+import { adviesPad, hoeWerktHetHref, volledigPad } from "@/lib/paden";
+import { aanvraagMailto, openMail } from "@/lib/aanvraagMail";
 import { ANDERE_TOOL } from "@/domain/content-schema";
 import { geldigeLink } from "@/domain/wizard";
 import { Beoordelingen, BeoordelingenKort } from "./Beoordelingen";
@@ -46,6 +47,21 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
   const beheer = content.tools.tools.find((x) => x.id === advies.tooladvies.tool)?.beheer;
   const beheerTekst = beheer ? `${beheer.naam} (${beheer.email})` : t.beheer_onbekend;
   const isAccountaanvraag = kleur.vervolgactie === "accountaanvraag" || kleur.vervolgactie === "accountaanvraag_met_voorwaarden";
+  // Bij een accountaanvraag opent de knop ook een e-mail aan de beheerder (Outlook), met onderwerp en tekst ingevuld.
+  const mailto =
+    isAccountaanvraag && beheer && weergave === "medewerker" && typeof window !== "undefined"
+      ? aanvraagMailto({
+          aan: beheer.email,
+          tool,
+          naam: content.gebruiker.naam,
+          referentie: advies.referentie,
+          uitkomst: kleur.uitkomst,
+          voorwaarden: advies.voorwaarden,
+          link: `${window.location.origin}${volledigPad(adviesPad(advies.id))}`,
+          onderwerp: t.aanvraag_mail.onderwerp,
+          tekst: t.aanvraag_mail.tekst,
+        })
+      : null;
   const toetserNamen = advies.toetsers.map((id) => r.toetsers.find((x) => x.id === id)?.naam ?? id);
   // "Wat moet je extra regelen?" bij de gekozen antwoorden (bijvoorbeeld bij Afhankelijkheid). Hoort bij het advies,
   // niet bij de vraag.
@@ -264,13 +280,27 @@ export const Adviescard = forwardRef<HTMLHeadingElement, Props>(function Adviesc
                     .replace("{toetsers}", toetserNamen.join(" en ") || "de toetsers")
                     .replace("{beheer}", beheerTekst)}
                 </p>
+                {mailto && advies.status === "account_aangevraagd" && (
+                  <p style={{ margin: "0 0 0.75rem" }}>
+                    <a href={mailto}>{t.aanvraag_mail.opnieuw.replace("{beheer}", beheer!.naam)}</a>
+                  </p>
+                )}
               </>
             )}
           </div>
           {actieFout && <p className="foutmelding" role="alert">{actieFout}</p>}
           <div className="knoppen">
             {actieKanNog && onActie && (
-              <button type="button" className="knop" onClick={onActie} disabled={actieBezig}>
+              <button
+                type="button"
+                className="knop"
+                onClick={() => {
+                  // Eerst de e-mail openen (direct bij de klik, anders blokkeert de browser het), dan registreren.
+                  if (mailto && !contactOpnieuw) openMail(mailto);
+                  onActie();
+                }}
+                disabled={actieBezig}
+              >
                 {contactOpnieuw ? t.contact_opnieuw.knop : actie!.knop.replace("{tool}", tool)}
               </button>
             )}

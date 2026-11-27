@@ -34,11 +34,16 @@ Voorbeeld (accountaanvraag):
 ```
 
 **E-mail naar de beheerder.** `tool.beheer` komt uit `content/tools.yaml` (wie de tool beheert en waar je een
-licentie of account aanvraagt). De flow achter `ACTIE_ACCOUNT_URL` stuurt de accountaanvraag per e-mail naar
-`tool.beheer.email`, met de referentie, de tool, de uitkomst, eventuele voorwaarden en de link naar het advies.
-Bijvoorbeeld: Claude Code → digitaleontwikkeling@ijk.nl, Microsoft 365 Copilot en Copilot workflows →
-ict@driessengroep.nl, HubBI en AI Flows → info@hubbi.nl. De webapp verstuurt zelf geen e-mail (geen mailserver of
-geheimen in de app); de medewerker ziet op de adviescard naar welk adres de aanvraag gaat.
+licentie of account aanvraagt): Claude Code → digitaleontwikkeling@ijk.nl, Microsoft 365 Copilot en Copilot workflows
+→ ict@driessengroep.nl, HubBI en AI Flows → info@hubbi.nl.
+
+Bij "Account aanvragen voor …" opent de app een e-mail in het mailprogramma van de medewerker (mailto; bij IJK
+Outlook): **aan** `tool.beheer.email`, **onderwerp** "Aanvraag licentie <tool> - <voornaam en achternaam>", en een
+korte tekst met de referentie, de uitkomst, de voorwaarden en de link naar het advies (`src/lib/aanvraagMail.ts`,
+teksten `aanvraag_mail`). De medewerker verstuurt die mail zelf. Daarnaast gaat de webhook naar `ACTIE_ACCOUNT_URL`
+(registratie en status); laat de flow daarom zelf **geen** e-mail meer sturen, anders krijgt de beheerder hem dubbel.
+De webapp verstuurt zelf geen e-mail (geen mailserver of geheimen in de app). In Teams opent de mail in een nieuw
+venster; lukt dat niet, dan staat er na de aanvraag een link "Open de e-mail … opnieuw".
 
 Bij een tool buiten de IJK Toolbox is `tool` bijvoorbeeld
 `{ "id": "andere_tool", "naam": "<naam die de medewerker opgaf>", "buitenToolbox": true, "link": "https://…" }`

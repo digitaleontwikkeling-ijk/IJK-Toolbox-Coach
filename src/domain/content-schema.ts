@@ -409,6 +409,7 @@ export const tekstenSchema = z.object({
   extra_regelen_titel: tekst,
   beheer_tool: tekst,
   aanvraag_naar: tekst,
+  aanvraag_mail: z.object({ onderwerp: tekst, tekst: tekst, opnieuw: tekst }),
   beheer_onbekend: tekst,
   /** Toetsers en beheerders: overzicht van alle vragen en antwoorden. */
   overzicht: z.object({
