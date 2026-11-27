@@ -82,6 +82,7 @@ test("compliance officer keurt goed met voorwaarden", async ({ page }) => {
   await expect(overzicht).toContainText("Aanvullende vragen");
   await geenOvertredingen(page);
 
+  await expect(page.getByRole("group", { name: "Jouw advies en/of besluit" })).toBeVisible();
   // Voorwaarden zijn verplicht bij "met voorwaarden".
   await page.getByText("Goedgekeurd met voorwaarden", { exact: true }).click();
   await page.getByRole("button", { name: "Besluit vastleggen" }).click();

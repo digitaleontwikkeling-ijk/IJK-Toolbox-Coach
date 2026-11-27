@@ -114,7 +114,7 @@ function Besluitpaneel({ advies, content, onKlaar }: { advies: AdviesDto; conten
           <p className="hulptekst">Je besluit als {toetserNaam(content, rol ?? "")}.</p>
           <Keuze
             naam="besluit"
-            legend="Jouw besluit"
+            legend={t.toetsing.besluit_label}
             opties={(["goedgekeurd", "goedgekeurd_met_voorwaarden", "afgewezen"] as const).map((b) => ({ id: b, label: t.besluiten[b] }))}
             waarde={besluit}
             onKies={setBesluit}
