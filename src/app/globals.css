@@ -420,3 +420,7 @@ fieldset.keuze legend + * { clear: both; }
   .overzicht__tabel tr { padding: 0.6rem 0; border-bottom: 1px solid var(--wolk); }
   .overzicht__tabel th, .overzicht__tabel td { padding: 0; border: 0; }
 }
+
+/* Toetsers: aandachtspunten (privacy, AI, techniek) onder één titel. */
+.beoordelingen__lijst { display: grid; gap: 1rem; }
+.beoordeling h4 { margin: 0 0 0.5rem; font-size: 1.05rem; }

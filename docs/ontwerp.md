@@ -235,6 +235,10 @@ Lettertypes: Riona Sans (titels) en Ratio (platte tekst) zijn licentie-fonts, op
 - Daarvoor bewaart het advies de voorstellen van de coach (alleen antwoord-id en zekerheid; migratie 006,
   `coach_voorstellen`). Oudere adviezen hebben die niet; daar ontbreekt de herkomst bij de checks.
 - Het gesprek met de coach staat er bewust niet in (keuze IJK); dat wordt na afronden gewist.
+- Indeling van de aanvraag voor toetsers: kop "Use case: <eerste zin>", de beschrijving, de adviescard en onderaan
+  het overzicht. Op de kaart: "Waarom deze kleur?" in zinnen (`src/domain/toelichting.ts`, opnieuw berekend met de
+  beslisregels als de regelset gelijk is; anders de korte motivatie), de aandachtspunten voor privacy, AI en techniek
+  onder één titel, "Wat moet de use case-eigenaar (extra) regelen?", zonder de uitleg over de coach en de disclaimer.
 
 ## 19. Rust en witruimte
 

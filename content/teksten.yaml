@@ -164,6 +164,11 @@ overzicht:
 adviescard:
   beoordelingen_titel: Privacy en AI
   meer_over_advies: Meer over dit advies (toelichting en je antwoorden)
+  # Toetsers en beheerders (bij een aanvraag).
+  beoordelingen_toetser: Aandachtspunten voor de toetsing
+  beoordelingen_toetser_intro: Wat de spelregels uit de antwoorden afleiden voor privacy, AI en techniek.
+  extra_regelen_toetser: Wat moet de use case-eigenaar (extra) regelen?
+  usecase_titel: "Use case: {titel}"
 
 # Op de adviescard: wat je extra moet regelen bij het gekozen antwoord (bijvoorbeeld bij Afhankelijkheid).
 extra_regelen_titel: Wat moet je extra regelen?
